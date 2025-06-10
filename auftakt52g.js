@@ -3,6 +3,7 @@
 */
 /********** 本スクリプトの目的・成果 ***************
 Ｇｉｔｈｕｂに置けばURLコピーができるのかの確認
+2025/06/10 10:23　URLコピーはできたが、Wake Lockはできなかった。
 
 ----以下は52_2のもの
 分割音と分割振り
@@ -438,8 +439,11 @@ function init(){
 	      //console.log('mark_delay: ' + mark_delay);
 			if(this.value == 0){
 				f_wakelock = false;
-				wakeLock.release;
-				//console.log('Wake Lock is released!');
+wakeLock.release().then(() => {
+  wakeLock = null;
+});
+				
+				alert('Wake Lock is released!');
 			}else{
 				f_wakelock = true;
 				wakeLock = enableWakeLock();
@@ -650,12 +654,13 @@ let wakeLock = null;
 async function enableWakeLock() {
   try {
     const wakeLock = await navigator.wakeLock.request('screen');
-    //console.log('Wake Lock is active!');
+    alert('Wake Lock is active!');
     return wakeLock;
   } catch (err) {
-    //console.error(`Wake Lock request failed: ${err.message}`);
+    alert(`Wake Lock request failed: ${err.message}`);
   }
 }
+
 
 
 /*****************
