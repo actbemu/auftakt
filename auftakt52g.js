@@ -63,7 +63,8 @@ Screen wakeLock の起動をosc.startのタイミングと同じにする。も�
 let fdebug = false;
 //公開URL　　CopyURLで使用　ＧＩＴＨＵＢにしてみる
 //const baseURL = 'http://www1.vecceed.ne.jp/~bemu/auftakt/auftakt52_1.html';
-const baseURL = 'https://actbemu.github.io/auftakt/auftakt52g.html?mm=87';
+const baseURL = 'https://actbemu.github.io/auftakt/auftakt52g.html';
+
 //変数のスコープを配慮し、initの外側で宣言だけしておく
 let canvas;	//動指標が動くcanvas
 let ctx;	//インスタンス
@@ -433,9 +434,9 @@ function init(){
 					wakeLock.release().then(() => {
 					  wakeLock = null;
 					});
-					alert('Wake Lock is released!');
+					dispMsg('Wake Lock is released!');
 				}else{
-					 	alert('wakelockラジオボタン');
+					 	//alert('wakelockラジオボタン');
 						f_wakelock = true;  //ラジオボタンONが押されたことを示すフラグ
 		    			//ラジオボタンの変化ではユーザー操作とはみなされないようだ。
 						//osc.startと同様に動作開始時にフラグをチェックして起動させる
@@ -544,15 +545,13 @@ function init(){
 		//console.log('MM:' + MM + ' index:' + aryMM_idx);
 		console.log('aryMM.length:' + aryMM.length);
 		timer = setTimeout(() => {
-	if(travel < 8){
-		longtap = true;
-			//設定パネル表示
-		
-		dispSetting();
-	} 
-	
-	}, 600);
-		
+			if(travel < 8){  //600msec間の累積移動量^2が少ない場合は長押しと判定
+				longtap = true;
+				//設定パネル表示
+				dispSetting();
+			} 
+		}, 600);
+			
 	}
 
 function mcMouseDown(event) {
@@ -678,6 +677,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 
 	myc.addEventListener('mouseup', mcMouseUp);
 	function mcMouseUp(event) {
+		console.log('★MouseUp！' + moving);
 		f_mousedown = false;
 		if(longtap){
 			touch = false;
@@ -698,7 +698,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 	const btnCopyURL = document.getElementById("btn_copy_url");
 	btnCopyURL.addEventListener('click', () => {
 		if (!navigator.clipboard) {
-			alert("'Copy URL' is not available on this bowser.");
+			dispMsg("'Copy URL' is not available on this bowser.");
 			return;
 		}
 		//デフォルト値の場合はＵＲＬに含めない。
@@ -710,10 +710,23 @@ myc.addEventListener('mousemove', mcMouseMove);
 		if(!f_sound)txt += "&bs=0";
 		navigator.clipboard.writeText(txt).then(		() => {
 			alert('URL successfully Copied');},() => {
-			alert('Copy failure');});
+			dispMsg('Copy failure');});
 		});  //end of event listener btn_copy_url
 		
-//
+	const el = document.getElementById('msgbox');
+
+	//メッセージエリアに表示し、2秒後に消す
+	function dispMsg(txt){
+		
+		console.log(el.textContent);
+		el.textContent = txt;
+		//el.style.display = 'block';
+		setTimeout(() => {   //2秒後に消す
+			  el.textContent ='';
+		}, 2000);
+	}
+
+	
 }　　//end of init
 
 //---- 関数など --------------------------------------
@@ -725,10 +738,10 @@ let wakeLock = null;
 async function enableWakeLock() {
   try {
     const wakeLock = await navigator.wakeLock.request('screen');
-    alert('Wake Lock is active!');
+    dispMsg('Wake Lock is active!');
     return wakeLock;
   } catch (err) {
-    alert(`Wake Lock request failed: ${err.message}`);
+	  dispMsg('Wake Lock request failed');
   }
 }
 
