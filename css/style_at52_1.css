@@ -20,7 +20,7 @@ position:relative;
 }
 
 #myCanvas{
-    background: #FFFFE0;
+    background: #fffcf2;
     width: 100%;
     height: 90%;
     top: 0px;
@@ -29,7 +29,7 @@ position:relative;
 }
 
 #beatCanvas{
-    background: #b8ccda;
+    background: #e7e3b7;
     width: 100%;
     height:10%;
     bottom: 0px;
@@ -130,3 +130,13 @@ a:link { color: #29659d; }
 a:visited { color: #29659d;  }
 a:hover { color: #29659d }
 a:active { color: #29659d }
+
+#msgbox{
+    color: #9f4b23;
+    bottom: 3px;
+    position: absolute;
+    font-size:smaller;
+    font-family:sans-serif;
+    z-index:3;
+    margin: 0 auto;
+}
