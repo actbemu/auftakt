@@ -434,10 +434,9 @@ function init(){
 	  radioButton.addEventListener('change', function() {
 	    // 選択されているラジオボタンの値を取得します
 	    // this.checked は、イベントが発生したラジオボタンがチェックされているかを示します
-	    if (this.checked) {
-	      //const mark_delay = this.value;
-	      //console.log('mark_delay: ' + mark_delay);
-			if(this.value == 0){
+	 	alert('ラジオボタン変化');
+	    if(this.checked) {
+		if(this.value == 0){
 				f_wakelock = false;
 wakeLock.release().then(() => {
   wakeLock = null;
