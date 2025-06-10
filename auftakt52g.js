@@ -3,7 +3,8 @@
 */
 /********** 本スクリプトの目的・成果 ***************
 Ｇｉｔｈｕｂに置けばURLコピーができるのかの確認
-2025/06/10 10:23　URLコピーはできたが、Wake Lockはできなかった。
+2025/06/10 10:23　URLコピーはできたが、Wake Lockはできなかった。そもそもリスナー部分がコメントアウトされていた。
+2025/06/10 12:54　すべてのリスナーが応答していない。
 
 ----以下は52_2のもの
 分割音と分割振り
@@ -60,8 +61,9 @@ Screen wakeLock の起動をosc.startのタイミングと同じにする。も�
 ****************************************************/
 //----- グローバル変数の宣言・定義 ----------------------
 let fdebug = false;
-//公開URL　　CopyURLで使用
-const baseURL = 'http://www1.vecceed.ne.jp/~bemu/auftakt/auftakt52_1.html';
+//公開URL　　CopyURLで使用　ＧＩＴＨＵＢにしてみる
+//const baseURL = 'http://www1.vecceed.ne.jp/~bemu/auftakt/auftakt52_1.html';
+const baseURL = 'https://actbemu.github.io/auftakt/auftakt52g.html?mm=87';
 //変数のスコープを配慮し、initの外側で宣言だけしておく
 let canvas;	//動指標が動くcanvas
 let ctx;	//インスタンス
@@ -78,6 +80,7 @@ let oscActive=false;	//オシレータ起動中か
 let fstop = false;	//直後の拍点で停止させるためのフラグ
 let f_wakelock = false;
 let f_sound = true;	//クリックサウンドON/OFFフラグ
+let f_mousedown = false;   //マウススイッチON
 //タイムスタンプ
 let baseTimeStamp;	//[msec]単位
 let currentClickTimeStamp;
@@ -127,13 +130,6 @@ let Beat_idx = 0; //拍位置のインデクス
 let topMargin = 100;	//最高点の上余白
 const divHrate = 0.7   //分割振りの高さ比率
 
-//クリックサウンド関連オブジェクトの初期化
-//DOMにアクセスしないのでここで初期化可能
-//const cLen = 0.03;		//クリック音の長さ[sec]
-//const divClickArate = 0.7;  //分割音の初期ゲイン比率
-//const devClickLrate = 0.6   //分割音の長さ比率
-//上記は関数 rsvClickSound内に移行
-
 //クリックサウンド関連（Beat Sound）
 //let ary_sdelay = [];
 let ary_sdelay = new Array(160, 120, 80, 0, -50, -100, -200);  //タイミング調整用
@@ -174,15 +170,11 @@ function init(){
 	canvas = document.getElementById("myCanvas");
 	ctx = canvas.getContext("2d");
 
-
     beat_canvas = document.getElementById("beatCanvas");       //拍子表示カンバス（画面下部）
     beat_context = beat_canvas.getContext("2d");
 
-/*    var canvasWidth; //= canvas.width;
-    var canvasHeight;	//= canvas.height;
-*/
-    var beat_canvasWidth = beat_canvas.width;
-    var beat_canvasHeight = beat_canvas.height;
+    let beat_canvasWidth = beat_canvas.width;
+    let beat_canvasHeight = beat_canvas.height;
 	//設定パネルを非表示に
 	document.getElementById('setting').style.display = 'none';
 
@@ -299,15 +291,16 @@ function init(){
 	//console.log(wrapper);
 		var w = wrapper.clientWidth;    //wrapper.widthでは値が取得できなかった
 		var h = wrapper.clientHeight;
-	//console.log(w + ', ' + h);
-		var el_my = document.getElementById('myCanvas');
+	console.log('wrapper.clientWidth:' + w + ', wrapper.clientHeight:' + h);
+		
+		const el_my = document.getElementById('myCanvas');
 		el_my.setAttribute('width', w);
-		el_my.setAttribute('height', 0.8 * h);
-		//el_my.width = w;
+		el_my.setAttribute('height', 0.8 * h);  //wrapperを上下に8:2に分ける
+		
 		const el_beat = document.getElementById('beatCanvas');
 		el_beat.setAttribute('width', w);
 		el_beat.setAttribute('height', 0.2 * h);
-		drawBeat();
+		drawBeat();   //拍子数字を書く
 	    }
 
 	//========イベントリスナー関連================================
@@ -425,33 +418,31 @@ function init(){
     }
 
 	//●●●●---設定パネルの処理---●●●
-	//●Wake Lock機能（スリープ回避機能）のON/OFF
 	
-	// name属性が "radiosound" のラジオボタンをすべて取得します
+	//●Wake Lock機能（スリープ回避機能）のON/OFF
+	// name属性が "radioWakeLock" のラジオボタンをすべて取得
 	const radioWakeLock = document.querySelectorAll('input[name="radioWakeLock"][type="radio"]');
-	// 各ラジオボタンにイベントリスナーを設定します
+	// 各ラジオボタンにイベントリスナーを設定
 	radioWakeLock.forEach(function(radioButton) {
-	  radioButton.addEventListener('change', function() {
-	    // 選択されているラジオボタンの値を取得します
-	    // this.checked は、イベントが発生したラジオボタンがチェックされているかを示します
-	 	alert('ラジオボタン変化');
-	    if(this.checked) {
-		if(this.value == 0){
-				f_wakelock = false;
-wakeLock.release().then(() => {
-  wakeLock = null;
-});
-				
-				alert('Wake Lock is released!');
-			}else{
-				f_wakelock = true;
-    				//ラジオボタンの変化ではユーザー操作とはみなされないようだ。
-				//osc.startと同様に動作開始時にフラグをチェックして起動させる
-				
-			}
-	    }
-	  });
-	});
+		 radioButton.addEventListener('change', function() {
+		    // 選択されているラジオボタンの値を取得します
+		    // this.checked は、イベントが発生したラジオボタンがチェックされているかを示します
+		    if(this.checked) {
+				if(this.value == 0){
+					f_wakelock = false;
+					wakeLock.release().then(() => {
+					  wakeLock = null;
+					});
+					alert('Wake Lock is released!');
+				}else{
+					 	alert('wakelockラジオボタン');
+						f_wakelock = true;  //ラジオボタンONが押されたことを示すフラグ
+		    			//ラジオボタンの変化ではユーザー操作とはみなされないようだ。
+						//osc.startと同様に動作開始時にフラグをチェックして起動させる
+				}
+		    }
+		 });
+	});  //forEachここまで
 	
 	
 	//●サウンドON/OFF
@@ -463,9 +454,7 @@ wakeLock.release().then(() => {
 	    // 選択されているラジオボタンの値を取得します
 	    // this.checked は、イベントが発生したラジオボタンがチェックされているかを示します
 	    if (this.checked) {
-	      //const mark_delay = this.value;
-	      //console.log('mark_delay: ' + mark_delay);
-			if(this.value == 0){f_sound = false;}else{f_sound = true;}
+	     	if(this.value == 0){f_sound = false;}else{f_sound = true;}
 			drawBeat();
 	    }
 	  });
@@ -473,7 +462,7 @@ wakeLock.release().then(() => {
 
 	//●サウンドタイミング調整
 	//AI Geminiによるコード
-	// name属性が "radiotiming" のラジオボタンをすべて取得します
+	// name属性が "radiotiming" のラジオボタンをすべて取得
 	const radioTiming = document.querySelectorAll('input[name="radiotiming"][type="radio"]');
 	// 各ラジオボタンにイベントリスナーを設定します
 	radioTiming.forEach(function(radioButton) {
@@ -482,9 +471,7 @@ wakeLock.release().then(() => {
 	    // this.checked は、イベントが発生したラジオボタンがチェックされているかを示します
 	    if (this.checked) {
 	      sdelay_idx = this.value;
-	      //console.log('mark_delay: ' + mark_delay);
-			//sdelay = mark_delay / 1000;
-			sdelay = ary_sdelay[sdelay_idx] / 1000;
+	      sdelay = ary_sdelay[sdelay_idx] / 1000;
 			console.log('sdelay:' + sdelay);
 	    }
 	  });
@@ -499,7 +486,7 @@ wakeLock.release().then(() => {
 	    // 選択されているラジオボタンの値を取得します
 	    // this.checked は、イベントが発生したラジオボタンがチェックされているかを示します
 	    if (this.checked) {
-	      ndivSound = this.value;
+		    ndivSound = this.value;
 			drawBeat();
 	    }
 	  });
@@ -536,7 +523,9 @@ wakeLock.release().then(() => {
 	let timer;
 	let longtap;
 	let isClick = false;
+	//myc.addEventListener('touchstart', mcToucStart);
 	myc.addEventListener('touchstart', mcToucStart);
+	myc.addEventListener('mousedown', mcMouseDown);
 	function mcToucStart(event) {
 		event.preventDefault();  //イベントの処理を続けるのを阻止する。
 		
@@ -566,6 +555,37 @@ wakeLock.release().then(() => {
 		
 	}
 
+function mcMouseDown(event) {
+		event.preventDefault();  //イベントの処理を続けるのを阻止する。
+		f_mousedown = true;
+		startY = event.pageY;  //[0]最初のタッチだけを検知する。
+		console.log('タッチスタート　at　x=' + startY);
+		x0 = event.pageX;
+		y0 = event.pageY;
+		travel = 0;
+		longtap = false;
+		isClick = true;
+		//現在のMMに相当するaryMM_idxを求めておく
+		aryMM_idx = 0;
+		while (MM > aryMM[aryMM_idx]) {
+			aryMM_idx++;
+		}
+		//console.log('MM:' + MM + ' index:' + aryMM_idx);
+		console.log('aryMM.length:' + aryMM.length);
+		timer = setTimeout(() => {
+		if(travel < 8){
+			longtap = true;
+				//設定パネル表示
+			f_mousedown = false;
+			dispSetting();
+		} 
+	
+	}, 600);
+		
+	}
+
+
+	
 	myc.addEventListener('touchmove', mcMove);
 	function mcMove(event) {
 		//長押し検出用に移動量積算
@@ -603,8 +623,49 @@ wakeLock.release().then(() => {
 		isClick = false;
 	}
 
+myc.addEventListener('mousemove', mcMouseMove);
+	function mcMouseMove(event) {
+		if(f_mousedown){
+			//長押し検出用に移動量積算
+			travel += (x0 - event.pageX)^2 + (y0 - event.pageY)^2;
+			x0 = event.pageX;
+			y0 = event.pageY;
+			console.log('travel:' + travel);
+		
+			const delta0 = 20;  //上下方向に動いた距離のしきい値
+			event.preventDefault();
+			const yy = event.pageY;
+			//移動量がしきい値以内ならなにもしない
+			deltaY = startY - yy;
+			if(Math.abs(deltaY) < delta0) return;
+			//console.log('動いた！' + deltaY);
+			startY = yy;
+			//クリック音を出す
+			const now = context.currentTime;
+			gain.gain.setValueAtTime(1, now);
+			gain.gain.linearRampToValueAtTime(0, now + 0.01);
+			//aryMM_idxを増減する
+			aryMM_idx += Math.sign(deltaY);
+			
+			if(aryMM_idx >= aryMM.length){
+				aryMM_idx = aryMM.length - 1;
+				console.log('aryMM_idx上限！');
+			}
+			if(aryMM_idx < 0) aryMM_idx = 0;
+			console.log(aryMM_idx);
+			//MMを設定し、表示する
+			MM = aryMM[aryMM_idx];
+			document.getElementById('tempo').textContent = MM;
+			//console.log('動いた！' + aryMM_idx);
+			//touchendのときにクリックと判断しないようにフラグを立てる
+			isClick = false;
+		}
+	}
+
+	
 	myc.addEventListener('touchend', mcTouchEnd);
 	function mcTouchEnd(event) {
+		mousedown = false;
 		if(longtap){
 			touch = false;
 		}else{
@@ -615,10 +676,19 @@ wakeLock.release().then(() => {
 		}
 	}
 
+	myc.addEventListener('mouseup', mcMouseUp);
+	function mcMouseUp(event) {
+		f_mousedown = false;
+		if(longtap){
+			touch = false;
+		}else{
+			clearTimeout(timer);
+			if(!isClick)return;
+			//クリックと判断
+			metroStart();
+		}
+	}
 
-
-
-	
 	
 	// URLコピー処理（[Copy URL]がクリックされたら）
 	//参考：https://qiita.com/abcya/items/6a9f245057cf61f09b07
@@ -890,13 +960,16 @@ function metroStart(){  //■ストップ操作
 			baseTimeStamp = performance.now() - context.currentTime * 1000;
 		}
 		if(f_wakelock){
+			 enableWakeLock();
+			/*
 			try {
-				wakeLock = await navigator.wakeLock.request("screen");
+				wakeLock = navigator.wakeLock.request("screen");
 				alert("Screen Wake Lock enabled.");
 			} catch (err) {
 				// 起動ロックのリクエストに失敗。ふつうはバッテリーなどのシステム関連
 				alert("Screen Wake Lock failed.  `${err.name}, ${err.message}`);
 			}
+			*/
 			f_wakelock = false;
 		}
 		//現在時刻を拍点時刻にする
