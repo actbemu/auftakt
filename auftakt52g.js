@@ -446,7 +446,9 @@ wakeLock.release().then(() => {
 				alert('Wake Lock is released!');
 			}else{
 				f_wakelock = true;
-				wakeLock = enableWakeLock();
+    				//ラジオボタンの変化ではユーザー操作とはみなされないようだ。
+				//osc.startと同様に動作開始時にフラグをチェックして起動させる
+				
 			}
 	    }
 	  });
@@ -887,8 +889,16 @@ function metroStart(){  //■ストップ操作
 			oscActive = true;
 			//オシレータ開始時のタイムスタンプを基準にする
 			baseTimeStamp = performance.now() - context.currentTime * 1000;
-			//https必須のためコメントアウト
-			//if(f_wakelock)wakeLock = enableWakeLock();
+		}
+		if(f_wakelock){
+			try {
+				wakeLock = await navigator.wakeLock.request("screen");
+				alert("Screen Wake Lock enabled.");
+			} catch (err) {
+				// 起動ロックのリクエストに失敗。ふつうはバッテリーなどのシステム関連
+				alert("Screen Wake Lock failed.  `${err.name}, ${err.message}`);
+			}
+			f_wakelock = false;
 		}
 		//現在時刻を拍点時刻にする
 		currentClickTimeStamp = currentTimeStamp();
