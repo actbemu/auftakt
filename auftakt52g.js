@@ -426,7 +426,7 @@ function init(){
 
 	//●●●●---設定パネルの処理---●●●
 	//●Wake Lock機能（スリープ回避機能）のON/OFF
-	/*
+	
 	// name属性が "radiosound" のラジオボタンをすべて取得します
 	const radioWakeLock = document.querySelectorAll('input[name="radioWakeLock"][type="radio"]');
 	// 各ラジオボタンにイベントリスナーを設定します
@@ -452,7 +452,7 @@ wakeLock.release().then(() => {
 	    }
 	  });
 	});
-	*/
+	
 	
 	//●サウンドON/OFF
 	// name属性が "radiosound" のラジオボタンをすべて取得します
