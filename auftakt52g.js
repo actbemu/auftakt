@@ -2,6 +2,9 @@
 【auftakt52_１.js】2025/06/06　auftakt52_0.jsを元に開発
 */
 /********** 本スクリプトの目的・成果 ***************
+Ｇｉｔｈｕｂに置けばURLコピーができるのかの確認
+
+----以下は52_2のもの
 分割音と分割振り
 分割振りについては、従来のパラメータ配列を採用するか？→変拍子対応しなければ不要
 
@@ -616,7 +619,7 @@ function init(){
 	//参考：https://qiita.com/abcya/items/6a9f245057cf61f09b07
 	//別サイトの情報で、どうやらhttps通信でないと使えないみたいだ。
 	//htmlファイルの方でもコメントアウトしておく。
-	/*
+	
 	const btnCopyURL = document.getElementById("btn_copy_url");
 	btnCopyURL.addEventListener('click', () => {
 		if (!navigator.clipboard) {
@@ -634,7 +637,7 @@ function init(){
 			alert('URL successfully Copied');},() => {
 			alert('Copy failure');});
 		});  //end of event listener btn_copy_url
-		*/
+		
 //
 }　　//end of init
 
