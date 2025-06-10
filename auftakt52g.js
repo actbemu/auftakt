@@ -5,6 +5,10 @@
 Ｇｉｔｈｕｂに置けばURLコピーができるのかの確認
 2025/06/10 10:23　URLコピーはできたが、Wake Lockはできなかった。そもそもリスナー部分がコメントアウトされていた。
 2025/06/10 12:54　すべてのリスナーが応答していない。
+2025/06/11  6:51 昨夜のうちにほぼ解決
+残りの課題
+・メッセージエリアのレイアウト。中央にならない。
+・Wake Lock 一旦解除すると、２回目以降はうまく有効にならない!
 
 ----以下は52_2のもの
 分割音と分割振り
@@ -165,6 +169,9 @@ if( iphone || androidSp || ipad || androidT){
 	console.log('PCです。');
 
 }
+
+
+
 
 //----- DOM関連初期化処理：DOM要素がロードされた後に呼ばれる-----
 function init(){
@@ -416,6 +423,8 @@ function init(){
 	function dispSetting(){
     	//setting画面(div要素)を表示
         document.getElementById('setting').style.display = 'block';
+		//設定画面を開くタイミングでWake Lock状態をチェックしメッセージボックスに表示
+		chkWakeLock();
     }
 
 	//●●●●---設定パネルの処理---●●●
@@ -726,8 +735,28 @@ myc.addEventListener('mousemove', mcMouseMove);
 		}, 2000);
 	}
 
-	
-}　　//end of init
+	//起動時に表示してみる
+	chkWakeLock();
+	//******************Wake Lock関連初期チェックと表示****************
+	function chkWakeLock() {
+		if (navigator.wakeLock) {
+		  const isWakeLockActive = navigator.wakeLock.locked;
+		
+		  if (isWakeLockActive) {
+		    // Wake Lockがアクティブな状態
+		    dispMsg("Screen Wake Lock is active.");
+		  } else {
+		    // Wake Lockがアクティブでない状態
+		    dispMsg("Screen Wake Lock is NOT active.");
+		  }
+		} else {
+			// Wake Lock APIがサポートされていない
+			dispMsg("Wake Lock API is not supported on this browser.");
+			//設定メニューの該当部分を表示しない
+			document.getElementById('wakelockdiv').style.display = "none";
+		}
+	}
+}　　//★★★★★end of init★★★★
 
 //---- 関数など --------------------------------------
 /*****************
@@ -1122,6 +1151,7 @@ function long_press(el,nf,lf,sec){
   });
 }  //function long_press
 
+
 //テンポ選択リストボックスの内容
 var optStr = '<option value="10">10</option>';
 		optStr += '<option value="20">20</option>';
@@ -1166,6 +1196,7 @@ var optStr = '<option value="10">10</option>';
 		optStr += '<option value="192">192</option>';
 		optStr += '<option value="200">200</option>';
 		optStr += '<option value="208">208</option>';
+
 
 
 //--------お決まりの作法-----------------------
