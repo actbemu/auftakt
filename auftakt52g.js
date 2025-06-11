@@ -793,10 +793,10 @@ let wakelock = null;
 async function enableWakeLock() {
   try {
     const wakeLock = await navigator.wakeLock.request('screen');
-    dispMsg('Wake Lock is active!');
+    //dispMsg('Wake Lock is active!');
     return wakeLock;
   } catch (err) {
-	  dispMsg('Wake Lock request failed');
+	  //dispMsg('Wake Lock request failed');
   }
 }
 
