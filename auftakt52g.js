@@ -1012,14 +1012,14 @@ function drawBeat(){        //拍子エリアに数字を置く
 
 //メトロノームのON/OFF
 function metroStart(){  //
-	document.getElementbyId('msgbox').textContents = '■canvasクリック！　movingフラグ：' + moving + 'fstop:' + fstop;
+	document.getElementById('msgbox').textContents = '■canvasクリック！　movingフラグ：' + moving + 'fstop:' + fstop;
 	//dispMsg('■canvasクリック！　movingフラグ：' + moving);
 	if(moving){	//Stop ■ストップ操作
 		moving = false;
 		fstop = true;	//次の拍点で停止させる
 		console.log('停止フラグ：' + fstop);
 	}else{		//Start　■スタート操作
-		document.getElementbyId('msgbox').textContents = '●スタート！';
+		document.getElementById('msgbox').textContents = '●スタート！';
 		console.log('●スタート！');
 		if(!oscActive){	//初回タップ時のみの処理
 			//オシレータ開始（この段階で音量は０）
