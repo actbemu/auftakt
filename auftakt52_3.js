@@ -804,9 +804,9 @@ myc.addEventListener('mousemove', mcMouseMove);
 let wakelock = null;
 async function enableWakeLock() {
   try {
-    const wakeLock = await navigator.wakeLock.request('screen');
+    wakelock = await navigator.wakeLock.request('screen');  //const　外した　外で定義
     //dispMsg('Wake Lock is active!');
-    return wakeLock;
+    return wakelock;
   } catch (err) {
 	  //dispMsg('Wake Lock request failed');
   }
@@ -815,8 +815,8 @@ async function enableWakeLock() {
 //******************Wake Lock関連初期チェックと表示****************
 //Ver.2.3では初回タップ時に起動するが、その結果をアラートで確認してもらうことにする。
 function chkWakeLock() {
-	if (navigator.wakeLock) {
-	  const isWakeLockActive = navigator.wakeLock.locked;
+	if (wakelock) {
+	  const isWakeLockActive = wakelock.locked;
 	
 	  if (isWakeLockActive) {
 		// Wake Lockがアクティブな状態
@@ -1058,7 +1058,7 @@ function metroStart(){  //
 		console.log('enableWakeLock:' + wakelock);
 		setTimeout(() => {   //0.5秒後にチェック
 			  chkWakeLock();
-		}, 500);
+		}, 1000);
 		
 		/*
 		try {
