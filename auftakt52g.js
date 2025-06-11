@@ -448,8 +448,8 @@ function init(){
 		    if(this.checked) {
 				if(this.value == 0){
 					f_wakelock = false;
-					wakeLock.release().then(() => {
-					  wakeLock = null;
+					wakelock.release().then(() => {
+					  wakelock = null;
 					});
 					dispMsg('Wake Lock is released!');
 				}else{
@@ -772,7 +772,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 ■スリープ回避するため画面をロックするWake Lock
 　　ユーザー操作(設定パネルでのON操作)により呼び出す
 */
-let wakeLock = null;
+let wakelock = null;
 async function enableWakeLock() {
   try {
     const wakeLock = await navigator.wakeLock.request('screen');
@@ -1011,7 +1011,8 @@ function metroStart(){  //■ストップ操作
 			baseTimeStamp = performance.now() - context.currentTime * 1000;
 		}
 		if(f_wakelock){
-			 enableWakeLock();
+			wakelock = enableWakeLock();
+			chkWakeLock();
 			/*
 			try {
 				wakeLock = navigator.wakeLock.request("screen");
