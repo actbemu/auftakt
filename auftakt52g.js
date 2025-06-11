@@ -1000,7 +1000,7 @@ function drawBeat(){        //拍子エリアに数字を置く
 
 //カンバス内長押しかどうか判別し、長押しでない場合はメトロノームのON/OFF
 function metroStart(){  //■ストップ操作
-	console.log('■canvasクリック！　movingフラグ：' + moving);
+	dispMsg('■canvasクリック！　movingフラグ：' + moving);
 	if(moving){	//Stop
 		moving = false;
 		fstop = true;	//次の拍点で停止させる
