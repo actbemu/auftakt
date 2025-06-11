@@ -76,7 +76,7 @@ let fdebug = false;
 //公開URL　　CopyURLで使用　ＧＩＴＨＵＢにしてみる
 //const baseURL = 'http://www1.vecceed.ne.jp/~bemu/auftakt/auftakt52_1.html';
 const baseURL = 'https://actbemu.github.io/auftakt/auftakt52g.html';
-const msg0 = 'rev.002';  //スマホでデバッグ時に最新のものになっているかを確認するためのリビジョン番号
+const msg0 = 'Metronome Auftakt5.2 rev.002';  //スマホでデバッグ時に最新のものになっているかを確認するためのリビジョン番号
 
 //変数のスコープを配慮し、initの外側で宣言だけしておく
 let canvas;	//動指標が動くcanvas
@@ -709,6 +709,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 			clearTimeout(timer);
 			if(!isClick)return;
 			//クリックと判断
+			dispMsg('going to metroStart()');
 			metroStart();
 		}
 	}
