@@ -694,6 +694,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 			clearTimeout(timer);
 			if(!isClick)return;
 			//クリックと判断
+			moving = false;  //デバグ用これがあると停止しなくなる予定
 			metroStart();
 		}
 	}
@@ -710,6 +711,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 			if(!isClick)return;
 			//クリックと判断
 			dispMsg('going to metroStart()');
+			moving = false;
 			metroStart();
 		}
 	}
@@ -1001,7 +1003,7 @@ function drawBeat(){        //拍子エリアに数字を置く
 	}
 }
 
-//カンバス内長押しかどうか判別し、長押しでない場合はメトロノームのON/OFF
+//メトロノームのON/OFF
 function metroStart(){  //■ストップ操作
 	dispMsg('■canvasクリック！　movingフラグ：' + moving);
 	if(moving){	//Stop
