@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<!-- ver.2.3　Wake Lockの実用実装、開始待ち時間 GitHub-->
+    <meta charset="utf-8">
+	<meta name="keywords" content="Metrononme, Auftakt">
+    <link rel="stylesheet" href="css/style_at52_3.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data:; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+
+	<script type="text/javascript" src="./auftakt52_3.js"></script>
+	
+<!-- .ファビコンなどの設定 -->
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="./images/apple-touch-icon.png" sizes="180x180">
+<link rel="icon" type="image/png" href="./images/android-touch-icon.png" sizes="192x192">
+
+<title>Metronome: Auftakt 5 ver.2.1</title>
+</head>
+<body>
+
+    <div class="wrapper">
+        <canvas id="myCanvas" width="300" height="800"></canvas>
+		
+        <canvas id="beatCanvas"   width="300" height="80"></canvas>
+    </div>
+	<div class="wrapper" align="center">
+	<!-- メッセージボックス -->
+			<div id="msgbox"　align="center">Metronome Auftakt5 Ver.2.2 Rev.02
+			</div>
+		
+	</div>	
+    <!-- 設定パネル -->
+    <div id="setting">
+		<div id="btn_close_setting" align="right" class="ButtonText">[Close]</div>
+
+		Beat Sound<br>
+		<div class="radiorow">
+		<input type="radio" value="1" name="radiosound" checked />ON&nbsp;
+		<input type="radio" value="0" name="radiosound"/>OFF
+		</div>
+
+		Beat Sound Timing<br>
+		<div class="radiorow">
+		<small>Late</small>
+		<input type="radio" value="0" name="radiotiming"/>
+		<input type="radio" value="1" name="radiotiming"/>
+		<input type="radio" value="2" name="radiotiming" />
+		
+		<input type="radio" value="3" name="radiotiming"  checked/>
+		
+		<input type="radio" value="4" name="radiotiming" />
+		<input type="radio" value="5" name="radiotiming" />
+		<input type="radio" value="6" name="radiotiming"/>
+		<small>Early</small>
+		</div>
+<br>
+
+		Divide Beat Sound into<br>
+		<div class="radiorow">
+		<input type="radio" value=1 name="dsradio" checked/>none&nbsp;
+		<input type="radio" value=2 name="dsradio" />2&nbsp;
+		<input type="radio" value=3 name="dsradio" />3&nbsp;
+		<input type="radio" value=4 name="dsradio" />4&nbsp;
+		</div>
+
+		Divide Beat Motion into<br>
+		<div class="radiorow">
+		<input type="radio" value=1 name="dbradio" checked/>none&nbsp;
+		<input type="radio" value=2 name="dbradio" />2&nbsp;
+		<input type="radio" value=3 name="dbradio" />3&nbsp;
+		</div>
+		<br>
+		<div id="wakelockdiv">
+		Waiting Time to Start<br>
+		<div class="radiorow">
+		<input type="radio" value="0" name="waitingtime"  checked/>0 sec&nbsp;
+		<input type="radio" value="2000" name="waitingtime" />2 sec&nbsp;
+		<input type="radio" value="4000" name="waitingtime" />4 sec&nbsp;
+		
+		</div>
+		</div>
+		<br>
+		<div align="right"  class="ButtonText">
+			<span id="btn_copy_url">[Copy URL]</span>
+			<a href="http://www1.vecceed.ne.jp/~bemu/auftakt/auftakt5Help.html" target="_blank" style="text-decoration: none">
+			[Help]
+			</a>
+		</div>
+
+    </div>
+    <!-- TAPボタン -->
+    <div id="btnTAP">
+        <img src="./images/btnTAP2.png" alt="" />
+    </div>
+
+    <!-- TEMPO表示、プルダウンリスト表示ボタン -->
+    <div id="tempo">
+        60
+    </div>
+
+    <!-- テンポ調節＋／－ボタン -->
+    <div id="tempoAdjdown">
+    <img src="./images/btnAdjDwn.png" alt="－button" />
+    </div>
+    <div id="tempoAdjup">
+    <img src="./images/btnAdjUp.png" alt="" />
+    </div>
+  
+    <!-- TEMPOプルダウンリスト -->
+    <div id="divTempoList">
+        <select id="tempoList">
+        </select>
+    </div>
+	
+</body>
+</html>
