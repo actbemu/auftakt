@@ -12,6 +12,7 @@
 この時点でGITHUBに送る
 2025/06/11 22:57 ロックかかっているのにalertではNOT activeと出てしまう。
 ボールの最高点がボタンとかぶる。もうすこし低くてもよいか。
+2025/06/12  6:46 chkWakeLockのオブジェクトを変更
 
 ******以下は52gのもの************************
 Ｇｉｔｈｕｂに置けばURLコピーができるのかの確認
@@ -1055,11 +1056,13 @@ function metroStart(){  //
 	}
 	if(f_wakelock){
 		wakelock = enableWakeLock();
-		console.log('enableWakeLock:' + wakelock);
+		console.log('enableWakeLock:' + wakelock.loked);
+		alert('Screen Wake Lock enabled. The screen will stay on');
+		/*
 		setTimeout(() => {   //0.5秒後にチェック
 			  chkWakeLock();
 		}, 1000);
-		
+		*/
 		/*
 		try {
 			wakeLock = navigator.wakeLock.request("screen");
