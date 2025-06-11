@@ -751,7 +751,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 	}
 
 	//起動時に表示してみる
-	chkWakeLock();
+	//chkWakeLock();
 	//******************Wake Lock関連初期チェックと表示****************
 	function chkWakeLock() {
 		if (navigator.wakeLock) {
