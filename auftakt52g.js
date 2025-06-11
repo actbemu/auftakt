@@ -277,7 +277,8 @@ function init(){
 	if(strBST === null){fl = 3;}else{		//ndivSoundが指定されていないときはデフォルト値
 		fl = parseInt(strBST);
 		if(fl < 0 || fl > 6) fl = 3; //範囲外のときは、時間差０に設定
-		sdelay = ary_sdelay[fl] / 1000;
+		//sdelay = ary_sdelay[fl] / 1000;
+		sdelay = ary_sdelay[fl] ;
 		sdelay_idx = fl;
 		//設定パネルのラジオボタンchckedに反映
 		setRadioValue("radiotiming", fl);
@@ -484,8 +485,9 @@ function init(){
 	    // 選択されているラジオボタンの値を取得します
 	    // this.checked は、イベントが発生したラジオボタンがチェックされているかを示します
 	    if (this.checked) {
-	      sdelay_idx = this.value;
-	      sdelay = ary_sdelay[sdelay_idx] / 1000;
+			  sdelay_idx = this.value;
+			  //sdelay = ary_sdelay[sdelay_idx] / 1000;
+			sdelay = ary_sdelay[sdelay_idx];
 			console.log('sdelay:' + sdelay);
 	    }
 	  });
@@ -810,7 +812,7 @@ function drawMark() {
 
 	//■正規化座標	
 	beatTick　=　bpm2beatTick(MM * ndivBeat);
-	const t = (currentTimeStamp() - currentClickTimeStamp)/beatTick;
+	const t = (currentTimeStamp() - currentClickTimeStamp)/beatTick - sdelay;
 	const y = -4 * t * (t - 1);
 	
 	//console.log(x + " " + y);
@@ -1106,8 +1108,8 @@ function rsvClickSound(soundtype, timestamp){
 	if(soundtype == 1){gain0 = 0.5;len *= 0.5}
 	const nextClickTime = timeStampToAudioContextTime(timestamp);
 	console.log(nextClickTime);
-	gain.gain.setValueAtTime(gain0, nextClickTime + sdelay);
-	gain.gain.linearRampToValueAtTime(0, nextClickTime + sdelay + len);
+	gain.gain.setValueAtTime(gain0, nextClickTime);  //sdelayはボールの座標計算で使うように変更
+	gain.gain.linearRampToValueAtTime(0, nextClickTime + len);  //sdelayはボールの座標計算で使うように変更
 }
 /*****************
 //指定したDOM要素、長押しかどうかを判別して指定した関数に振り分ける
