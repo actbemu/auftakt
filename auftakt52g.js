@@ -460,7 +460,7 @@ function init(){
 					wakelock.release().then(() => {
 					  wakelock = null;
 					});
-					dispMsg('Wake Lock is released!');
+					//dispMsg('Wake Lock is released!');
 				}else{
 					 	//alert('wakelockラジオボタン');
 						f_wakelock = true;  //ラジオボタンONが押されたことを示すフラグ
