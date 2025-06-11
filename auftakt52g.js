@@ -776,7 +776,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 			document.getElementById('wakelockdiv').style.display = "none";
 		}
 	}
-	dispMSG(msg0);
+	//dispMSG(msg0);
 }　　//★★★★★end of init★★★★
 
 //---- 関数など --------------------------------------
@@ -1007,7 +1007,7 @@ function drawBeat(){        //拍子エリアに数字を置く
 
 //メトロノームのON/OFF
 function metroStart(){  //
-	dispMsg('■canvasクリック！　movingフラグ：' + moving);
+	//dispMsg('■canvasクリック！　movingフラグ：' + moving);
 	if(moving){	//Stop ■ストップ操作
 		moving = false;
 		fstop = true;	//次の拍点で停止させる
