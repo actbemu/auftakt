@@ -686,15 +686,16 @@ myc.addEventListener('mousemove', mcMouseMove);
 	myc.addEventListener('touchend', mcTouchEnd);
 	function mcTouchEnd(event) {
 	dispMsg('touchend...isClick:' + isClick + ', longtap:' + longtap);
-		mousedown = false;
+		f_mousedown = false;
 		if(longtap){
 			touch = false;
 		}else{
-		
 			clearTimeout(timer);
 			if(!isClick)return;
 			//クリックと判断
-			moving = false;  //デバグ用これがあると停止しなくなる予定
+			//moving = false;  //デバグ用これがあると停止しなくなる予定
+			//クリックと判断
+			dispMsg('going to metroStart()  moving:' + moving);
 			metroStart();
 		}
 	}
