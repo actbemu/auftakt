@@ -17,6 +17,10 @@
 →効果あり！ただしやはりテンポが早くなると（８０を超えると）、１６分音符は欠けが出てしまう。
 ▼この確認をしている最中に、タップで停止できなくなった。他の要素のリスナーは機能している。
 ・ボールの色をコードのはじめの方で指定できるようにした。
+★2025/06/11 14:56　 dispMSGが定義されていないエラーがスマホではわからずかなりてこずってしまった。
+結局、実際のWake Lockが行アクティブか否かにかかわらず、一度設定画面でONにすると、metroStartまで行くが、その後スタートしない。
+その状態でWake LockをOFFにすると大丈夫。なのでコードの何処かに問題があるということになる。
+	→実際にWake LockをONにした直後にchkWakeLockをしていて、この中に例のdspMSGが入っている。これがだめだったのか。
 
 ----以下は52_2のもの
 分割音と分割振り
@@ -1024,7 +1028,7 @@ function metroStart(){  //
 		}
 		if(f_wakelock){
 			wakelock = enableWakeLock();
-			chkWakeLock();
+			//chkWakeLock();
 			/*
 			try {
 				wakeLock = navigator.wakeLock.request("screen");
