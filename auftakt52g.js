@@ -441,7 +441,7 @@ function init(){
     	//setting画面(div要素)を表示
         document.getElementById('setting').style.display = 'block';
 		//設定画面を開くタイミングでWake Lock状態をチェックしメッセージボックスに表示
-		chkWakeLock();
+		//chkWakeLock();
     }
 
 	//●●●●---設定パネルの処理---●●●
