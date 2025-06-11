@@ -684,7 +684,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 	
 	myc.addEventListener('touchend', mcTouchEnd);
 	function mcTouchEnd(event) {
-	dispMsg('Click? isClick:' + isClick);
+	dispMsg('Click? longtap:' + longtap);
 		mousedown = false;
 		if(longtap){
 			touch = false;
