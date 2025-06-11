@@ -695,6 +695,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 			//クリックと判断
 			//moving = false;  //デバグ用これがあると停止しなくなる予定
 			//クリックと判断
+			//moving = false;
 			dispMsg('going to metroStart()  moving:' + moving);
 			metroStart();
 		}
@@ -711,8 +712,8 @@ myc.addEventListener('mousemove', mcMouseMove);
 			clearTimeout(timer);
 			if(!isClick)return;
 			//クリックと判断
-			dispMsg('going to metroStart()');
-			moving = false;
+			//moving = false;
+			dispMsg('going to metroStart()  moving:' + moving);
 			metroStart();
 		}
 	}
@@ -1005,9 +1006,9 @@ function drawBeat(){        //拍子エリアに数字を置く
 }
 
 //メトロノームのON/OFF
-function metroStart(){  //■ストップ操作
+function metroStart(){  //
 	dispMsg('■canvasクリック！　movingフラグ：' + moving);
-	if(moving){	//Stop
+	if(moving){	//Stop ■ストップ操作
 		moving = false;
 		fstop = true;	//次の拍点で停止させる
 		console.log('停止フラグ：' + fstop);
