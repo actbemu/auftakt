@@ -82,7 +82,8 @@ let beat_canvas;
 let beat_context;
 let raf;	//request animation frameのインスタンス（停止するときに指定するため）
 let ball;	//動指標オブジェクト
-const ball_col = 'navy';   //ボールの色
+//const ball_col = 'navy';   //ボールの色
+const ball_col = '#082752';   //ボールの色濃い藍
 const beat_col = '#375d69';   //;拍数字の色"rgb(153,153,0)";
 
 //各種ステータスフラグ（動作コントロール用）
