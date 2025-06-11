@@ -684,11 +684,12 @@ myc.addEventListener('mousemove', mcMouseMove);
 	
 	myc.addEventListener('touchend', mcTouchEnd);
 	function mcTouchEnd(event) {
+	dispMsg('Click? isClick:' + isClick);
 		mousedown = false;
 		if(longtap){
 			touch = false;
 		}else{
-			dispMsg('Click? isClick:' + isClick);
+		
 			clearTimeout(timer);
 			if(!isClick)return;
 			//クリックと判断
@@ -699,6 +700,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 	myc.addEventListener('mouseup', mcMouseUp);
 	function mcMouseUp(event) {
 		console.log('★MouseUp！' + moving);
+		dispMsg('mouse up Click? isClick:' + isClick);
 		f_mousedown = false;
 		if(longtap){
 			touch = false;
