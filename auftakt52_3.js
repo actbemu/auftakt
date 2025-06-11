@@ -1056,7 +1056,10 @@ function metroStart(){  //
 	if(f_wakelock){
 		wakelock = enableWakeLock();
 		console.log('enableWakeLock:' + wakelock);
-		chkWakeLock();
+		setTimeout(() => {   //0.5秒後にチェック
+			  chkWakeLock();
+		}, 500);
+		
 		/*
 		try {
 			wakeLock = navigator.wakeLock.request("screen");
