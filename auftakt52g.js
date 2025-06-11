@@ -712,7 +712,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 			clearTimeout(timer);
 			if(!isClick)return;
 			//クリックと判断
-			//moving = false;
+			//moving = false;  //デバグ用これがあると停止しなくなる予定
 			dispMsg('going to metroStart()  moving:' + moving);
 			metroStart();
 		}
