@@ -21,6 +21,8 @@
 結局、実際のWake Lockが行アクティブか否かにかかわらず、一度設定画面でONにすると、metroStartまで行くが、その後スタートしない。
 その状態でWake LockをOFFにすると大丈夫。なのでコードの何処かに問題があるということになる。
 	→実際にWake LockをONにした直後にchkWakeLockをしていて、この中に例のdspMSGが入っている。これがだめだったのか。
+ その影響もあったが、外しても、PCだと大丈夫だが、スマホでは動かない。その動かないスマホでも、低速にしてOFFで開始し、拍点に落ちる前にONにしてタップすると
+ ちゃんと停止する。ということはイベントは拾っている。
 
 ----以下は52_2のもの
 分割音と分割振り
@@ -750,8 +752,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 
 	//メッセージエリアに表示し、2秒後に消す
 	function dispMsg(txt){
-		
-		console.log(el.textContent);
+		//console.log(el.textContent);
 		el.textContent = txt;
 		//el.style.display = 'block';
 		setTimeout(() => {   //2秒後に消す
@@ -1011,12 +1012,14 @@ function drawBeat(){        //拍子エリアに数字を置く
 
 //メトロノームのON/OFF
 function metroStart(){  //
+	document.getElementbyId('msgbox').textContents = '■canvasクリック！　movingフラグ：' + moving + 'fstop:' + fstop;
 	//dispMsg('■canvasクリック！　movingフラグ：' + moving);
 	if(moving){	//Stop ■ストップ操作
 		moving = false;
 		fstop = true;	//次の拍点で停止させる
 		console.log('停止フラグ：' + fstop);
 	}else{		//Start　■スタート操作
+		document.getElementbyId('msgbox').textContents = '●スタート！';
 		console.log('●スタート！');
 		if(!oscActive){	//初回タップ時のみの処理
 			//オシレータ開始（この段階で音量は０）
