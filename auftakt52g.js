@@ -12,7 +12,9 @@
 →スタータスをチェックするコードを加え、メッセージエリアに表示し現状分析する。
 →2025/06/11  9:01　スマホでやってみたが、有効になっていてもNOT activeと表示される。
 ・★sdelayを大きくすると音が欠ける問題。予約時刻をずらすのではなく、ボールの動きに使うタイムスタンプの方を遅らせればよいのでは？
-
+→効果あり！ただしやはりテンポが早くなると（８０を超えると）、１６分音符は欠けが出てしまう。
+この確認をしている最中に、タップで停止できなくなった。他の要素のリスナーは機能している。
+ボールの色をコードのはじめの方で指定できるようにした。
 
 ----以下は52_2のもの
 分割音と分割振り
@@ -80,7 +82,7 @@ let beat_canvas;
 let beat_context;
 let raf;	//request animation frameのインスタンス（停止するときに指定するため）
 let ball;	//動指標オブジェクト
-const ball_col = '#375d69';   //ボールの色
+const ball_col = 'navy';   //ボールの色
 const beat_col = '#375d69';   //;拍数字の色"rgb(153,153,0)";
 
 //各種ステータスフラグ（動作コントロール用）
@@ -143,7 +145,7 @@ const divHrate = 0.7   //分割振りの高さ比率
 //let ary_sdelay = [];
 let ary_sdelay = new Array(160, 120, 80, 0, -50, -100, -200);  //タイミング調整用
 let sdelay_idx = 3;
-let sdelay = 0;		//サウンドタイミング調整用[sec]
+let sdelay = 0;		//サウンドタイミング調整用[msec]
 const context = new AudioContext();
 const osc = context.createOscillator();
 const gain = context.createGain();
@@ -201,7 +203,7 @@ function init(){
 	  vx:17,
 	  vy: 23,
 	  radius: 20,
-	  color: "#375d69",
+	  color: ball_col,
 	  draw(x,y) {
 	    ctx.beginPath();
 	    ctx.arc(x, y, this.radius, 0, Math.PI * 2, true);
