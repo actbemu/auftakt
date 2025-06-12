@@ -1074,8 +1074,7 @@ function drawWaiting(rate) {
 	if(rate > 0.01){
 		startAngle = 1.5 * Math.PI;
 		const angle = rate * 2 * Math.PI;
-		//const radius = 120;
-		const radius = canvas.width / 6;
+		let radius = canvas.width / 6;
 		
 		if(canvas.height < canvas.width){radius =canvas.height / 6};
 		ctx.beginPath();
