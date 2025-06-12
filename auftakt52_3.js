@@ -18,7 +18,7 @@
 　　タイマーをクリアしたらintervalIDを0にする。intervalID>0のときはカウントダウン中ということで、クリックを無視する。→OK
  1秒おいてからカウントダウン始まる。→クリックしたらすぐに数字が表示されるか、ボールが跳ね上がるかして、ユーザーに反応を示すこと。 
 2025/06/12 13:08 パイチャート表示OK　やはりこちらの方が良い
-設定シートが開いてしまう。
+クリックしたあとに必ず設定シートが開いてしまう。
 
 ******以下は52gのもの************************
 Ｇｉｔｈｕｂに置けばURLコピーができるのかの確認
@@ -130,6 +130,7 @@ let fstop = false;	//直後の拍点で停止させるためのフラグ
 let f_wakelock = true;  //初回スタート時にWake Lockアクティブにする。
 let f_sound = true;	//クリックサウンドON/OFFフラグ
 let f_mousedown = false;   //マウススイッチON
+let f_mouseup = false;  //マウススイッチUP
 //タイムスタンプ
 let baseTimeStamp;	//[msec]単位
 let currentClickTimeStamp;
@@ -595,7 +596,7 @@ function init(){
 		//console.log('MM:' + MM + ' index:' + aryMM_idx);
 		console.log('aryMM.length:' + aryMM.length);
 		timer = setTimeout(() => {
-			if(travel < 8){  //600msec間の累積移動量^2が少ない場合は長押しと判定
+			if(travel < 12){  //600msec間の累積移動量^2が少ない場合は長押しと判定
 				longtap = true;
 				//設定パネル表示
 				dispSetting();
@@ -606,31 +607,32 @@ function init(){
 
 function mcMouseDown(event) {
 		event.preventDefault();  //イベントの処理を続けるのを阻止する。
-		f_mousedown = true;
-		startY = event.pageY;  //[0]最初のタッチだけを検知する。
-		console.log('タッチスタート　at　x=' + startY);
-		x0 = event.pageX;
-		y0 = event.pageY;
-		travel = 0;
-		longtap = false;
-		isClick = true;
 		//現在のMMに相当するaryMM_idxを求めておく
 		aryMM_idx = 0;
 		while (MM > aryMM[aryMM_idx]) {
 			aryMM_idx++;
 		}
 		//console.log('MM:' + MM + ' index:' + aryMM_idx);
-		console.log('aryMM.length:' + aryMM.length);
+		//console.log('aryMM.length:' + aryMM.length);
+			
+		f_mousedown = true;
+		startY = event.pageY;  //[0]最初のタッチだけを検知する。
+		console.log('MouseDownスタート　at　Y=' + startY);
+		x0 = event.pageX;
+		y0 = event.pageY;
+		//長押し検出
+		travel = 0;
+		longtap = false;
+		isClick = true;
 		timer = setTimeout(() => {
-		if(travel < 8){
-			longtap = true;
-				//設定パネル表示
-			f_mousedown = false;
-			dispSetting();
-		} 
-	
-	}, 600);
-		
+			//600msec間の累積移動量が小さければ長押し
+			if((travel < 12) && f_mousedown == true){
+				longtap = true;
+					//設定パネル表示
+				f_mousedown = false;
+				dispSetting();
+			} 
+		}, 600);
 	}
 
 
@@ -646,14 +648,16 @@ function mcMouseDown(event) {
 		const delta0 = 20;  //上下方向に動いた距離のしきい値
 		event.preventDefault();
 		const yy = event.touches[0].pageY;
-		//移動量がしきい値以内ならなにもしない
+		//移動量がしきい値未満ならなにもしない
 		deltaY = startY - yy;
 		if(Math.abs(deltaY) < delta0) return;
+		//ここで長押しでないことが確定、つまり移動しているのでテンポ変更とみなす
+		longtap = false;
 		//console.log('動いた！' + deltaY);
 		startY = yy;
 		//クリック音を出す
 		const now = context.currentTime;
-		gain.gain.setValueAtTime(1, now);
+		gain.gain.setValueAtTime(0.6, now);
 		gain.gain.linearRampToValueAtTime(0, now + 0.01);
 		//aryMM_idxを増減する
 		aryMM_idx += Math.sign(deltaY);
@@ -687,6 +691,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 			//移動量がしきい値以内ならなにもしない
 			deltaY = startY - yy;
 			if(Math.abs(deltaY) < delta0) return;
+			longtap = false;
 			//console.log('動いた！' + deltaY);
 			startY = yy;
 			//クリック音を出す
@@ -701,7 +706,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 				console.log('aryMM_idx上限！');
 			}
 			if(aryMM_idx < 0) aryMM_idx = 0;
-			console.log(aryMM_idx);
+			//console.log(aryMM_idx);
 			//MMを設定し、表示する
 			MM = aryMM[aryMM_idx];
 			document.getElementById('tempo').textContent = MM;
@@ -765,6 +770,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 	myc.addEventListener('mouseup', mcMouseUp);
 	function mcMouseUp(event) {
 		console.log('★MouseUp！ moving:' + moving);
+		f_mouseup = true;
 		//dispMsg('mouseup Click? isClick:' + isClick + ', longtap:' + longtap);
 		f_mousedown = false;
 		if(longtap){
@@ -1303,7 +1309,7 @@ function drawCounDownChart() {
 	let rate = 0;
 	if(start_wait > 0) rate = (start_wait - time0) / start_wait;
 	
-		console.log('描画タイマー起動中　rate:' + rate);
+		//console.log('描画タイマー起動中　rate:' + rate);
 	//
 	drawWaiting(rate);
 
@@ -1312,6 +1318,7 @@ function drawCounDownChart() {
 		window.cancelAnimationFrame(raf_countdown);
 		metroStart();
 	}else{
+		//次の描画の予約
 		raf_countdown = window.requestAnimationFrame(drawCounDownChart);
 	}
 }
