@@ -439,12 +439,14 @@ function init(){
 	let timer;  //長押し判別タイマー
 	let longtap;
 	let isClick = false;
-	//myc.addEventListener('touchstart', mcToucStart);
+	
 	myc.addEventListener('touchstart', mcToucStart);
 	myc.addEventListener('mousedown', mcMouseDown);
 	function mcToucStart(event) {
 		event.preventDefault();  //イベントの処理を続けるのを阻止する。
-		
+
+		f_mousedown = true;
+		f_mouseup = false;
 		startY = event.touches[0].pageY;  //[0]最初のタッチだけを検知する。
 		console.log('タッチスタート　at　x=' + startY);
 		x0 = event.touches[0].pageX;
@@ -461,8 +463,10 @@ function init(){
 		//console.log('MM:' + MM + ' index:' + aryMM_idx);
 		console.log('aryMM.length:' + aryMM.length);
 		timer = setTimeout(() => {
-			if(travel < 12){  //600msec間の累積移動量^2が少ない場合は長押しと判定
+			if((travel < 12) && f_mousedown == true){  //600msec間の累積移動量^2が少ない場合は長押しと判定
+				//600msecの間にupされていなければlongtapと判定、という意味からすると!f_mouse_upのほうが論理的にわかりやすか。
 				longtap = true;
+				f_mousedown = false;
 				//設定パネル表示
 				dispSetting();
 			} 
@@ -470,7 +474,7 @@ function init(){
 			
 	}
 
-function mcMouseDown(event) {
+	function mcMouseDown(event) {
 		event.preventDefault();  //イベントの処理を続けるのを阻止する。
 		//現在のMMに相当するaryMM_idxを求めておく
 		aryMM_idx = 0;
@@ -481,7 +485,7 @@ function mcMouseDown(event) {
 		//console.log('aryMM.length:' + aryMM.length);
 
 		f_mousedown = true;
-		startY = event.pageY;  //[0]最初のタッチだけを検知する。
+		startY = event.pageY;  
 		console.log('MouseDownスタート　at　Y=' + startY);
 		x0 = event.pageX;
 		y0 = event.pageY;
@@ -540,7 +544,7 @@ function mcMouseDown(event) {
 
 myc.addEventListener('mousemove', mcMouseMove);
 	function mcMouseMove(event) {
-		if(f_mousedown){
+		if(f_mousedown){　　//mousedownはあたりまえなので不要では？
 			//長押し検出用に移動量積算
 			travel += (x0 - event.pageX)^2 + (y0 - event.pageY)^2;
 			if(travel > 12) clearInterval(timer);
@@ -578,9 +582,23 @@ myc.addEventListener('mousemove', mcMouseMove);
 	}
 
 	
-	myc.addEventListener('touchend', mcTouchEnd);
+	myc.addEventListener('touchend', mcMouseUp);  //処理をmcMouseUpと同じにした
 	function mcTouchEnd(event) {
-		clearInterval(timer);
+		//clearInterval(timer);
+		//f_mousedown = false;
+		
+		clearInterval(timer);  //長押し判別タイマー停止
+		if(f_raf_countdown){
+			//カウントダウンタイマーを止める
+			window.cancelAnimationFrame(raf_countdown);
+			f_raf_countdown = false;
+			//ボールを最終拍においてスタンバイ
+			drawWaiting(0);
+			f_mouseup = true;
+			f_mousedown = false;
+			return;
+		}
+		f_mouseup = true;
 		f_mousedown = false;
 		if(longtap){
 			touch = false;
