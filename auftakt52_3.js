@@ -18,7 +18,10 @@
 　　タイマーをクリアしたらintervalIDを0にする。intervalID>0のときはカウントダウン中ということで、クリックを無視する。→OK
  1秒おいてからカウントダウン始まる。→クリックしたらすぐに数字が表示されるか、ボールが跳ね上がるかして、ユーザーに反応を示すこと。 
 2025/06/12 13:08 パイチャート表示OK　やはりこちらの方が良い
-クリックしたあとに必ず設定シートが開いてしまう。
+クリックしたあとに必ず設定シートが開いてしまう。マウスupの際の処理（フラグ設定）をしていなかった。
+問題点
+パイチャート表示中に再度クリックしたときの挙動→タイマーをキャンセルして待機状態にする。2025/06/12 16:51ほぼOK
+しかし、テンポ変更（スワイプ）、設定シート表示（長押し）の判別がいまいち。場合によっては、ずっとスワイプ状態になってしまうこともある。
 
 ******以下は52gのもの************************
 Ｇｉｔｈｕｂに置けばURLコピーができるのかの確認
@@ -131,6 +134,8 @@ let f_wakelock = true;  //初回スタート時にWake Lockアクティブにす
 let f_sound = true;	//クリックサウンドON/OFFフラグ
 let f_mousedown = false;   //マウススイッチON
 let f_mouseup = false;  //マウススイッチUP
+let f_raf_countdown = false;
+
 //タイムスタンプ
 let baseTimeStamp;	//[msec]単位
 let currentClickTimeStamp;
@@ -572,7 +577,7 @@ function init(){
 	var endY = null;
 	var deltaY = null;
 	var x0, y0, travel;  //move量
-	let timer;
+	let timer;  //長押し判別タイマー
 	let longtap;
 	let isClick = false;
 	//myc.addEventListener('touchstart', mcToucStart);
@@ -593,6 +598,7 @@ function init(){
 		while (MM > aryMM[aryMM_idx]) {
 			aryMM_idx++;
 		}
+
 		//console.log('MM:' + MM + ' index:' + aryMM_idx);
 		console.log('aryMM.length:' + aryMM.length);
 		timer = setTimeout(() => {
@@ -614,7 +620,7 @@ function mcMouseDown(event) {
 		}
 		//console.log('MM:' + MM + ' index:' + aryMM_idx);
 		//console.log('aryMM.length:' + aryMM.length);
-			
+
 		f_mousedown = true;
 		startY = event.pageY;  //[0]最初のタッチだけを検知する。
 		console.log('MouseDownスタート　at　Y=' + startY);
@@ -624,10 +630,10 @@ function mcMouseDown(event) {
 		travel = 0;
 		longtap = false;
 		isClick = true;
-		timer = setTimeout(() => {
+		timer = setTimeout(() => {　　//停止はclearInterval(timer)
 			//600msec間の累積移動量が小さければ長押し
 			if((travel < 12) && f_mousedown == true){
-				longtap = true;
+				longtap = true;  //mouseupなどで使う
 					//設定パネル表示
 				f_mousedown = false;
 				dispSetting();
@@ -641,6 +647,7 @@ function mcMouseDown(event) {
 	function mcMove(event) {
 		//長押し検出用に移動量積算
 		travel += (x0 - event.touches[0].pageX)^2 + (y0 - event.touches[0].pageY)^2;
+		if(travel > 12) clearInterval(timer);
 		x0 = event.touches[0].pageX;
 		y0 = event.touches[0].pageY;
 		console.log('travel:' + travel);
@@ -681,6 +688,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 		if(f_mousedown){
 			//長押し検出用に移動量積算
 			travel += (x0 - event.pageX)^2 + (y0 - event.pageY)^2;
+			if(travel > 12) clearInterval(timer);
 			x0 = event.pageX;
 			y0 = event.pageY;
 			console.log('travel:' + travel);
@@ -719,12 +727,13 @@ myc.addEventListener('mousemove', mcMouseMove);
 	
 	myc.addEventListener('touchend', mcTouchEnd);
 	function mcTouchEnd(event) {
+		clearInterval(timer);
 	//dispMsg('touchend...isClick:' + isClick + ', longtap:' + longtap);
 		f_mousedown = false;
 		if(longtap){
 			touch = false;
 		}else{
-			clearTimeout(timer);
+			//clearTimeout(timer);
 			if(!isClick)return;
 			//クリックと判断
 			//moving = false;  //デバグ用これがあると停止しなくなる予定
@@ -743,7 +752,8 @@ myc.addEventListener('mousemove', mcMouseMove);
 				ct0 = performance.now();
 				//描画タイマー起動
 				raf_countdown = window.requestAnimationFrame(drawCounDownChart);
-				
+				f_raf_countdown = true;
+				console.log('pieチャートタイマー起動 raf_countdown:' + raf_countdown);
 				/*
 
 				
@@ -770,6 +780,17 @@ myc.addEventListener('mousemove', mcMouseMove);
 	myc.addEventListener('mouseup', mcMouseUp);
 	function mcMouseUp(event) {
 		console.log('★MouseUp！ moving:' + moving);
+		clearInterval(timer);  //長押し判別タイマー停止
+		if(f_raf_countdown){
+			//カウントダウンタイマーを止める
+			window.cancelAnimationFrame(raf_countdown);
+			f_raf_countdown = false;
+			//ボールを最終拍においてスタンバイ
+			drawWaiting(0);
+			f_mouseup = true;
+			f_mousedown = false;
+			return;
+		}
 		f_mouseup = true;
 		//dispMsg('mouseup Click? isClick:' + isClick + ', longtap:' + longtap);
 		f_mousedown = false;
@@ -779,6 +800,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 			//clearTimeout(timer);
 			if(!isClick)return;
 			//クリックと判断
+			
 			//moving = false;  //デバグ用これがあると停止しなくなる予定
 			//dispMsg('going to metroStart()  moving:' + moving);
 			if(moving){	//Stop ■ストップ操作
@@ -795,7 +817,9 @@ myc.addEventListener('mousemove', mcMouseMove);
 				//描画タイマー起動
 				console.log('描画タイマー起動');
 				raf_countdown = window.requestAnimationFrame(drawCounDownChart);
-				
+				f_raf_countdown = true;
+								console.log('pieチャートタイマー起動 raf_countdown:' + raf_countdown);
+
 				/*
 				//ボールを最終拍においてスタンバイ
 				ctx.clearRect(0, 0, canvas.width, canvas.height);//カンバス内全面クリア
@@ -921,7 +945,7 @@ function drawMark() {
 	const y = -4 * t * (t - 1);
 	
 	//console.log(x + " " + y);
-	let maxH =  (canvas.height - 2*ball.radius);
+	let maxH =  (canvas.height - 5*ball.radius);
 	
 	if(divBeat_idx > 0){maxH *= divHrate;}//分割振り対応
 	bpm = MM * ndivBeat;
@@ -1316,10 +1340,14 @@ function drawCounDownChart() {
 	if(rate < 0.001){  //動作開始
 		//タイマー破棄
 		window.cancelAnimationFrame(raf_countdown);
+		f_raf_countdown = false;
+		console.log('タイマー破棄　raf_countdown:' + raf_countdown);
+		
 		metroStart();
 	}else{
 		//次の描画の予約
 		raf_countdown = window.requestAnimationFrame(drawCounDownChart);
+		f_raf_countdown = true;
 	}
 }
 
