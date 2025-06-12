@@ -12,7 +12,13 @@
 この時点でGITHUBに送る
 2025/06/11 22:57 ロックかかっているのにalertではNOT activeと出てしまう。
 ボールの最高点がボタンとかぶる。もうすこし低くてもよいか。
-2025/06/12  6:46 chkWakeLockのオブジェクトを変更
+2025/06/12  6:46 chkWakeLockのオブジェクトを変更→だめ。結局単なるアラートで対応
+待ち時間対応で、カウントダウン表示して開始するようにdelayStart関数作成
+2025/06/12  8:30　カウントダウン中に再度クリックしてしまうと、タイマーが残ってしまい、止まらなくなる。
+　　タイマーをクリアしたらintervalIDを0にする。intervalID>0のときはカウントダウン中ということで、クリックを無視する。→OK
+ 1秒おいてからカウントダウン始まる。→クリックしたらすぐに数字が表示されるか、ボールが跳ね上がるかして、ユーザーに反応を示すこと。 
+2025/06/12 13:08 パイチャート表示OK　やはりこちらの方が良い
+設定シートが開いてしまう。
 
 ******以下は52gのもの************************
 Ｇｉｔｈｕｂに置けばURLコピーができるのかの確認
@@ -104,13 +110,18 @@ let beat_canvas;
 let beat_context;
 let raf;	//request animation frameのインスタンス（停止するときに指定するため）
 let ball;	//動指標オブジェクト
+let intervalID = 0;
 //const ball_col = 'navy';   //ボールの色
 //const ball_col = '#082752';   //ボールの色濃い藍
 const ball_col = '#165e83';   //ボールの色 藍
 const beat_col = '#250d00';   //;拍数字の色;黒檀 こくたん#250d00
 const divdot0_col = '#38b48b'  //分割時のドット
 const divdot1_col = '#38b48b'  //分割時のドット#38b48b翡翠色
+const cntdwn_col = '#b48a76'  //梅染 うめぞめ　　桜鼠 さくらねず#e9dfe5
+const pie_color = '#b48a76'  //梅染 うめぞめ　　桜鼠 さくらねず#e9dfe5
 
+let ct0;    //カウントダウン開始タイムスタンプ
+let raf_countdown;  //開始待機時のパイチャート表示アニメーションrequest animation frame
 
 //各種ステータスフラグ（動作コントロール用）
 let moving=false;	//動作中かどうか
@@ -721,26 +732,45 @@ myc.addEventListener('mousemove', mcMouseMove);
 				console.log('停止フラグ：' + fstop);
 			}else{
 				//ボールを最終拍においてスタンバイ
+				let rate = 0;
+				if(start_wait >0)rate = 100;
+				drawWaiting(rate);
+				ct0 = performance.now();
+				//描画タイマー起動
+				raf_countdown = window.requestAnimationFrame(drawCounDownChart);
+				
+				/*
+
+				
 				ctx.clearRect(0, 0, canvas.width, canvas.height);//カンバス内全面クリア
 				//xxU = xx0 + ( Beat - 1) * xpitch;	//跳ね上げ点
 				ball.draw(xx0 + ( Beat - 1) * xpitch, canvas.height - ball.radius);
-				//待ち時間語に開始
-				setTimeout(() => {   //start_wait[msec]後にスタート
-				  metroStart();
-				}, start_wait);
+				*/
+				
+				//待ち時間後に開始
+				/*
+				remainingTime = start_wait / 1000;
+				intervalID = setInterval(delayStart, 1000);
+								console.log('■intervalID:' + intervalID);
+				*/
+				/*
+					setTimeout(() => {   //start_wait[msec]後にスタート
+					  metroStart();
+					}, start_wait);
+				*/
 			}		
 		}
 	}
 
 	myc.addEventListener('mouseup', mcMouseUp);
 	function mcMouseUp(event) {
-		console.log('★MouseUp！' + moving);
+		console.log('★MouseUp！ moving:' + moving);
 		//dispMsg('mouseup Click? isClick:' + isClick + ', longtap:' + longtap);
 		f_mousedown = false;
 		if(longtap){
 			touch = false;
 		}else{
-			clearTimeout(timer);
+			//clearTimeout(timer);
 			if(!isClick)return;
 			//クリックと判断
 			//moving = false;  //デバグ用これがあると停止しなくなる予定
@@ -748,16 +778,33 @@ myc.addEventListener('mousemove', mcMouseMove);
 			if(moving){	//Stop ■ストップ操作
 				moving = false;
 				fstop = true;	//次の拍点で停止させる
-				console.log('停止フラグ：' + fstop);
+				console.log('停止フラグ　fstop：' + fstop);
 			}else{
+				console.log('停止フラグ　fstop：' + fstop);
+				//ボールを最終拍においてスタンバイ
+				let rate = 0;
+				if(start_wait >0)rate = 1;
+				drawWaiting(rate);
+				ct0 = performance.now();
+				//描画タイマー起動
+				console.log('描画タイマー起動');
+				raf_countdown = window.requestAnimationFrame(drawCounDownChart);
+				
+				/*
 				//ボールを最終拍においてスタンバイ
 				ctx.clearRect(0, 0, canvas.width, canvas.height);//カンバス内全面クリア
 				//xxU = xx0 + ( Beat - 1) * xpitch;	//跳ね上げ点
 				ball.draw(xx0 + ( Beat - 1) * xpitch, canvas.height - ball.radius);
-				//待ち時間語に開始
-				setTimeout(() => {   //start_wait[msec]後にスタート
-				  metroStart();
-				}, start_wait);
+				//待ち時間後に開始
+				remainingTime = start_wait / 1000;
+				intervalID = setInterval(delayStart, 1000);
+								console.log('■■■intervalID:' + intervalID);
+				*/
+				/*
+					setTimeout(() => {   //start_wait[msec]後にスタート
+					  metroStart();
+					}, start_wait);
+				*/
 			}
 		}
 	}
@@ -1211,6 +1258,89 @@ function long_press(el,nf,lf,sec){
 	}
   });
 }  //function long_press
+
+/*****************************
+*/
+
+let remainingTime;  //[sec]
+function  delayStart(){
+	if(remainingTime > 0){
+		//remainingTimeを表示
+		ctx.clearRect(0, 0, canvas.width, canvas.height);//カンバス内全面クリア
+		ball.draw(xx0 + ( Beat - 1) * xpitch, canvas.height - ball.radius);
+		ctx.font = "bold 50pt sans-serif";
+		ctx.fillStyle = cntdwn_col;
+		ctx.fillText(remainingTime, canvas.width / 2 - 0.5 * ctx.measureText(remainingTime).width, canvas.height / 2); 
+	
+		remainingTime --;
+			
+	}else{   //時間切れ
+		//alert('time up!');
+		//表示を消す
+		ctx.clearRect(0, 0, canvas.width, canvas.height);//カンバス内全面クリア
+		ball.draw(xx0 + ( Beat - 1) * xpitch, canvas.height - ball.radius);
+		//カウントダウンタイマーを止める
+		clearInterval(intervalID);
+		console.log('★★★　stopped　intervalID:' + intervalID);
+		intervalID = 0;   //0でタイマーが止まったことを示す
+		//メトロノームスタート
+		metroStart();
+	}
+
+	
+}
+
+
+
+/*******************
+開始待機画面描画
+アウフタクトにボールを置いて、rateに相当するグラフを描画
+*/
+function drawCounDownChart() {
+	const now = performance.now();
+	const time0 = now - ct0; //開始からの経過時間[msec];
+	//残り時間の割合を計算
+	let rate = 0;
+	if(start_wait > 0) rate = (start_wait - time0) / start_wait;
+	
+		console.log('描画タイマー起動中　rate:' + rate);
+	//
+	drawWaiting(rate);
+
+	if(rate < 0.001){  //動作開始
+		//タイマー破棄
+		window.cancelAnimationFrame(raf_countdown);
+		metroStart();
+	}else{
+		raf_countdown = window.requestAnimationFrame(drawCounDownChart);
+	}
+}
+
+
+/*******************
+開始待機画面描画
+アウフタクトにボールを置いて、rate(0 - 1)に相当するグラフを描画
+*/
+function drawWaiting(rate) {
+	//ボールを最終拍においてスタンバイ
+	ctx.clearRect(0, 0, canvas.width, canvas.height);//カンバス内全面クリア
+	ball.draw(xx0 + ( Beat - 1) * xpitch, canvas.height - ball.radius);
+	//パイチャート描画
+	if(rate > 0.01){
+		startAngle = 1.5 * Math.PI;
+		const angle = rate * 2 * Math.PI;
+		//const radius = 120;
+		const radius = canvas.width / 6;
+		
+		if(canvas.height < canvas.width){radius =canvas.height / 6};
+		ctx.beginPath();
+		ctx.moveTo(canvas.width / 2, canvas.height / 2); // 円の中心キャンバスの中央
+		ctx.arc(canvas.width / 2, canvas.height / 2,  radius , startAngle, startAngle - angle, true);
+		ctx.fillStyle = pie_color;
+		ctx.fill(); 		
+	}
+	
+}
 
 
 //テンポ選択リストボックスの内容
