@@ -541,6 +541,7 @@ if( iphone || androidSp || ipad || androidT){
 		console.log(aryMM_idx);
 		//MMを設定し、表示する
 		MM = aryMM[aryMM_idx];
+		setTempo(MM);
 		document.getElementById('tempo').textContent = MM;
 		//touchendのときにクリックと判断しないようにフラグを立てる
 		isClick = false;
@@ -579,6 +580,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 			if(aryMM_idx < 0) aryMM_idx = 0;
 			//MMを設定し、表示する
 			MM = aryMM[aryMM_idx];
+			setTempo(MM);
 			document.getElementById('tempo').textContent = MM;
 			//touchendのときにクリックと判断しないようにフラグを立てる
 			isClick = false;
