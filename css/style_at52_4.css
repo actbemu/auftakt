@@ -30,7 +30,7 @@ position:relative;
 }
 
 #beatCanvas{
-    background: ##250d00;  /*砂色#dcd3b2　黒檀 #250d00*/
+    background: #250d00;  /*砂色#dcd3b2　黒檀 #250d00*/
     width: 100%;
     height:10%;
     bottom: 0px;
