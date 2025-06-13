@@ -33,7 +33,7 @@ const ball_col = '#38b48b';   //珊瑚朱色 #ee836f、琥珀色#bf783a
 const beat_col = '#dde5fe';   //;拍数字の色; 砂色#dcd3b2、海貝色#fff5ee
 const beat_bgcol = '#250d00';  //拍子エリア背景色　黒檀#250d00
 const mc_bgcol = '#fffffc';  //メインキャンバス　胡粉色 #fffffc
-const set_bgcol = '#dcd3b2';  //設定パネルの背景　砂色#dcd3b2
+const set_bgcol = 'rgb(220,211,178,0.6)';  //設定パネルの背景　砂色#dcd3b2、rgb(220,211,178,0.4)
 
 
 const divdot0_col = '#e7e7eb';  //分割時のドット紫水晶 #e7e7eb
@@ -358,6 +358,7 @@ beat_canvas.style.color = beat_bgcol;
     	//setting画面(div要素)を表示
         document.getElementById('setting').style.display = 'block';
 		document.getElementById('setting').style.backgroundColor  = set_bgcol;
+		
     }
 
 	//●●●●---設定パネルの処理---●●●●
