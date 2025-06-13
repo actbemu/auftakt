@@ -1,5 +1,5 @@
 /*
-【auftakt52.js】2025/06/12　auftakt52.jsを元に開発
+【auftakt52_4.js】2025/06/12　auftakt52.jsを元に開発
 */
 /************* 本スクリプトの目的・成果 ***************
 htmlのscriptタグの中でdeferをつけたときの効果を確認。
@@ -28,15 +28,18 @@ let ball;	//動指標オブジェクト
 let intervalID = 0;
 //const ball_col = 'navy';   //ボールの色
 //const ball_col = '#082752';   //ボールの色濃い藍
-const ball_col = '#165e83';   //ボールの色 藍
-const beat_col = '#dcd3b2';   //;拍数字の色; 砂色#dcd3b2
+//const ball_col = '#165e83';   //ボールの色 藍
+const ball_col = '#38b48b';   //珊瑚朱色 #ee836f、琥珀色#bf783a
+const beat_col = '#dde5fe';   //;拍数字の色; 砂色#dcd3b2、海貝色#fff5ee
 const beat_bgcol = '#250d00';  //拍子エリア背景色　黒檀#250d00
 const mc_bgcol = '#fffffc';  //メインキャンバス　胡粉色 #fffffc
+const set_bgcol = '#dcd3b2';  //設定パネルの背景　砂色#dcd3b2
 
-const divdot0_col = '#38b48b';  //分割時のドット
-const divdot1_col = '#38b48b'; //分割時のドット#38b48b翡翠色
-const cntdwn_col = '#b48a76';  //梅染 うめぞめ　　桜鼠 さくらねず#e9dfe5
-const pie_color = '#b48a76';  //梅染 うめぞめ　　桜鼠 さくらねず#e9dfe5
+
+const divdot0_col = '#e7e7eb';  //分割時のドット紫水晶 #e7e7eb
+const divdot1_col = '#ee836f';  //分割時のドット翡翠色 #38b48b 
+const cntdwn_col = '#b48a76';  //梅染 うめぞめ　　桜鼠 さくらねず#e9dfe5、灰桜 #e8d3d1
+const pie_color = '#e8d3d1';  //梅染 うめぞめ　　桜鼠 さくらねず#e9dfe5、薄桜 #fdeff2
 const msg_col = '#e6b422';  //黄金 #e6b422
 let ct0;    //カウントダウン開始タイムスタンプ
 let raf_countdown;  //開始待機時のパイチャート表示アニメーションrequest animation frame
@@ -354,6 +357,7 @@ beat_canvas.style.color = beat_bgcol;
 	function dispSetting(){
     	//setting画面(div要素)を表示
         document.getElementById('setting').style.display = 'block';
+		document.getElementById('setting').style.backgroundColor  = set_bgcol;
     }
 
 	//●●●●---設定パネルの処理---●●●●
@@ -682,7 +686,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 	const btnCopyURL = document.getElementById("btn_copy_url");
 	btnCopyURL.addEventListener('click', () => {
 		if (!navigator.clipboard) {
-			//dispMsg("'Copy URL' is not available on this bowser.");
+			dispMsg("'Copy URL' is not available on this bowser.");
 			return;
 		}
 		//デフォルト値の場合はＵＲＬに含めない。
@@ -764,7 +768,7 @@ if (isSupported) {
 		wakeLock.addEventListener('release', () => {
 			// if wake lock is released alter the button accordingly
 			//changeUI('released');
-			dispMsg('Wake Lock is released.');
+			dispMsg('** Wake Lock is released. **');
 		});
 		
 		} catch (err) {
@@ -939,7 +943,7 @@ function drawBeat(){        //拍子エリアに数字を置く
 	beat_context.fillStyle = beat_col;
 	xpitch = beat_canvas.width / Beat;
 	xx0 = xpitch / 2;  //0.5拍目の位置
-	let y0 = 45;
+	let y0 = 50;
 	beat_context.clearRect(0, 0, beat_canvas.width, beat_canvas.height);
 	let x = xx0;
 	//console.log("Beat:" + Beat);
@@ -996,7 +1000,7 @@ function metroStart(){  //
 		//wakelock = enableWakeLock();
 		requestWakeLock();
 		//console.log('enableWakeLock:' + wakelock.loked);
-		dispMsg('Screen Wake Lock enabled. The screen will stay on');
+		//dispMsg('Screen Wake Lock enabled. The screen will stay on.');
 
 		f_wakelock = false;
 	}
