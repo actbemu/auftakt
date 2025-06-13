@@ -29,12 +29,15 @@ let intervalID = 0;
 //const ball_col = 'navy';   //ボールの色
 //const ball_col = '#082752';   //ボールの色濃い藍
 const ball_col = '#165e83';   //ボールの色 藍
-const beat_col = '#dcd3b2';   //;拍数字の色;黒檀#250d00 砂色#dcd3b2
-const divdot0_col = '#38b48b'  //分割時のドット
-const divdot1_col = '#38b48b'  //分割時のドット#38b48b翡翠色
-const cntdwn_col = '#b48a76'  //梅染 うめぞめ　　桜鼠 さくらねず#e9dfe5
-const pie_color = '#b48a76'  //梅染 うめぞめ　　桜鼠 さくらねず#e9dfe5
+const beat_col = '#dcd3b2';   //;拍数字の色; 砂色#dcd3b2
+const beat_bgcol = '#250d00';  //拍子エリア背景色　黒檀#250d00
+const mc_bgcol = '#fffffc';  //メインキャンバス　胡粉色 #fffffc
 
+const divdot0_col = '#38b48b';  //分割時のドット
+const divdot1_col = '#38b48b'; //分割時のドット#38b48b翡翠色
+const cntdwn_col = '#b48a76';  //梅染 うめぞめ　　桜鼠 さくらねず#e9dfe5
+const pie_color = '#b48a76';  //梅染 うめぞめ　　桜鼠 さくらねず#e9dfe5
+const msg_col = '#e6b422';  //黄金 #e6b422
 let ct0;    //カウントダウン開始タイムスタンプ
 let raf_countdown;  //開始待機時のパイチャート表示アニメーションrequest animation frame
 
@@ -135,7 +138,9 @@ if( iphone || androidSp || ipad || androidT){
 
     beat_canvas = document.getElementById("beatCanvas");       //拍子表示キャンバス（画面下部）
     beat_context = beat_canvas.getContext("2d");
-
+//背景色設定
+canvas.style.color = mc_bgcol;
+beat_canvas.style.color = beat_bgcol;
     let beat_canvasWidth = beat_canvas.width;
     let beat_canvasHeight = beat_canvas.height;
 	//設定パネルを非表示に
@@ -697,6 +702,7 @@ myc.addEventListener('mousemove', mcMouseMove);
 	//メッセージエリアに表示し、３秒後に消す
 	function dispMsg(txt){
 		//console.log(el.textContent);
+		el.style.color = msg_col;
 		el.textContent = txt;
 		//el.style.display = 'block';
 		setTimeout(() => {   //2秒後に消す
@@ -985,8 +991,6 @@ function metroStart(){  //
 		oscActive = true;
 		//オシレータ開始時のタイムスタンプを基準にする
 		baseTimeStamp = performance.now() - context.currentTime * 1000;
-		//メッセージボックスクリア
-		document.getElementById('msgbox').textContent = '';
 	}
 	if(f_wakelock && isSupported){
 		//wakelock = enableWakeLock();
