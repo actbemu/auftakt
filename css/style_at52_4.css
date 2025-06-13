@@ -1,0 +1,144 @@
+*{margin: 0; padding: 0;}
+html, body{height: 100%; width: 100%;}
+/*html, body { overflow-x: hidden; } */
+body {
+  /*-webkit-touch-callout:none;  リンク長押しのポップアップ(※1)を無効化*/
+  -webkit-user-select:none;   /*テキスト長押しの選択ボックス(※2)を無効化*/
+}
+canvas{display: block;}
+
+/*
+wrapperについて参考サイト
+http://qiita.com/ShinyaOkazawa/items/9e662bf2121548f79d5f
+*/
+.wrapper{
+  width: 100%;
+  height: 100%;
+}
+
+#parent{
+position:relative;
+}
+
+#myCanvas{
+    background: ##fef4f4;  /*桜色*/
+    width: 100%;
+    height: 90%;
+    top: 0px;
+    left: 0px;
+    position: relative;
+}
+
+#beatCanvas{
+    background: #dcd3b2;  /*砂色*/
+    width: 100%;
+    height:10%;
+    bottom: 0px;
+    left: 0px;
+    position: absolute;
+}
+
+#myButtons{
+    bottom: 20px;
+    left: 20px;
+    position: absolute;
+}
+
+#myButtons button{
+    padding: 5px;
+}
+
+
+#btnTAP{
+    top:10px;
+    right: 5px;
+    position: absolute;
+}
+
+#tempo{
+    top:10px;
+    left: 5px;
+    position: absolute;
+    font-size: 30pt;
+    font-weight: bolder;
+    font-family: "sans-serif";
+    color: #767c6b;  /*山鳩色*/
+}
+#tempoAdjdown{
+ top:10px;
+    left: 100px;
+    position: absolute;
+    font-size: 30pt;
+    font-weight: bolder;
+    font-family: "sans-serif";
+    color: #CEE3F6;
+}
+#tempoAdjup{
+ top:10px;
+    left: 157px;
+    position: absolute;
+    font-size: 30pt;
+    font-weight: bolder;
+    font-family: "sans-serif";
+    color: #CEE3F6;
+}
+#divTempoList{
+    top:50px;
+    left: 5px;
+    position: absolute;
+}
+select{
+    font-size: 24pt;
+}
+
+#slider{
+    top:70px;
+    right: 5px;
+    position: absolute;
+}
+
+#jquery-ui-slider {
+    margin: 10px auto;
+    height: 150px;
+}
+
+/*
+リンク長押しのポップアップを有効にしておく。
+冒頭のbodyの -webkit-touch-callout:none; をコメントアウトした
+*/
+#setting{
+    top:70px;
+    left:15px;
+	background:rgb(193 228 233 / 50%);  /* 白藍*/
+	padding:0.5em;
+    position: absolute;
+    font-family: "sans-serif";
+    color:#222233;
+    font-size:3.5vh;
+}
+
+.radiorow{
+    font-size:3.2vh;
+    margin-left:2em;
+}
+
+.ButtonText{
+     font-size:3vh;
+    font-weight:bold;
+    color:#29659d;
+}
+a:link { color: #29659d; }
+a:visited { color: #29659d;  }
+a:hover { color: #29659d }
+a:active { color: #29659d }
+
+#msgbox{
+    color: #9f4b23;
+    color:#752100;  /*赤銅色*/
+    bottom: 3px;
+    position: absolute;
+    font-size:smaller;
+    font-family:sans-serif;
+    z-index:3;
+    margin: 0 auto;
+}
