@@ -694,14 +694,14 @@ myc.addEventListener('mousemove', mcMouseMove);
 
 
 	const el = document.getElementById('msgbox');
-	//メッセージエリアに表示し、2秒後に消す
+	//メッセージエリアに表示し、３秒後に消す
 	function dispMsg(txt){
 		//console.log(el.textContent);
 		el.textContent = txt;
 		//el.style.display = 'block';
 		setTimeout(() => {   //2秒後に消す
 			  el.textContent ='';
-		}, 2000);
+		}, 3000);
 	}
   
 
