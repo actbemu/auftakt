@@ -8,6 +8,8 @@ htmlのscriptタグの中でdeferをつけたときの効果を確認。
 Wake Lockがリリースされたときの扱いを検討
 リリースイベントが検知できるか
 Wake Lockを再び設定できるか?
+スマホで画面を別アプリにしたら、15秒で暗転。AuftaktにもどったらWake Lock ONになっていた。
+動作としてはOK．ただし、メッセージが表示されない。
 
 ****************************************************/
 //----- グローバル変数の宣言・定義 -----------------
@@ -747,8 +749,7 @@ if (isSupported) {
 		try {
 		wakeLock = await navigator.wakeLock.request('screen');
 		
-		// change up our interface to reflect wake lock active
-		//changeUI();
+		dispMsg('<< Wake Lock is active.>>');
 		
 		// listen for our release event
 		wakeLock.onrelease = function(ev) {
