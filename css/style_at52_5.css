@@ -141,6 +141,7 @@ a:active { color: #29659d }
 }
 
 #QRsheet{
+    overflow-wrap: anywhere;
     top:70px;
     left:15px;
 	/*background:rgb(193 228 233 / 50%);   白藍*/
