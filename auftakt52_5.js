@@ -59,6 +59,9 @@ const el_csBSD = document.getElementById('csBSD');
 const el_csBMD = document.getElementById('csBMD');
 const el_URL = document.getElementById('URL');
 const el_QR = document.getElementById('QR');
+const el_dBSD = document.getElementById('dBSD');
+const el_dBMD = document.getElementById('dBMD');
+
 
 
 
@@ -192,7 +195,9 @@ function resizeCanvas(){
 	cvMain.setAttribute('height', 0.8 * h);  //wrapperを上下に8:2に分ける
 
 	//設定パネルとQRコード出力シートの幅を規定
-	elQRsheet.style.width = (wrapper.clientWidth - 20) +'px';
+	let wQSheet = wrapper.clientWidth;
+	if(wrapper.clientHeight < wrapper.clientWidth) wQSheet = wrapper.clientHeight;
+	elQRsheet.style.width = (wQSheet - 20) +'px';
 	
 	//const el_beat = document.getElementById('beatCanvas');
 	cvBeat.setAttribute('width', w);
@@ -526,6 +531,8 @@ btnQRcode.addEventListener('click', () => {
 	//設定パネルを消し、QRコード出力シートを表示
 	dispElement(elSetting, false);
 	dispElement(elQRsheet, true);
+	//メトロノームの動作停止
+	f_stop = true;
 	
 	if (!navigator.clipboard) {
 		dispMsg("'Copy URL' is not available on this bowser.");
@@ -545,7 +552,17 @@ btnQRcode.addEventListener('click', () => {
 	el_csBeat.textContent = Beat;
 	el_csTempo.textContent = MM;
 	el_csBSD.textContent = ndivSound;
+	if(ndivSound > 1){
+		dispElement(el_dBSD, true);
+	}else{
+		dispElement(el_dBSD, false);  //デフォルト値の場合は表示しない
+	}
 	el_csBMD.textContent = ndivBeat;
+	if(ndivSound > 1){
+		dispElement(el_dBMD, true);
+	}else{
+		dispElement(el_dBMD, false);
+	}
 	el_URL.textContent = txt;
 
 	document.getElementById('QR').textContent = '';　　//QRコード描画前にエリア内消去
