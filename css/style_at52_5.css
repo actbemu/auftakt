@@ -110,7 +110,7 @@ select{
     position: absolute;
     font-family: "sans-serif";
     color:#222233;
-    font-size:3.5vh;
+    font-size:3.3vh;
 }
 
 .radiorow{
@@ -149,11 +149,11 @@ a:active { color: #29659d }
     position: absolute;
     font-family: "sans-serif";
     color:#222233;
-    font-size:2vh;
+    font-size:2.9vh;
 }
 
 #current_setting{
-    margin-left:2em;
+    margin-left:1em;
 }
 
 #QR{
@@ -163,4 +163,9 @@ a:active { color: #29659d }
 
 #URL{
     color:#752100
+}
+
+.cs_text{
+    font-weight:bold;
+    color:#250d00;
 }
