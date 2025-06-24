@@ -21,7 +21,7 @@
 const DEBUG = true;  //デバグ用 主にconsole表示 
 
 //公開URL　　QRコード出力で使用
-const BASE_URL = location.protocol+'://'+location.host+location.pathname;
+const BASE_URL = location.protocol+'//'+location.host+location.pathname;
 if(DEBUG) console.log(BASE_URL);
 
 //----色関連-----------------
