@@ -197,7 +197,7 @@ function resizeCanvas(){
 	//設定パネルとQRコード出力シートの幅を規定
 	let wQSheet = wrapper.clientWidth;
 	if(wrapper.clientHeight < wrapper.clientWidth) wQSheet = wrapper.clientHeight;
-	elQRsheet.style.width = (wQSheet - 20) +'px';
+	elQRsheet.style.width = (wQSheet - 30) +'px';
 	
 	//const el_beat = document.getElementById('beatCanvas');
 	cvBeat.setAttribute('width', w);
