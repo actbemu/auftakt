@@ -15,7 +15,8 @@
 2025/06/20下にスワイプしたときに、設定パネルが開いてしまうことがある。振り分け条件で＝の場合が抜けていた
 テンポリストの表示。2段階ではなく、ワンタップでリスト全体が表示できるようにしたい。
 
-起動時と設定画面のHELPタップ時に、画面上に図のようなヘルプを重ね書きする。
+起動時と設定画面のHELPタップ時に、画面上にヘルプを重ね書きする。
+拍子エリアに描いた破線の円は、個別に消去する必要がある。その他cvMainのパーツは、スタート時点で自動的に消去される。
 */
 
 //■■■■■■■ 定数・変数宣言、定義 ■■■■■■
@@ -526,7 +527,13 @@ function mcMouseUp(event) {
 	}
 }
 
-	
+//Help表示（[Help]がクリックされたら）
+const btnHelp = document.getElementById("btn_Help");
+btnHelp.addEventListener('click', () => {
+	//設定パネルを消し、Help表示
+	dispElement(elSetting, false);
+	drawHelp();
+});
 // QRコード出力処理（[QR code]がクリックされたら）
 const btnQRcode = document.getElementById("btn_QRcode");
 btnQRcode.addEventListener('click', () => {
@@ -902,19 +909,30 @@ function drawWaiting(rate) {
 //起動時と設定画面のHELPタップ時に、画面上にヘルプを重ね書きする。
 function drawHelp() {
 	const txt_color = '#ed6d3d';  //鬱金色 うこんいろ#fabf14 黒檀 こくたん#250d00
-	const line_color = '#fabf14';
+	const line_color = '#ed6d3d';
 	var str = '';
 	var xx, yy;
 	ctxMain.font = "13pt sans-serif";
 	ctxMain.fillStyle = txt_color;
-	str = 'Tap here to select Tempo.';
+	ctxMain.strokeStyle = line_color;
+	ctxMain.lineWidth = 1;
+	
+	//テンポ関連
+	str = 'Tap Number to select Tempo.';
 	ctxMain.fillText(str, 10, 120);
+	//矢印線書く、角度は45度から20度に変えて鋭い矢印に
+	aline(ctxMain, 20, 104, 30, 40, 20, 14);
+	
 	str = 'Tempo up / down';
 	ctxMain.fillText(str, 100, 100);
+	aline(ctxMain, 130, 88, 140, 53, 20, 14);
+
 	str = 'Tapping';
 	ctxMain.fillText(str, 200, 80);
+	aline(ctxMain, 220, 66, 225, 38, 20, 14);
 
-	//以下の文字列はセンタリング
+
+	//画面中央タップとスワイプ（センタリング）
 	ctxMain.textAlign = "center";
 	xx = 0.5 * cvMain.width;
 	str = 'Swipe upward/downward';
@@ -923,16 +941,71 @@ function drawHelp() {
 	str = 'to change Tempo.';
 	yy = 0.5 * cvMain.height - 25;
 	ctxMain.fillText(str, xx, yy);
-	str = 'Tap here to Start/ Stop.';
+
+	
+	str = 'Tap to Start/ Stop.';
+	const offset_y = 30;
 	yy = 0.5 * cvMain.height + 30;
-	ctxMain.fillText(str, xx, yy);
+	ctxMain.fillText(str, xx, yy + offset_y);
 	str = 'LongTap for setting.';
 	yy += 20;
-	ctxMain.fillText(str, xx, yy);
-	str = 'Tap here to change Beat';
+	ctxMain.fillText(str, xx, yy + offset_y);
+		//破線の円setLineDash() メソッドで点線のパターンを指定
+	ctxMain.setLineDash([2, 2]);
+	ctxMain.beginPath();
+	ctxMain.arc(0.5 * cvMain.width, 0.5 * cvMain.height + offset_y,13, 0, Math.PI * 2, true);
+	ctxMain.closePath();
+	ctxMain.strokeStyle = line_color;
+	ctxMain.stroke();
+	ctxMain.setLineDash([]);  //dashを解除
+	//破線の円に向けた矢印
+	aline(ctxMain,0.5 * cvMain.width-30, 0.5 * cvMain.height+20+offset_y,0.5 * cvMain.width-4, 0.5 * cvMain.height+4+offset_y, 20, 14);
+	
+
+	//拍子
+	str = 'Tap Beat Area to change Beat';
 	yy = cvMain.height - 45;
 	ctxMain.fillText(str, xx, yy);
+	aline(ctxMain, xx, yy, xx, yy+50, 20,14);
+
+
+
+	//↕　上・下スワイプはunicode矢印
+	ctxMain.font = "30pt sans-serif"
+	ctxMain.fillText('↕', 0.5 * cvMain.width - 50, 0.5 * cvMain.height + 7);
+    //矢印線書く
+	aline(ctxMain,0.5 * cvMain.width-26, 0.5 * cvMain.height - 23, 0.5 * cvMain.width-40, 0.5 * cvMain.height-5, 20, 14);
+
 }
+
+
+//矢印線書く関数( 描画するキャンバス, 始点x, 始点y, 終点x, 終点y, 矢印線角度, 矢印線長さ )
+//https://webnation.co.jp/javascript%E3%81%A7canvas%E3%81%A7%E4%B8%89%E8%A7%92%E9%96%A2%E6%95%B0%E3%81%A7%E7%9F%A2%E5%8D%B0%E7%B7%9A%E3%82%92%E6%9B%B8%E3%81%8F/
+function aline(ctx, x1, y1, x2, y2, r, len){
+	//元の線
+	ctx.beginPath();
+	ctx.moveTo( x1, y1 );
+	ctx.lineTo( x2, y2 );
+	ctx.stroke();
+
+	//元の線の角度
+	var rad = Math.atan2(y2-y1, x2-x1);
+	//矢印線の角度
+	var radA = r * Math.PI / 180;
+
+	//矢印線1
+	ctx.beginPath();
+	ctx.moveTo( x2, y2 );
+	ctx.lineTo( x2 - len * Math.cos(rad+radA), y2 - len * Math.sin(rad+radA) );
+	ctx.stroke();
+
+	//矢印線2
+	ctx.beginPath();
+	ctx.moveTo( x2, y2 );
+	ctx.lineTo( x2 - len * Math.cos(rad-radA), y2 - len * Math.sin(rad-radA) );
+	ctx.stroke();
+}
+
 
 //■■■■■■■ 初期化コード ■■■■■■
 
