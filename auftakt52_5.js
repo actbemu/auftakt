@@ -14,6 +14,8 @@
 課題
 2025/06/20下にスワイプしたときに、設定パネルが開いてしまうことがある。振り分け条件で＝の場合が抜けていた
 テンポリストの表示。2段階ではなく、ワンタップでリスト全体が表示できるようにしたい。
+
+起動時と設定画面のHELPタップ時に、画面上に図のようなヘルプを重ね書きする。
 */
 
 //■■■■■■■ 定数・変数宣言、定義 ■■■■■■
@@ -197,7 +199,8 @@ function resizeCanvas(){
 	//設定パネルとQRコード出力シートの幅を規定
 	let wQSheet = wrapper.clientWidth;
 	if(wrapper.clientHeight < wrapper.clientWidth) wQSheet = wrapper.clientHeight;
-	elQRsheet.style.width = (wQSheet - 40) +'px';	
+	elQRsheet.style.width = (wQSheet - 30) +'px';
+	
 	//const el_beat = document.getElementById('beatCanvas');
 	cvBeat.setAttribute('width', w);
 	cvBeat.setAttribute('height', 0.2 * h);
@@ -896,6 +899,40 @@ function drawWaiting(rate) {
 	
 }
 
+//起動時と設定画面のHELPタップ時に、画面上にヘルプを重ね書きする。
+function drawHelp() {
+	const txt_color = '#ed6d3d';  //鬱金色 うこんいろ#fabf14 黒檀 こくたん#250d00
+	const line_color = '#fabf14';
+	var str = '';
+	var xx, yy;
+	ctxMain.font = "13pt sans-serif";
+	ctxMain.fillStyle = txt_color;
+	str = 'Tap here to select Tempo.';
+	ctxMain.fillText(str, 10, 120);
+	str = 'Tempo up / down';
+	ctxMain.fillText(str, 100, 100);
+	str = 'Tapping';
+	ctxMain.fillText(str, 200, 80);
+
+	//以下の文字列はセンタリング
+	ctxMain.textAlign = "center";
+	xx = 0.5 * cvMain.width;
+	str = 'Swipe upward/downward';
+	yy = 0.5 * cvMain.height - 40;
+	ctxMain.fillText(str, xx, yy);
+	str = 'to change Tempo.';
+	yy = 0.5 * cvMain.height - 25;
+	ctxMain.fillText(str, xx, yy);
+	str = 'Tap here to Start/ Stop.';
+	yy = 0.5 * cvMain.height + 30;
+	ctxMain.fillText(str, xx, yy);
+	str = 'LongTap for setting.';
+	yy += 20;
+	ctxMain.fillText(str, xx, yy);
+	str = 'Tap here to change Beat';
+	yy = cvMain.height - 45;
+	ctxMain.fillText(str, xx, yy);
+}
 
 //■■■■■■■ 初期化コード ■■■■■■
 
@@ -998,6 +1035,9 @@ xx0 = xpitch/2;
 //ボールの初期表示位置（アウフタクト）
 drawWaiting(0);
 
+//ヘルプ表示
+drawHelp();
+
 //---DOM関連------------------
 //背景色設定
 cvMain.style.color = mc_bgcol;
@@ -1011,6 +1051,9 @@ dispElement(elSetting, false);
 dispElement(elDivTempoList, false);
 //ＱＲコード出力パネルを非表示に
 dispElement(elQRsheet, false);
+
+
+
 
 /***********************************
 Wake Lock関連　
