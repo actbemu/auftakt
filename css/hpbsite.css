@@ -1,0 +1,223 @@
+/* --------------------------------------------- */
+/* ▼モバイルファースト (全環境に共通のデザイン) */
+/* --------------------------------------------- */
+/* viewportはhtmlファイルの中、<meta>タグで指定する。*/
+
+/*可変文字サイズ
+	以下https://pecopla.net/web-column/fontsize-css参考
+*/
+html{
+    font-size: 62.5%;
+}
+
+body{
+    font-size:1.6rem;/* 16px*/
+    line-height: 2;
+}
+
+h1 {
+    font-size: 36px;/* IE8以下とAndroid4.3以下用フォールバック */
+    font-size: calc(2.4rem + ((1vw - 0.64rem) * 2.1429));/* 24px~36pxで可変*/
+    line-height: 1.3;
+}
+
+h2 {
+    font-size: 24px;/* IE8以下とAndroid4.3以下用フォールバック */
+    font-size: calc(2rem + ((1vw - 0.64rem) * 0.7143));/* 20px~24pxで可変*/
+    line-height: 1.3;
+}
+
+@media (min-width: 1200px) {/* 1200px以上*/
+    h1 {
+        font-size: 3.6rem;/* 36px*/
+    }
+    h2 {
+        font-size: 2.4rem;/* 24px*/
+    }
+}
+
+@media screen and (max-width: 640px) {/* 640px以下*/
+    body{
+    line-height: 2;
+    }
+    h1{
+        font-size: 2.4rem;/* 24px*/
+    }
+    h2 {
+        font-size: 2rem;/* 20px*/
+    }
+}
+
+/*--------------hpbsite.cssより移植----------------------*/
+/*色、デザイン*/
+BODY{
+	color: #666633;
+	background-color: #FFFFFF;
+	/*左右の余白*/
+	margin-left:5%;
+	margin-right:5%;
+	}
+H1{
+  color: #663300;
+  
+  border-left-style : none;
+  border-bottom-width : 3px;
+  border-bottom-style : ridge;
+  padding-left : 10px;
+  border-bottom-color : #993366;
+  border-left-color : #993366;
+  text-align : center;
+
+}
+H2{
+  color: #663300;
+  padding-left : 5px;
+  border-left-width : 2pc;
+  border-bottom-width : 3px;
+  border-left-style : solid;
+  border-bottom-style : solid;
+  border-left-color : #993366;
+  border-bottom-color : #993366;
+  line-height:2.3;
+}
+H3{
+  color: #663300;
+  padding-left : 3px;
+  border-left-width : 1pc;
+  border-bottom-width : 3px;
+  border-left-style : solid;
+  border-bottom-style : none;
+  border-left-color : #993366;
+  border-bottom-color : #993366;
+    line-height:2.3;
+}
+H4{
+  color: #663300;
+  margin-top:1;
+
+}
+
+A{
+  color: #CC3300;
+  text-decoration: underline;
+}
+A:VISITED{
+  color: #FF6666;
+  text-decoration: underline;
+}
+A:HOVER{
+  color: #993366;
+  text-decoration: underline;
+}
+A:ACTIVE{
+  color: #FF0000;
+  text-decoration: underline;
+}
+UL{
+  color: #666633;
+  list-style-image : url(l_g01.gif);
+  list-style-position: outside;
+}
+TH{
+  color : #58582c;
+  background-color : #caca95;
+}
+TD{
+  color : #626231;
+  
+}
+
+/*------------------------------------*/
+P, LI{
+  line-height : 1.8;
+}
+
+/*画像表示ボックス*/
+img{
+	max-width:100%;	/*親要素の幅を超えないようにする*/
+	height: auto;	/*高さも自動的にスケーリングする*/
+}
+
+.imagebox{
+	margin : 0 auto;	/*中央に揃わないのはなぜ？*/
+	align:center;
+	width:95%;
+	/*デバグ用
+	border-style:solid;
+	border-width:5px;
+	border-color:#ff00d2;
+	*/
+}
+
+
+ .restab01 {
+	border: solid 3px #993360; border-collapse: collapse;
+	background-color:  #FFFFFF;
+  }
+
+  .restab01 th,
+  .restab01 td {
+	border: solid 1px #993360; border-collapse: collapse;
+
+}
+
+/* フッター領域を画面下に固定表示する。（本当に必要か？） */
+div#footer{
+position: fixed; /* フッターを固定する */
+bottom: 0; /* 上部から配置の基準位置を決める */
+left: 0; /* 左から配置の基準位置を決める */
+width: 100%; /* フッターの横幅を指定する */
+height: 35px; /* フッターの高さを指定する */
+padding:10px; /* フッター内側の余白を指定する(上下左右) */
+background-color: #31a9ee; /* フッターの背景色を指定する */
+color: #FFFFFF; /* フッターのフォントの色を指定する */
+margin:0 auto;
+}
+
+/* -------------------------------------------- */
+/* ▼タブレット用デザインとして付け足すデザイン */
+/* -------------------------------------------- */
+@media screen and (min-width: 768px) {
+：　：　：
+：　：　：
+}
+/* ------------------------------------ */
+/* ▼PC用デザインとして付け足すデザイン */
+/* ------------------------------------ */
+@media screen and (min-width:880px){
+body{
+	width:800px;
+	margin:auto;	/*中央揃え*/
+	background-image : url(bg02.gif); /*これまでの背景を流用*/
+	background-repeat: repeat-y;
+}
+
+.imagebox{
+	width:70%;
+	margin : 0 auto;	/*中央に揃わないのはなぜ？*/
+	align:center;
+
+	/*border-color:aqua;*/
+}
+
+#testpic{
+	margin:0 auto;
+		align:center;
+	max-width:60%;
+}
+}
+
+/*スマホなどの場合に表のセルを縦に並べる*/
+@media screen and (max-width: 640px) {
+  .restab01 {
+    width: 100%;
+	border: solid 2px #993360; border-collapse: collapse;
+  }
+  .restab01 th,
+  .restab01 td {
+   border-bottom: none;
+    display: block;
+    width: 100%;
+  }
+}
+
