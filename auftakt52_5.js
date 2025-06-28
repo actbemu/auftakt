@@ -88,6 +88,11 @@ let ball = {  //動指標ボールのオブジェクトを作る
 	  },
 };
 
+const ball_image = new Image();
+ball_image.src = './images/ball.gif';
+const ball_width = 40;
+const ball_height = 40;
+
 
 
 //各種ステータスフラグ（動作コントロール用）
@@ -601,8 +606,8 @@ function drawMark() {
 	if(bpm > 120){ maxH = (1-(bpm - 120)/200) * maxH;}  //テンポが早い場合の高さ制限
 	//console.log('maxH：'+maxH);
 	//ボールを表示
-	ball.draw(xxU + t * (xxD - xxU), (cvMain.height - ball.radius) - y * maxH);
-	
+	//ball.draw(xxU + t * (xxD - xxU), (cvMain.height - ball.radius) - y * maxH);
+	drawBall(xxU + t * (xxD - xxU), (cvMain.height - 0.5 * ball_height) - y * maxH);	
 	//■次の描画の予約（お決まりの手続き）
 	rafBall = window.requestAnimationFrame(drawMark);
 
@@ -616,7 +621,8 @@ function drawMark() {
 			//描画エリアの消去（クリア）
 			ctxMain.clearRect(0, 0, cvMain.width, cvMain.height);
 			//指標を次の拍点に置いて停止
-			ball.draw(xxD, cvMain.height - ball.radius);
+			//ball.draw(xxD, cvMain.height - ball.radius);
+			drawBall(xxD, cvMain.height - 0.5 * ball_height);
 			
 		}else{  //★本来の拍点処理ここから
 			if(ndivBeat == 1){   //分割振りではない場合→拍子拍点の処理
@@ -774,8 +780,8 @@ function metroStart(){  //
 	//アニメーション起動
 	//ボールを初期位置に置く
 	xxU = xx0 + ( Beat - 1) * xpitch;	//跳ね上げ点
-	ball.draw(xxU, cvMain.height - ball.radius);
-	
+	//ball.draw(xxU, cvMain.height - ball.radius);
+	drawBall(xxU, cvMain.height - 0.5 * ball_height);
 	if(ndivBeat > 1){  //分割振りのとき
 		nextClickTimeStamp = currentClickTimeStamp + beatTick(MM) / ndivBeat;
 		if(f_sound) rsvClickSound(0,currentClickTimeStamp + beatTick(MM));  //次の拍子拍点サウンドを予約
@@ -889,7 +895,8 @@ function drawCounDownChart() {
 function drawWaiting(rate) {
 	//ボールを最終拍においてスタンバイ
 	ctxMain.clearRect(0, 0, cvMain.width, cvMain.height);//キャンバス内全面クリア
-	ball.draw(xx0 + ( Beat - 1) * xpitch, cvMain.height - ball.radius);
+	//ball.draw(xx0 + ( Beat - 1) * xpitch, cvMain.height - ball.radius);
+	drawBall(xx0 + ( Beat - 1) * xpitch, cvMain.height - 0.5 * ball_height);
 	//パイチャート描画
 	if(rate > 0.01){
 		startAngle = 1.5 * Math.PI;
@@ -1006,6 +1013,13 @@ function aline(ctx, x1, y1, x2, y2, r, len){
 	ctx.stroke();
 }
 
+function drawBall(xx,yy) {
+	console.log('ボール画像描画');
+	//xx=0;
+	//yy=0;
+	ctxMain.drawImage(ball_image, xx - 0.5 * ball_width, yy - 0.5 * ball_height, ball_width, ball_height);
+	
+}
 
 //■■■■■■■ 初期化コード ■■■■■■
 
