@@ -600,7 +600,7 @@ function drawMark() {
 	const y = -4 * t * (t - 1);
 	
 	//console.log(x + " " + y);
-	let maxH =  (cvMain.height - 5*ball.radius);
+	let maxH =  (cvMain.height - 2.1*ball_height);
 	
 	if(divBeat_idx > 0){maxH *= divHrate;}  //分割振り対応
 	let bpm = MM * ndivBeat;
