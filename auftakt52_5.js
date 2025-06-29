@@ -30,15 +30,15 @@ if(DEBUG) console.log(BASE_URL);
 //----色関連-----------------
 //const ball_col = '#082752';   //ボールの色濃い藍#082752
 //const ball_col = '#165e83';   //ボールの色 藍#165e83
-const ball_col = '#38b48b';   //珊瑚朱色 #ee836f、琥珀色#bf783a
-const beat_col = '#dde5fe';   //;拍数字の色; 砂色#dcd3b2、海貝色#fff5ee
+//const ball_col = '#38b48b';   //、琥珀色#bf783a
+const beat_col = '#fff5ee';   //;拍数字の色; 砂色#dcd3b2、海貝色#fff5ee
 const beat_bgcol = '#250d00';  //拍子エリア背景色　黒檀#250d00
 const mc_bgcol = '#fffffc';  //メインキャンバス　胡粉色 #fffffc
 const set_bgcol = 'rgb(220,211,178,0.6)';  //設定パネルの背景　砂色#dcd3b2、rgb(220,211,178,0.4)
 const divdot0_col = '#e7e7eb';  //分割時のドット紫水晶 #e7e7eb
-const divdot1_col = '#ee836f';  //分割時のドット翡翠色 #38b48b 
-const cntdwn_col = '#b48a76';  //梅染 うめぞめ　　桜鼠 さくらねず#e9dfe5、灰桜 #e8d3d1
-const pie_col = '#e8d3d1';  //梅染 うめぞめ　　桜鼠 さくらねず#e9dfe5、薄桜 #fdeff2
+const divdot1_col = '#ee836f';  //分割時のドット珊瑚朱色 #ee836f
+const cntdwn_col = '#b48a76';  //梅染 うめぞめ#b48a76　　桜鼠
+const pie_col = '#e8d3d1';  //桜鼠 さくらねず#e9dfe5、薄桜 #fdeff2
 const msg_col = '#e6b422';  //黄金 #e6b422
 
 //-----DOMエレメント関連
@@ -73,6 +73,7 @@ const el_dBMD = document.getElementById('dBMD');
 let rafBall;	//request animation frameのインスタンス（停止するときに指定するため）
 let rafCDC;  //開始待機時のパイチャート表示アニメーションrequest animation frame　　Count Down Chart
 
+/*
 let ball = {  //動指標ボールのオブジェクトを作る
 	  x: 100,	  y: 100,
 	  vx:17,
@@ -87,12 +88,12 @@ let ball = {  //動指標ボールのオブジェクトを作る
 	    ctxMain.fill();
 	  },
 };
-
+*/
+// 6.29 ballを翡翠玉のイメージに変更
 const ball_image = new Image();
 ball_image.src = './images/ball.gif';
 const ball_width = 40;
 const ball_height = 40;
-
 
 
 //各種ステータスフラグ（動作コントロール用）
@@ -946,7 +947,7 @@ function drawHelp() {
 	yy = 0.5 * cvMain.height - 40;
 	ctxMain.fillText(str, xx, yy);
 	str = 'to change Tempo.';
-	yy = 0.5 * cvMain.height - 25;
+	yy = 0.5 * cvMain.height - 20;
 	ctxMain.fillText(str, xx, yy);
 
 	
@@ -967,7 +968,6 @@ function drawHelp() {
 	ctxMain.setLineDash([]);  //dashを解除
 	//破線の円に向けた矢印
 	aline(ctxMain,0.5 * cvMain.width-30, 0.5 * cvMain.height+20+offset_y,0.5 * cvMain.width-4, 0.5 * cvMain.height+4+offset_y, 20, 14);
-	
 
 	//拍子
 	str = 'Tap Beat Area to change Beat';
@@ -975,13 +975,11 @@ function drawHelp() {
 	ctxMain.fillText(str, xx, yy);
 	aline(ctxMain, xx, yy, xx, yy+50, 20,14);
 
-
-
 	//↕　上・下スワイプはunicode矢印
 	ctxMain.font = "30pt sans-serif"
-	ctxMain.fillText('↕', 0.5 * cvMain.width - 50, 0.5 * cvMain.height + 7);
+	ctxMain.fillText('↕', 0.5 * cvMain.width - 50, 0.5 * cvMain.height + 15);
     //矢印線書く
-	aline(ctxMain,0.5 * cvMain.width-26, 0.5 * cvMain.height - 23, 0.5 * cvMain.width-40, 0.5 * cvMain.height-5, 20, 14);
+	aline(ctxMain,0.5 * cvMain.width-26, 0.5 * cvMain.height - 20, 0.5 * cvMain.width-40, 0.5 * cvMain.height, 20, 14);
 
 }
 
