@@ -897,6 +897,7 @@ function drawWaiting(rate) {
 	//ボールを最終拍においてスタンバイ
 	ctxMain.clearRect(0, 0, cvMain.width, cvMain.height);//キャンバス内全面クリア
 	//ball.draw(xx0 + ( Beat - 1) * xpitch, cvMain.height - ball.radius);
+	if(DEBUG) console.log('xx0: ' + xx0 + 'cvMain.height:' + cvMain.height);
 	drawBall(xx0 + ( Beat - 1) * xpitch, cvMain.height - 0.5 * ball_height);
 	//パイチャート描画
 	if(rate > 0.01){
@@ -916,8 +917,8 @@ function drawWaiting(rate) {
 
 //起動時と設定画面のHELPタップ時に、画面上にヘルプを重ね書きする。
 function drawHelp() {
-	const txt_color = '#ed6d3d';  //鬱金色 うこんいろ#fabf14 黒檀 こくたん#250d00
-	const line_color = '#ed6d3d';
+	const txt_color = '#8f8667';  //鬱金色 うこんいろ#fabf14 黒檀 こくたん#250d00
+	const line_color = '#8f8667';  //#8f8667 利休色
 	var str = '';
 	var xx, yy;
 	ctxMain.font = "13pt sans-serif";
@@ -1011,6 +1012,7 @@ function aline(ctx, x1, y1, x2, y2, r, len){
 	ctx.stroke();
 }
 
+//xx,yyを中心にしたイメージ描画
 function drawBall(xx,yy) {
 	console.log('ボール画像描画');
 	//xx=0;
@@ -1116,12 +1118,12 @@ elTempoTxt.textContent = MM;
 //拍点座標の計算
 xpitch = cvMain.width / Beat;
 xx0 = xpitch/2;
-
 //ボールの初期表示位置（アウフタクト）
-drawWaiting(0);
+//drawWaiting(0); //初期化の最後にまわした。
 
 //ヘルプ表示
 drawHelp();
+
 
 //---DOM関連------------------
 //背景色設定
@@ -1349,3 +1351,8 @@ elWtRadio.forEach(function(radioButton) {
 		}
 	});
 });
+
+setTimeout(() => {   //3秒後にボールを置く
+	drawBall(xx0 + ( Beat - 1) * xpitch, cvMain.height - 0.5 * ball_height);
+}, 1000);
+	
