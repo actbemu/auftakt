@@ -33,7 +33,7 @@ if(DEBUG) console.log(BASE_URL);
 //const ball_col = '#38b48b';   //、琥珀色#bf783a
 const beat_col = '#fff5ee';   //;拍数字の色; 砂色#dcd3b2、海貝色#fff5ee
 const beat_bgcol = '#250d00';  //拍子エリア背景色　黒檀#250d00
-const mc_bgcol = '#fffffc';  //メインキャンバス　胡粉色 #fffffc
+const mc_bgcol = '#fef4f4';  //メインキャンバス桜色、胡粉色 #fffffc
 const set_bgcol = 'rgb(220,211,178,0.6)';  //設定パネルの背景　砂色#dcd3b2、rgb(220,211,178,0.4)
 const divdot0_col = '#e7e7eb';  //分割時のドット紫水晶 #e7e7eb
 const divdot1_col = '#ee836f';  //分割時のドット珊瑚朱色 #ee836f
