@@ -1445,24 +1445,27 @@ function bcMouseDown(event) {
 function bcMove(event) {
 	event.preventDefault();  //これでスクロール禁止できるのか？→効果ない
 //	if(f_mousedown){　　//マウスの場合ホバリングでもmoveイベントが発生するので必要
-		//移動量積算 upの際に一定量以下ならクリックと判断
+	
+	//移動量積算 upの際に一定量以下ならクリックと判断
 		travel = travel + (x0 - event.pageX) ** 2 + (y0 - event.pageY) ** 2;
-		
 		x0 = event.pageX;
 		y0 = event.pageY;
+		
 	
 		const delta0 = 200;  //★左右方向に動いた距離のしきい値、delta0より大きい変位があるごとにBeat更新
 		const yy = event.pageX;
-		//移動量がしきい値以内なら何もしない
+		//移動量がしきい値以内なら何もしないでreturn
 		deltaY = startY - yy;
 		if(Math.abs(deltaY) < delta0) return;
-		dispMsg('moving..');
+	
+		//しきい値を超えていたらBeat変更、次の移動量測定のため起点座標をstartYに書き留めておく。
 		startY = event.pageX;
 		//クリック音を出す
 		const now = context.currentTime;
+	/*
 		gain.gain.setValueAtTime(1, now);
 		gain.gain.linearRampToValueAtTime(0, now + 0.01);
-
+	*/
 
 		//Beatを増減する
 		if(deltaY > 0){
