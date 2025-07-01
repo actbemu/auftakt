@@ -14,21 +14,9 @@
 課題
 2025/06/20下にスワイプしたときに、設定パネルが開いてしまうことがある。振り分け条件で＝の場合が抜けていた
 テンポリストの表示。2段階ではなく、ワンタップでリスト全体が表示できるようにしたい。
+
 起動時と設定画面のHELPタップ時に、画面上にヘルプを重ね書きする。
-2025/07/01
-
-今後の微調整アイディア
-・テンポの範囲、↑↓を使うと最低１まで設定可能。OK
-・テンポ30未満のときは、動作中タップしたら直ちに停止OK
-・動作中タップしたときはメッセージエリアに、ストップ動作を受け付けたことを表示OK
-
-・拍子エリアを左右にスワイプすると、設定可能拍子範囲が広がる。最大12まで？
-・6拍子を超えたら、文字を小さくする。
-		参考：const fontSize = canvasWidth / 2;
-				ctx.font = `${fontSize}px serif`; 
-・隠しコマンド、URLパラメータで指定できるようにする。待機時間、テーマ
-・分割振りのときの弱拍の高さ調整
-
+拍子エリアに描いた破線の円は、個別に消去する必要がある。その他cvMainのパーツは、スタート時点で自動的に消去される。
 */
 
 //■■■■■■■ 定数・変数宣言、定義 ■■■■■■
@@ -45,7 +33,7 @@ if(DEBUG) console.log(BASE_URL);
 //const ball_col = '#38b48b';   //、琥珀色#bf783a
 const beat_col = '#fff5ee';   //;拍数字の色; 砂色#dcd3b2、海貝色#fff5ee
 const beat_bgcol = '#250d00';  //拍子エリア背景色　黒檀#250d00
-const mc_bgcol = '#fff6f5';  //メインキャンバス桜色、胡粉色 #fffffc
+const mc_bgcol = '#fef4f4';  //メインキャンバス桜色、胡粉色 #fffffc
 const set_bgcol = 'rgb(220,211,178,0.6)';  //設定パネルの背景　砂色#dcd3b2、rgb(220,211,178,0.4)
 const divdot0_col = '#e7e7eb';  //分割時のドット紫水晶 #e7e7eb
 const divdot1_col = '#ee836f';  //分割時のドット珊瑚朱色 #ee836f
@@ -128,7 +116,7 @@ let ct0;    //カウントダウン開始タイムスタンプ
 let intervalID = 0;  //インターバルタイマー、タイムアウトタイマーのID
 
 //メトロノームの基本パラメータ
-const minMM = 1;	//最小テンポ
+const minMM = 10;	//最小テンポ
 const maxMM = 210;	//最大テンポ
 const maxBeat = 6;	//拍子最大値
 const MM0 = 96;	//デフォルト値
@@ -162,7 +150,7 @@ let xx0;	//1拍目のx座標
 let xpitch;	//拍点のx座標間隔
 let xxU, xxD;	//跳ね上げ点と着地点のx座標
 let Beat_idx = 0; //拍位置のインデクス
-const divHrate = 0.75   //分割振りの高さ比率(0.6～0.75)
+const divHrate = 0.65   //分割振りの高さ比率(0.6～0.7)
 
 //Beat Sound タイミング調整
 let ary_sdelay = new Array(160, 120, 80, 0, -50, -100, -200);  //設定パネル、ラジオボタン設定値割り付け
@@ -472,7 +460,7 @@ function mcTouchEnd(event) {
 	//f_mousedown = false;
 	
 	clearInterval(timer);  //長押し判別タイマー停止
-	if(f_rafCDC){  //待機時間カウントダウン中のときはカウントダウン中止する
+	if(f_rafCDC){
 		//カウントダウンタイマーを止める
 		window.cancelAnimationFrame(rafCDC);
 		f_rafCDC = false;
@@ -493,7 +481,6 @@ function mcTouchEnd(event) {
 		if(isMoving){	//Stop ■ストップ操作
 			isMoving = false;
 			f_stop = true;	//次の拍点で停止させる
-			dispMsg('Halting...');
 			console.log('停止フラグ：' + f_stop);
 		}else{
 			//ボールを最終拍においてスタンバイ
@@ -531,27 +518,7 @@ function mcMouseUp(event) {
 		if(isMoving){	//Stop ■ストップ操作
 			isMoving = false;
 			f_stop = true;	//次の拍点で停止させる
-			dispMsg('Halting...');
 			console.log('停止フラグ　f_stop：' + f_stop);
-			if(MM < 30){
-				//アニメーション停止
-				window.cancelAnimationFrame(rafBall);
-				//描画エリアの消去（クリア）
-				ctxMain.clearRect(0, 0, cvMain.width, cvMain.height);
-				//ボールを最終拍においてスタンバイ
-				drawWaiting(0);
-				f_mouseup = true;
-				f_mousedown = false;
-				//予約していたサウンドを全消去
-				/*
-				// 現在の時間を取得
-					var t1 = audioContext.currentTime;
-					envelopeGen.gain.cancelScheduledValues(t1);
-				*/
-				var t1 = context.currentTime;
-				gain.gain.cancelScheduledValues(t1);
-				return;
-			}
 		}else{
 			console.log('停止フラグ　f_stop：' + f_stop);
 			//ボールを最終拍においてスタンバイ
