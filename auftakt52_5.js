@@ -1263,11 +1263,11 @@ cvMain.addEventListener('mouseup', mcMouseUp);
 //拍子エリアタッチで拍子を変更（循環）
 //cvBeat.addEventListener('click', BeatChange);
 
-//cvBeat.addEventListener('touchstart', bcToucStart);
+cvBeat.addEventListener('touchstart', bcToucStart);
 cvBeat.addEventListener('mousedown', bcMouseDown);
-//cvBeat.addEventListener('touchmove', bcMove);
+cvBeat.addEventListener('touchmove', bcMove);
 cvBeat.addEventListener('mousemove', bcMouseMove);
-//cvBeat.addEventListener('touchend', bcMouseUp);  //処理をmcMouseUpと同じにした
+cvBeat.addEventListener('touchend', bcMouseUp);  //処理をmcMouseUpと同じにした
 cvBeat.addEventListener('mouseup', bcMouseUp);
 
 //ウィンドウリサイズ後のパラメータ確定
@@ -1424,6 +1424,14 @@ setTimeout(() => {   //3秒後にボールを置く
 
 //拍子エリアのtouch
 //touch座標初期化
+function bcToucStart(event) {
+	//f_mousedown = true;  //マウスの場合必要
+	travel = 0;
+	startY = event.pageX;  
+	//移動距離測定用
+	x0 = event.pageX;
+	y0 = event.pageY;
+}
 function bcMouseDown(event) {
 	f_mousedown = true;  //マウスの場合必要
 	travel = 0;
@@ -1434,7 +1442,41 @@ function bcMouseDown(event) {
 }
 
 //拍子エリアのmove
-//touch座標初期化
+function bcMove(event) {
+	event.preventDefault();  //これでスクロール禁止できるのか？→効果ない
+//	if(f_mousedown){　　//マウスの場合ホバリングでもmoveイベントが発生するので必要
+		//移動量積算 upの際に一定量以下ならクリックと判断
+		travel = travel + (x0 - event.pageX) ** 2 + (y0 - event.pageY) ** 2;
+		
+		x0 = event.pageX;
+		y0 = event.pageY;
+	
+		const delta0 = 20;  //左右方向に動いた距離のしきい値、delta0より大きい変位があるごとにBeat更新
+		const yy = event.pageX;
+		//移動量がしきい値以内なら何もしない
+		deltaY = startY - yy;
+		if(Math.abs(deltaY) < delta0) return;
+		
+		startY = event.pageX;
+		//クリック音を出す
+		const now = context.currentTime;
+		gain.gain.setValueAtTime(1, now);
+		gain.gain.linearRampToValueAtTime(0, now + 0.01);
+
+
+		//Beatを増減する
+		if(deltaY > 0){
+			Beat --;
+			if(Beat <= 0){Beat = 1;}
+		}
+		if(deltaY < 0){
+			Beat ++;
+			if(Beat > 12) Beat = 12;
+		}
+		//表示変更
+		drawBeat(); //拍子文字を表示
+//	}
+}
 function bcMouseMove(event) {
 	event.preventDefault();  //これでスクロール禁止できるのか？→効果ない
 	if(f_mousedown){　　//マウスの場合ホバリングでもmoveイベントが発生するので必要
