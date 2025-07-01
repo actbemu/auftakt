@@ -150,7 +150,7 @@ let xx0;	//1拍目のx座標
 let xpitch;	//拍点のx座標間隔
 let xxU, xxD;	//跳ね上げ点と着地点のx座標
 let Beat_idx = 0; //拍位置のインデクス
-const divHrate = 0.65   //分割振りの高さ比率(0.6～0.7)
+const divHrate = 0.75   //分割振りの高さ比率(0.6～0.7)
 
 //Beat Sound タイミング調整
 let ary_sdelay = new Array(160, 120, 80, 0, -50, -100, -200);  //設定パネル、ラジオボタン設定値割り付け
