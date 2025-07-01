@@ -1451,7 +1451,7 @@ function bcMove(event) {
 		x0 = event.pageX;
 		y0 = event.pageY;
 	
-		const delta0 = 20;  //左右方向に動いた距離のしきい値、delta0より大きい変位があるごとにBeat更新
+		const delta0 = 200;  //左右方向に動いた距離のしきい値、delta0より大きい変位があるごとにBeat更新
 		const yy = event.pageX;
 		//移動量がしきい値以内なら何もしない
 		deltaY = startY - yy;
