@@ -1,5 +1,5 @@
 /*
-【auftakt52_4.js】
+【auftakt52_5.js】
 */
 /************* 本スクリプトの目的・成果 ***************
 コード全般の整理
@@ -23,11 +23,16 @@
 ・動作中タップしたときはメッセージエリアに、ストップ動作を受け付けたことを表示OK
 
 ・拍子エリアを左右にスワイプすると、設定可能拍子範囲が広がる。最大12まで？
+　　スワイプより、拍子エリア長押しでメニューを出すほうが簡単
 ・6拍子を超えたら、文字を小さくする。
 		参考：const fontSize = canvasWidth / 2;
 				ctx.font = `${fontSize}px serif`; 
 ・隠しコマンド、URLパラメータで指定できるようにする。待機時間、テーマ
-・分割振りのときの弱拍の高さ調整
+・分割振りのときの弱拍の高さ調整　divHrate　を0.65から0.75に変えてみた。
+・長期的には、長押しで詳細設定メニュー。というコンセプトで、拍子エリアの長押しで、変拍子の詳細設定など。
+
+★拍子エリアをスワイプしようとしたら、ドラッグしようとすると、横スクロールしてしまう
+
 
 */
 
@@ -743,11 +748,24 @@ function reserveSound() {
 //拍子エリアの描画、拍子数字と分割マーク表示
 function drawBeat(){        //拍子エリアに数字を置く
 	let topMargin = 10;     //拍数字の上余白
+	ctxBeat.textBaseline = "top";  //文字の左上を座標とする
 	ctxBeat.font = "bold 40pt sans-serif";
 	ctxBeat.fillStyle = beat_col;
 	xpitch = cvBeat.width / Beat;
+	//xpitchの値に応じて文字の大きさを動的に変える
+	/*
+	const fontSize = canvasWidth / 2;
+				ctx.font = `${fontSize}px serif`; 
+	
+	*/
+	const fontSize = xpitch;
+	ctxBeat.font = `bold ${fontSize}px  sans-serif`;
+	if(Beat > 6 )ctxBeat.font =  "bold 24pt sans-serif";
+	if(Beat > 9 )ctxBeat.font =  "bold 10pt sans-serif";
+	
+	
 	xx0 = xpitch / 2;  //0.5拍目の位置
-	let y0 = 50;
+	let y0 = topMargin;
 	ctxBeat.clearRect(0, 0, cvBeat.width, cvBeat.height);
 	let x = xx0;
 	for(let i = 0; i < Beat; i++){
@@ -1231,13 +1249,25 @@ const handleVisibilityChange = () => {
 }
 
 //========イベントリスナー関連================
-//イベントリスナーの設定
+//メインキャンバスのイベントリスナーの設定
 cvMain.addEventListener('touchstart', mcToucStart);
 cvMain.addEventListener('mousedown', mcMouseDown);
 cvMain.addEventListener('touchmove', mcMove);
 cvMain.addEventListener('mousemove', mcMouseMove);
 cvMain.addEventListener('touchend', mcMouseUp);  //処理をmcMouseUpと同じにした
 cvMain.addEventListener('mouseup', mcMouseUp);
+
+//拍子エリアのイベントリスナーの設定
+//拍子キャンバスでのイベントリスナー
+//拍子エリアタッチで拍子を変更（循環）
+//cvBeat.addEventListener('click', BeatChange);
+
+//cvBeat.addEventListener('touchstart', bcToucStart);
+cvBeat.addEventListener('mousedown', bcMouseDown);
+//cvBeat.addEventListener('touchmove', bcMove);
+cvBeat.addEventListener('mousemove', bcMouseMove);
+//cvBeat.addEventListener('touchend', bcMouseUp);  //処理をmcMouseUpと同じにした
+cvBeat.addEventListener('mouseup', bcMouseUp);
 
 //ウィンドウリサイズ後のパラメータ確定
 window.addEventListener('resize', resizeCanvas);
@@ -1260,9 +1290,10 @@ window.addEventListener("beforeunload", function (event) {
 	// event.returnValue = "リロード禁止です！";
 });
 
-//拍子エリアタッチで拍子を変更（循環）
-cvBeat.addEventListener('click', BeatChange);
-//タッピング
+
+
+
+//タッピングボタン
 elTap.addEventListener('click', Tapping);
 
 /*
@@ -1388,4 +1419,63 @@ elWtRadio.forEach(function(radioButton) {
 setTimeout(() => {   //3秒後にボールを置く
 	drawBall(xx0 + ( Beat - 1) * xpitch, cvMain.height - 0.5 * ball_height);
 }, 1000);
+
+
+//拍子エリアのtouch
+//touch座標初期化
+function bcMouseDown(event) {
+	f_mousedown = true;  //マウスの場合必要
+	travel = 0;
+	startY = event.pageX;  
+	//移動距離測定用
+	x0 = event.pageX;
+	y0 = event.pageY;
+}
+
+//拍子エリアのmove
+//touch座標初期化
+function bcMouseMove(event) {
+	if(f_mousedown){　　//mousedownはあたりまえなので不要では？→マウスの場合ホバリングでもmoveイベントが発生するので必要
+		//移動量積算 upの際に一定量以下ならクリックと判断
+		travel += (x0 - event.pageX)^2 + (y0 - event.pageY)^2;
+		
+		x0 = event.pageX;
+		y0 = event.pageY;
 	
+		const delta0 = 20;  //上下方向に動いた距離のしきい値
+		const yy = event.pageX;
+		//移動量がしきい値以内ならなにもしない
+		deltaY = startY - yy;
+		if(Math.abs(deltaY) < delta0) return;
+		startY = event.pageX;
+		//クリック音を出す
+		const now = context.currentTime;
+		gain.gain.setValueAtTime(1, now);
+		gain.gain.linearRampToValueAtTime(0, now + 0.01);
+
+
+		//Beatを増減する
+		if(deltaY < 0){
+			Beat --;
+			if(Beat <= 0){Beat = 1;}
+		}
+		if(deltaY > 0){
+			Beat ++;
+			if(Beat > 12) Beat = 12;
+		}
+		//表示変更
+		drawBeat(); //拍子文字を表示
+		//touchendのときにクリックと判断しないようにフラグを立てる
+		isClick = false;
+	}
+}
+
+
+function bcMouseUp(event) {
+	f_mouseup = true;
+	f_mousedown = false;
+	if(!isClick)return;
+
+	//クリックと判断
+	beatChange();
+}
