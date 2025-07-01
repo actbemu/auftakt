@@ -1,0 +1,173 @@
+*{margin: 0; padding: 0;}
+html, body{height: 100%; width: 100%;}
+/*html, body { overflow-x: hidden; } */
+body {
+  /*-webkit-touch-callout:none;  リンク長押しのポップアップ(※1)を無効化*/
+  -webkit-user-select:none;   /*テキスト長押しの選択ボックス(※2)を無効化*/
+}
+canvas{display: block;}
+
+/*
+wrapperについて参考サイト
+http://qiita.com/ShinyaOkazawa/items/9e662bf2121548f79d5f
+*/
+.wrapper{
+  width: 100%;
+  height: 100%;
+}
+
+#parent{
+position:relative;
+}
+
+#myCanvas{
+    background: ##fef4f4;  /*桜色*/
+    width: 100%;
+    height: 90%;
+    top: 0px;
+    left: 0px;
+    position: relative;
+}
+
+#beatCanvas{
+    background: #250d00;  /*砂色#dcd3b2　黒檀 #250d00*/
+    width: 100%;
+    height:10%;
+    bottom: 0px;
+    left: 0px;
+    position: absolute;
+}
+
+#myButtons{
+    bottom: 20px;
+    left: 20px;
+    position: absolute;
+}
+
+#myButtons button{
+    padding: 5px;
+}
+
+
+
+#tempo{
+    top:15px;
+    left: 5px;
+    position: absolute;
+    font-size: 30pt;
+    font-weight: bolder;
+    font-family: "sans-serif";
+    color: #0f2350;  /*濃い藍#0f2350藍色　#165e83　山鳩色#767c6b　　　小豆色#96514d  琥珀色 #bf783a*/
+}
+
+.btnText{
+    border:3pt;
+    border: solid;
+    border-radius: 8px;
+    border-width:2pt;
+    font-size:22pt;
+    font-weight: bolder;
+    font-family: "sans-serif";
+    color: #507ea4;  /*薄縹 うすはなだ#507ea4 */
+     top:17px;
+}
+
+#tempoAdjup{
+    left: 100px;
+    position: absolute;
+}
+
+#tempoAdjdown{
+    left: 142px;
+    position: absolute;
+}
+
+#btnTAP{
+    left: 190px;
+    position: absolute;
+}
+
+#divTempoList{
+    top:50px;
+    left: 8px;
+    position: absolute;
+}
+select{
+    font-size: 24pt;
+}
+
+
+
+/*
+リンク長押しのポップアップを有効にしておく。
+冒頭のbodyの -webkit-touch-callout:none; をコメントアウトした
+*/
+#setting{
+    top:70px;
+    left:15px;
+	background:rgb(193 228 233 / 50%);  /* 白藍*/
+	padding:0.5em;
+    position: absolute;
+    font-family: "sans-serif";
+    color:#222233;
+    font-size:3.3vh;
+}
+
+.radiorow{
+    font-size:3.2vh;
+    margin-left:2em;
+}
+
+.ButtonText{
+     font-size:3vh;
+    font-weight:bold;
+    color:#29659d;
+}
+a:link { color: #29659d; }
+a:visited { color: #29659d;  }
+a:hover { color: #29659d }
+a:active { color: #29659d }
+
+#msgbox{
+    color: #9f4b23;
+    color:#752100;  /*赤銅色*/
+    bottom: 3px;
+    position: absolute;
+    font-size:smaller;
+    font-family:sans-serif;
+    z-index:3;
+    margin: 0 auto;
+    text-align:center;
+}
+
+#QRsheet{
+    overflow-wrap: anywhere;
+    top:70px;
+    left:15px;
+	/*background:rgb(193 228 233 / 50%);   白藍*/
+    background:rgb(244 243 190);  /* 白藍*/
+	padding:0.5em;
+    position: absolute;
+    font-family: "sans-serif";
+    color:#222233;
+    font-size:2.9vh;
+    user-select: text;
+}
+
+#current_setting{
+    margin-left:1em;
+}
+
+#QR{
+    margin-left:3em;
+    padding: 2mm;
+}
+
+#URL{
+    color:#752100
+}
+
+.cs_text{
+    font-weight:bold;
+    color:#250d00;
+}
