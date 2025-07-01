@@ -275,6 +275,7 @@ function tempoDownLong(){
 }
 
 //拍子変更と表示
+//Beatキャンバスクリック時の処理
 function BeatChange() {
 	if(Beat >= maxBeat){
 		Beat = 1;
@@ -282,7 +283,7 @@ function BeatChange() {
 		Beat++;
 	}
 	drawBeat(); //拍子文字を表示
-	if(DEBUG) console.log('Beat:'+Beat);
+	if(DEBUG) console.log('　　　　　　　Beat:'+Beat);
 }
 
 //TAPボタンタップの処理
@@ -394,7 +395,7 @@ function mcMouseDown(event) {
 
 function mcMove(event) {
 	//長押し検出用に移動量積算
-	travel += (x0 - event.touches[0].pageX)^2 + (y0 - event.touches[0].pageY)^2;
+	travel = travel +(x0 - event.touches[0].pageX)　** 2 + (y0 - event.touches[0].pageY)　 ** 2;
 	if(travel > travel0){
 		clearInterval(timer);
 	} 
@@ -434,7 +435,7 @@ function mcMove(event) {
 function mcMouseMove(event) {
 	if(f_mousedown){　　//mousedownはあたりまえなので不要では？→マウスの場合ホバリングでもmoveイベントが発生するので必要
 	//長押し検出用に移動量積算
-		travel += (x0 - event.pageX)^2 + (y0 - event.pageY)^2;
+		travel = travel + (x0 - event.pageX) ** 2 + (y0 - event.pageY) ** 2;
 		if(travel > travel0){
 			clearInterval(timer);
 		} 
@@ -758,8 +759,8 @@ function drawBeat(){        //拍子エリアに数字を置く
 				ctx.font = `${fontSize}px serif`; 
 	
 	*/
-	const fontSize = xpitch;
-	ctxBeat.font = `bold ${fontSize}px  sans-serif`;
+	//const fontSize = xpitch;
+	//ctxBeat.font = `bold ${fontSize}px  sans-serif`;
 	if(Beat > 6 )ctxBeat.font =  "bold 24pt sans-serif";
 	if(Beat > 9 )ctxBeat.font =  "bold 10pt sans-serif";
 	
@@ -1435,18 +1436,20 @@ function bcMouseDown(event) {
 //拍子エリアのmove
 //touch座標初期化
 function bcMouseMove(event) {
-	if(f_mousedown){　　//mousedownはあたりまえなので不要では？→マウスの場合ホバリングでもmoveイベントが発生するので必要
+	event.preventDefault();  //これでスクロール禁止できるのか？→効果ない
+	if(f_mousedown){　　//マウスの場合ホバリングでもmoveイベントが発生するので必要
 		//移動量積算 upの際に一定量以下ならクリックと判断
-		travel += (x0 - event.pageX)^2 + (y0 - event.pageY)^2;
+		travel = travel + (x0 - event.pageX) ** 2 + (y0 - event.pageY) ** 2;
 		
 		x0 = event.pageX;
 		y0 = event.pageY;
 	
-		const delta0 = 20;  //上下方向に動いた距離のしきい値
+		const delta0 = 20;  //左右方向に動いた距離のしきい値、delta0より大きい変位があるごとにBeat更新
 		const yy = event.pageX;
 		//移動量がしきい値以内ならなにもしない
 		deltaY = startY - yy;
 		if(Math.abs(deltaY) < delta0) return;
+		
 		startY = event.pageX;
 		//クリック音を出す
 		const now = context.currentTime;
@@ -1455,27 +1458,22 @@ function bcMouseMove(event) {
 
 
 		//Beatを増減する
-		if(deltaY < 0){
+		if(deltaY > 0){
 			Beat --;
 			if(Beat <= 0){Beat = 1;}
 		}
-		if(deltaY > 0){
+		if(deltaY < 0){
 			Beat ++;
 			if(Beat > 12) Beat = 12;
 		}
 		//表示変更
 		drawBeat(); //拍子文字を表示
-		//touchendのときにクリックと判断しないようにフラグを立てる
-		isClick = false;
 	}
 }
 
 
 function bcMouseUp(event) {
-	f_mouseup = true;
 	f_mousedown = false;
-	if(!isClick)return;
-
-	//クリックと判断
-	beatChange();
+	console.log(   'mouse up  travel=' + travel);
+	if(travel <= 9)BeatChange();
 }
