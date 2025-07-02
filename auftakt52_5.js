@@ -215,6 +215,9 @@ function resizeCanvas(){
 	let w = wrapper.clientWidth;    //wrapper.widthでは値が取得できなかった
 	let h = wrapper.clientHeight;
 	if(DEBUG) console.log('wrapper.clientWidth:' + wrapper.clientWidth);
+	//window.innerWidth と window.innerHeight で画面の幅と高さを取得
+	w = window.innerWidth;
+	h = window.innerHeight;
 
 	//const el_my = document.getElementById('myCanvas');
 	cvMain.setAttribute('width', w);
@@ -1417,11 +1420,15 @@ elWtRadio.forEach(function(radioButton) {
 	});
 });
 
-setTimeout(() => {   //3秒後にボールを置く
-	drawBall(xx0 + ( Beat - 1) * xpitch, cvMain.height - 0.5 * ball_height);
-}, 1000);
+window.addEventListener("load", (event) => {
+//  drawBall(xx0 + ( Beat - 1) * xpitch, cvMain.height - 0.5 * ball_height);
+	setTimeout(() => {   //1秒後にボールを置く
+		drawBall(xx0 + ( Beat - 1) * xpitch, cvMain.height - 0.5 * ball_height);
+	}, 700);
+	
+});
 
-
+//--------------------------以後の関数は確認後に場所を移すこと
 //拍子エリアのtouch
 //touch座標初期化
 function bcToucStart(event) {
@@ -1445,27 +1452,24 @@ function bcMouseDown(event) {
 function bcMove(event) {
 	event.preventDefault();  //これでスクロール禁止できるのか？→効果ない
 //	if(f_mousedown){　　//マウスの場合ホバリングでもmoveイベントが発生するので必要
-	
-	//移動量積算 upの際に一定量以下ならクリックと判断
+		//移動量積算 upの際に一定量以下ならクリックと判断
 		travel = travel + (x0 - event.pageX) ** 2 + (y0 - event.pageY) ** 2;
+		
 		x0 = event.pageX;
 		y0 = event.pageY;
-		
 	
-		const delta0 = 200;  //★左右方向に動いた距離のしきい値、delta0より大きい変位があるごとにBeat更新
+		const delta0 = 20;  //左右方向に動いた距離のしきい値、delta0より大きい変位があるごとにBeat更新
 		const yy = event.pageX;
-		//移動量がしきい値以内なら何もしないでreturn
+		//移動量がしきい値以内なら何もしない
 		deltaY = startY - yy;
 		if(Math.abs(deltaY) < delta0) return;
-	
-		//しきい値を超えていたらBeat変更、次の移動量測定のため起点座標をstartYに書き留めておく。
+		
 		startY = event.pageX;
 		//クリック音を出す
 		const now = context.currentTime;
-	/*
 		gain.gain.setValueAtTime(1, now);
 		gain.gain.linearRampToValueAtTime(0, now + 0.01);
-	*/
+
 
 		//Beatを増減する
 		if(deltaY > 0){
