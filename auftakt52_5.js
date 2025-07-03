@@ -33,6 +33,7 @@
 
 ★拍子エリアをスワイプしようとしたら、ドラッグしようとすると、横スクロールしてしまう
 
+座標、リサイズしたときの座標の設定など再確認
 
 */
 
@@ -212,17 +213,26 @@ function timeStampToAudioContextTime(timeStamp) {
 //表示領域の描画
 function resizeCanvas(){
 	const wrapper = document.querySelector('.wrapper');
-	let w = wrapper.clientWidth;    //wrapper.widthでは値が取得できなかった
-	let h = wrapper.clientHeight;
-	if(DEBUG) console.log('wrapper.clientWidth:' + wrapper.clientWidth);
+	//let w = wrapper.clientWidth;    //wrapper.widthでは値が取得できなかった
+	//let h = wrapper.clientHeight;
+	//if(DEBUG) console.log('wrapper.clientWidth:' + wrapper.clientWidth);
+	
 	//window.innerWidth と window.innerHeight で画面の幅と高さを取得
-	w = window.innerWidth;
-	h = window.innerHeight;
-
+	let w = window.innerWidth;
+	let h = window.innerHeight;
+	let wpx;
+	let hpx;
+	if(DEBUG) console.log('■ resizeCanvas()　　width: ' + w);
+	
 	//const el_my = document.getElementById('myCanvas');
+	
 	cvMain.setAttribute('width', w);
-	cvMain.setAttribute('height', 0.8 * h);  //wrapperを上下に8:2に分ける
-
+	cvMain.setAttribute('height', 0.8 * h);  //wrapperを上下に8.5:1.5に分ける
+	wpx = w + 'px';
+	hpx = 0.85 * h + 'px';
+	if(DEBUG) console.log('   wpx: ' + wpx + '   hpx = ' +  hpx);
+	cvMain.style.width = wpx;
+	cvMain.style.height = hpx;
 	//設定パネルとQRコード出力シートの幅を規定
 	let wQSheet = wrapper.clientWidth;
 	if(wrapper.clientHeight < wrapper.clientWidth) wQSheet = wrapper.clientHeight;
@@ -230,9 +240,18 @@ function resizeCanvas(){
 	
 	//const el_beat = document.getElementById('beatCanvas');
 	cvBeat.setAttribute('width', w);
-	cvBeat.setAttribute('height', 0.2 * h);
+	cvBeat.setAttribute('height', 0.15 * h);
+	hpx = 0.15 * h + 'px';
+	cvBeat.style.width = wpx;
+	cvBeat.style.height = hpx;
+	
 	drawBeat();   //拍子数字を書く
 	if(!isMoving) drawWaiting(0);  //  静止状態のときは、最終拍にボールを置く
+
+	if(DEBUG){
+				ctxBeat.strokeStyle = "yellow";
+		ctxBeat.strokeRect(20, 15, 60, 60)
+	}
 }
 
 //ラジオボタンのchecked位置を設定する関数
@@ -751,10 +770,11 @@ function reserveSound() {
 
 //拍子エリアの描画、拍子数字と分割マーク表示
 function drawBeat(){        //拍子エリアに数字を置く
-	let topMargin = 10;     //拍数字の上余白
+	let topMargin = 7;     //拍数字の上余白
 	ctxBeat.textBaseline = "top";  //文字の左上を座標とする
-	ctxBeat.font = "bold 40pt sans-serif";
+	ctxBeat.font = "bold 30px sans-serif";
 	ctxBeat.fillStyle = beat_col;
+	ctxBeat.strokeStyle = beat_col;
 	xpitch = cvBeat.width / Beat;
 	//xpitchの値に応じて文字の大きさを動的に変える
 	/*
@@ -764,20 +784,31 @@ function drawBeat(){        //拍子エリアに数字を置く
 	*/
 	//const fontSize = xpitch;
 	//ctxBeat.font = `bold ${fontSize}px  sans-serif`;
-	if(Beat > 6 )ctxBeat.font =  "bold 24pt sans-serif";
-	if(Beat > 9 )ctxBeat.font =  "bold 10pt sans-serif";
+	if(Beat > 6 )ctxBeat.font =  "bold 26px sans-serif";
+	if(Beat > 9 )ctxBeat.font =  "bold 22px sans-serif";
 	
 	
 	xx0 = xpitch / 2;  //0.5拍目の位置
 	let y0 = topMargin;
 	ctxBeat.clearRect(0, 0, cvBeat.width, cvBeat.height);
 	let x = xx0;
+	let marksize = 3;
 	for(let i = 0; i < Beat; i++){
 		let str = (i+1).toString().trim();
 		if(DEBUG){
 			//console.debug(str + ":x=" + x);
 			//ctxBeat.fillRect(x, y0+15, 1, 10);  //チェック用マークを置く
 			//console.debug("y0="+y0);
+			ctxBeat.beginPath();
+			ctxBeat.moveTo(x-marksize, 0);
+			ctxBeat.lineTo(x,2*marksize);
+			ctxBeat.lineTo(x +  marksize, 0);
+			ctxBeat.lineTo(x-marksize,0);
+			ctxBeat.closePath();
+			ctxBeat.fill();
+			ctxBeat.stroke();
+			
+			
 		}
 		ctxBeat.fillText(str, x - 0.5 * ctxBeat.measureText(str).width, y0); 
 		x += xpitch;
@@ -1493,7 +1524,7 @@ function bcMouseMove(event) {
 		x0 = event.pageX;
 		y0 = event.pageY;
 	
-		const delta0 = 20;  //左右方向に動いた距離のしきい値、delta0より大きい変位があるごとにBeat更新
+		const delta0 = 50;  //左右方向に動いた距離のしきい値、delta0より大きい変位があるごとにBeat更新
 		const yy = event.pageX;
 		//移動量がしきい値以内ならなにもしない
 		deltaY = startY - yy;
