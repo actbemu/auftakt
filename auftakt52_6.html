@@ -1,0 +1,176 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<!-- ver.2　Rev.5 QRコード画面、ボタン画像ではなくCSSで対応-->
+    <meta charset="utf-8">
+	<meta name="keywords" content="Metrononme, Auftakt">
+    <link rel="stylesheet" href="./css/style_at52_6.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data:; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+	<script type="text/javascript" src="./auftakt52_6.js" defer ></script>
+	
+<!-- ファビコンなどの設定 -->
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="./images/apple-touch-icon.png" sizes="180x180">
+<link rel="icon" type="image/png" href="./images/android-touch-icon.png" sizes="192x192">
+ <link rel="manifest" href="/manifest.json">
+
+	<link rel="shortcut icon" href="./favicon.ico">
+     <link rel="icon" href="./favicon.ico">
+	
+<title>Metronome: Auftakt 5 ver.2 Rev.6</title>
+</head>
+<body>
+
+    <div class="wrapper">
+        <canvas id="myCanvas"></canvas>
+        <canvas id="beatCanvas"></canvas>
+    </div>
+	<div class="wrapper">
+	<!-- メッセージボックス -->
+			<div id="msgbox">Metronome： Auftakt5 Ver.2R5 @K. Kimura
+			</div>
+		
+	</div>
+
+    <!-- TEMPO表示、プルダウンリスト表示ボタン -->
+    <div id="tempo">
+        60
+    </div>
+	<!-- テンポ調節↑／↓ボタン -->
+
+			<span  class="btnText" id="tempoAdjup">↑</span>
+			<span class="btnText" id="tempoAdjdown">↓</span>
+			<span class="btnText" id="btnTAP">TAP</span>
+
+	
+    <!-- 設定パネル -->
+    <div id="setting">
+		<div id="btn_close_setting" align="right" class="ButtonText">[Close]</div>
+
+		Beat Sound<br>
+		<div class="radiorow">
+		<input type="radio" value="1" name="radiosound" checked />ON&nbsp;
+		<input type="radio" value="0" name="radiosound"/>OFF
+		</div>
+
+		Beat Sound Timing<br>
+		<div class="radiorow">
+		<small>Late</small>
+		<input type="radio" value="0" name="radiotiming"/>
+		<input type="radio" value="1" name="radiotiming"/>
+		<input type="radio" value="2" name="radiotiming" />
+		
+		<input type="radio" value="3" name="radiotiming"  checked/>
+		
+		<input type="radio" value="4" name="radiotiming" />
+		<input type="radio" value="5" name="radiotiming" />
+		<input type="radio" value="6" name="radiotiming"/>
+		<small>Early</small>
+		</div>
+<br>
+
+		Divide Beat Sound into<br>
+		<div class="radiorow">
+		<input type="radio" value=1 name="dsradio" checked/>none&nbsp;
+		<input type="radio" value=2 name="dsradio" />2&nbsp;
+		<input type="radio" value=3 name="dsradio" />3&nbsp;
+		<input type="radio" value=4 name="dsradio" />4&nbsp;
+		</div>
+
+		Divide Beat Motion into<br>
+		<div class="radiorow">
+		<input type="radio" value=1 name="dbradio" checked/>none&nbsp;
+		<input type="radio" value=2 name="dbradio" />2&nbsp;
+		<input type="radio" value=3 name="dbradio" />3&nbsp;
+		</div>
+		<br>
+		<div id="wakelockdiv">
+		Waiting Time to Start<br>
+		<div class="radiorow">
+		<input type="radio" value="0" name="waitingtime"  checked/>0 sec&nbsp;
+		<input type="radio" value="2000" name="waitingtime" />2 sec&nbsp;
+		<input type="radio" value="4000" name="waitingtime" />4 sec&nbsp;
+		
+		</div>
+		</div>
+		<br>
+		<div align="right"  class="ButtonText">
+			<span id="btn_QRcode">[QR code]</span>
+			<span id="btn_Help">[Help]</span>
+			</a>
+		</div>
+
+    </div>  <!--  設定画面ここまで  -->
+
+    <!-- QRコード表示パネル -->
+	<div id="QRsheet">
+		<div id="btn_close_QR" align="right" class="ButtonText">[Close]</div>
+		<div id="QRtitle">
+			You can use the following QR code and URL to record and share your settings.(The URL has been copied to your clipboard.)
+			
+		</div>
+		<br>
+		<div id="URL">https://actbemu.github.io/auftakt/auftakt52_4.html</div>
+		<div id="QR"></div>
+		<div id="current_setting">
+			Beat:<span class="cs_text" id="csBeat">4</span><br>
+			Tempo:<span class="cs_text" id="csTempo">96</span><br>
+			<div id="dBSD">Beat Sound Divsion:<span class="cs_text" id="csBSD">none</span></div>
+			<div id="dBMD">Beat Motion Divsion:<span class="cs_text" id="csBMD">none</span></div>
+		</div>
+	</div>
+
+  
+    <!-- TEMPOプルダウンリスト -->
+    <div id="divTempoList">
+        <select id="tempoList" size="8">
+		<option value="10">10</option>
+		<option value="20">20</option>
+		<option value="30">30</option>
+		<option value="35">35</option>
+		<option value="40">40</option>
+		<option value="42">42 Grave</option>
+		<option value="44">44</option>
+		<option value="46">46 Largo</option>
+		<option value="48">48</option>
+		<option value="50">50</option>
+		<option value="52">52 Adagio</option>
+		<option value="54">54</option>
+		<option value="56">56 Lento</option>
+		<option value="58">58</option>
+		<option value="60">60</option>
+		<option value="63">63</option>
+		<option value="66">66</option>
+		<option value="69">69</option>
+		<option value="72">72 Andante</option>
+		<option value="76">76</option>
+		<option value="80">80</option>
+		<option value="84">84</option>
+		<option value="88">88</option>
+		<option value="92">92</option>
+		<option value="96" selected>96 Moderato</option>
+		<option value="100">100</option>
+		<option value="104">104</option>
+		<option value="108">108 Allegretto</option>
+		<option value="112">112</option>
+		<option value="116">116</option>
+		<option value="120">120</option>
+		<option value="126">126</option>
+		<option value="132">132 Allegro</option>
+		<option value="138">138</option>
+		<option value="144">144</option>
+		<option value="152">152</option>
+		<option value="160">160 Vivace</option>
+		<option value="168">168</option>
+		<option value="176">176</option>
+		<option value="184">184 Presto</option>
+		<option value="192">192</option>
+		<option value="200">200</option>
+		<option value="208">208</option>
+        </select>
+    </div>
+	
+</body>
+</html>
