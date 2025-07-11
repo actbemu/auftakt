@@ -7,49 +7,68 @@
 ・背景画像、1/4、1/3、1/2のラインまたは色の変化
 
 変拍子対応構想
-・拍子エリアの長押しで設定画面表示
-・テキストボックスに、半角数字の設定を書き込む。23, 3332など。111111等とすると単純拍子を、６拍子よりも大きい数値に設定可能。（上限は１２か？）
+・拍子エリアの長押しで設定画面表示→■済み 25/07/09(15:57)
 ・この画面での設定の場合は、テンポとその表示はMMではなくBPMに。表示された数値がMMかBPMかは、文字色で区別。
-・設定の数字通りの拍を打つ場合（分割振り）、設定の桁位置での拍を打つ場合（変拍子）を指定するフラグ（チェックボックス）
-・変拍子指定をURLで行えるようにする。たとえば、eb="23-"
-・変拍子モードのときは、拍の数字ではなく、円とドットで表現。ドットはこれまでの分割振りのドットを使う。（１１１１１１として指定した単純拍子の場合も同じやり方で表示）
 ・変拍子モードのときは、拍子エリアのクリックは無効にする。それを暗示するために、拍子エリアの背景色を変更。
 ・あるいは、クリックしたら現在変拍子モードであること、変拍子モードを解除するか、そのままもどるか（Cacel）選択。
 ・あるいは、変拍子設定画面を表示。変拍子設定画面で、変拍子モード解除、キャンセルなどが指定できるようにする手も
+2025/07/09 16:27　変拍子が設定されている場合は、クリックでの拍子変更はしない。
 
-データ構造など
-従来のpc用プログラム参照。
-１拍ごとの情報を、配列から取り出す。
-配列要素は拍単位なので、変拍子のときと分割振りのときと別の配列を作ることになる。
-分割振りは、周期は一定で、着地点と高さが違うだけ。基本的には次の拍位置さえわかれば良い。
-変拍子のときは、着地点はつねに次の拍、そのかわり次の拍までの周期が変化する。次の拍位置までの周期さえわかれば良い。
-両者を一つの配列で扱うとすると、要素は、次の拍位置と周期の倍数の２つだけ用意すれば良い。→★拍毎に高さも指定する必要がある。正規化放物線の高さ
-やること
-
-高さの考慮
-高さを考慮するケースは、変拍子で分割モードでない場合
-durationが均一でない場合。
-配列内のdurationの最大値の打ち上げ高さを最大とする。このときの放物運動と同じ加速度で所定のdurationになるように高さを決める。
-設定文字列をはじめにスキャンして、単純拍子か否か、durationの最大値を求めておくと良いかも
-
-先にURLで変拍子を指定できるようにして、そのパラメータで所望の動きが実現できるかを確認。
-その後で、設定シートのデザイン、誤入力対策などを検討する。
 
 記録
 2025/07/07 11:04　設定文字列と分割フラグで、ボールの動きはほぼ所望の動きをさせることができた。
+	2025/07/08 21:56 AD設定パネル テキストボックスのinputで、動的に拍子を変えることができた。
+	ただし、１拍子のときに、Stopしてくれない。→拍子拍点判別方法が１拍とのときに対応していない
+	　　　→解決1拍子のときは、直前のmaxHが１かどうかで判別→OK
+	
 
 【今後の課題・考慮点など】
-・ＭＭとBPMの使い分けを整理。表示テンポについて、両者を色分けして表示することも検討。テンポ設定上限を変更。
-・変拍子のときは、八分音符のテンポが２００前後になることもざらにあり、
+・変拍子設定パネルのパラメータ反映
+・URLからパラメータ取得→■済み 25/07/09(16:29)
+→URL指定の拍子構成文字列はテキストボックスには反映されるが、実際の動作には反映されていない。
+・クリック音の出し方（分割振り、変拍子、分割モードとは独立に、分割音を出すのか。）
+resizeCanvas()にどこまで含めるか？サイズの決定だけにするか、画面とパラメータの設定まで含めるか。
+2025/07/08 15:30 htmlで設定シート試作。分割ではなく、ベースとするものをBeatかNoteで区別。
+clickサウンドについては、Beat間をいくつに分けるかを選択できるようにした。
+テンポ表示についてもBeatベースかNoteベースかで、末尾にB/Nを付して表記するようにしてみる。ただしあまり一般的ではない。
+
+拍子エリアの数字と縦ドット。設定によってはドットの数が多くなるかも。そのときはどうするか。小さめの円とドットにして多少スペースを稼ぐことはできる。
+
+特に変拍子の場合のテンポはNoteベースとなり３００くらいまで使うことになる。
+この場合テンポを選ぶときのリストボックスや、スワイプのテンポリストをNoteベースのものに変更しなくてはならない。
+isNormalBeatで区別すれば済むことだが面倒。
+テンポの変換は、単純拍子の場合は従来通り。変拍子のときは、文字列の１に対応するテンポ。
+ユーザがMeasure Strucureに打ち込んでいる際に単純拍子／変拍子の判別によって動的にテンポの表記も変えるのか？
+変拍子の場合は８分音符ベースで小節内の構成割をするケースが多いので、
+やるとしたら８分音符のテンポ設定／表示に切り替えるという手がある。
+
+
+isNormalで変拍子か単純拍子かを判別
+　変拍子：無音、拍点、分割（8部音符）の３種。「変拍子設定画面」で設定。分割の間隔は1duration単位。拍子拍点の識別は不要
+　単純拍子（従来通り）：無音、８分音符、３連符、１６分音符の４種。「設定画面」で設定。分割の間隔は表示テンポ（MM）の周期を分割数で除したもの。
+　単純拍子の場合、拍子拍点で分割音を予約する必要がある。従来はdivBeat_idxが0か否かで判別していた。
+	→更新前のxxUとxxDが異なっていれば拍子拍点とみなされる。  
+
+ちょっと面倒なのは、変拍子設定文字列で、単純拍子を指定した場合。「33」「1111」など
+この場合は、（基本）設定画面で分割振りを指定したものと区別できない。この場合は、分割振りと分割音は独立して設定できるようにする。
+ただ、それを変拍子設定画面で用意するかどうかは検討の余地あり。
+→２拍３連をやりたい場合は、基本設定画面で行うことになる。
+そのへんの使い分けがユーザーに理解してもらえるか？・ＭＭとBPMの使い分けを整理。表示テンポについて、両者を色分けして表示することも検討。
+　→isNormalBeatを使い、単純拍子、変拍子で切り替え。
+		isNormalBeatのときは従来のMM（拍子拍点の偏移速度）、
+		変拍子の場合はいわゆる８分音符のテンポ
+ 
+・テンポ設定上限を変更。リストボックスでは１０～２０８。それ以外は１～３００？
+	・変拍子のときは、八分音符のテンポが２００前後になることもざらにあり、
 今のままだと、高さ制限により、打ち上げ高さが低くなっている。
-分割モードか否かで、高さ制限も考慮する必要がある。
+	分割モードか否かで、高さ制限も考慮する必要がある。
+	→拍運動配列のdurationとbpmから計算した実時間のdurationの最小値をもとに、最高点を低くする。
 ・基本モード（単純拍子と分割振り、分割音）のユーザインタフェースを維持したうえで、変拍子対応。
 ・変拍子のときに、拍子エリアをクリックした途端に単純拍子になってしまわないようにする必要がある。
-変拍子のときは拍子エリアクリック時に、拍子変更ではなく、設定画面を開くようにするなど。
+→変拍子のときは拍子エリアクリック時に、拍子変更ではなく、設定画面を開くようにするなど。
 
-・クリック音の出し方（分割振り、変拍子、分割モードとは独立に、分割音を出すのか。）
-変拍子モードの場合は、無音、拍点、分割（8部音符）の３種、「変拍子設定画面」で設定
-単純拍子の場合は（従来通り）無音、８分音符、３連符、１６分音符の４種、「設定画面」で設定
+
+
 
 変拍子設定画面は半透明にして、プレビュー機能を用意する。
 設定文字列を入力してプレビューして決定するという段階が踏めるように考慮する。
@@ -60,6 +79,7 @@ durationが均一でない場合。
 //■■■■■■■ 定数・変数宣言、定義 ■■■■■■
 //----- グローバル変数の宣言・定義 -----------------
 const DEBUG = true;  //デバグ用 主にconsole表示 
+var no_of_draw = 0;  //描画カウンタ
 
 //公開URL　　QRコード出力で使用
 const BASE_URL = location.protocol+'//'+location.host+location.pathname;
@@ -71,6 +91,7 @@ if(DEBUG) console.log(BASE_URL);
 //const ball_col = '#38b48b';   //、琥珀色#bf783a
 const beat_col = '#fff5ee';   //;拍数字の色; 砂色#dcd3b2、海貝色#fff5ee
 const beat_bgcol = '#250d00';  //拍子エリア背景色　黒檀#250d00
+const beat_bgcol2 = '#３67760';  //拍子エリア変拍子モード背景色　紫紺 しこん#460e44
 const mc_bgcol = '#fff6f5';  //メインキャンバス桜色、胡粉色 #fffffc
 const set_bgcol = 'rgb(220,211,178,0.6)';  //設定パネルの背景　砂色#dcd3b2、rgb(220,211,178,0.4)
 const divdot0_col = '#e7e7eb';  //分割時のドット紫水晶 #e7e7eb
@@ -103,8 +124,8 @@ const el_QR = document.getElementById('QR');
 const el_dBSD = document.getElementById('dBSD');
 const el_dBMD = document.getElementById('dBMD');
 
-
-
+const elAdSetting = document.getElementById('exBeat');  //変拍子設定パネル(AD設定パネル)
+const elBeatStr = document.getElementById('ex_beat_str');  //拍子構成設定文字列
 
 
 //動指標関連
@@ -149,7 +170,9 @@ let f_rafCDC = false;  //カウントダウンアニメーション起動中
 //タイムスタンプ
 let baseTimeStamp;	//[msec]単位
 let currentClickTimeStamp;
+let upBeatTimeStamp;
 let nextClickTimeStamp;
+let downBeatTimeStamp;
 let ct0;    //カウントダウン開始タイムスタンプ
 let intervalID = 0;  //インターバルタイマー、タイムアウトタイマーのID
 
@@ -161,29 +184,35 @@ const MM0 = 96;	//デフォルト値
 const Beat0 = 4;	//デフォルト値
 
 let MM;	//設定されたメトロノームの表示テンポ　メルツェルのメトロノーム
-let beatTick = (bpm) => 60 * 1000 / bpm;  // 周期[msec]
-let Beat;	//設定された拍子
+let bpm;
+let BPM;
+let beatTick = (bpm) => 60 * 1000 / bpm;  // bpm単位のテンポから周期[msec]
+let Beat;	//拍子（単純拍子）
 
-//テンポ設定用配列
-let aryMM = new Array(10, 20, 30, 35, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 63, 66, 69, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108, 112, 116, 120, 126, 132, 138, 144, 152, 160, 168, 176, 184, 192, 200, 208);
+//テンポ設定用配列（スワイプの範囲）
+let aryMM = new Array(10, 20, 30, 35, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 63, 66, 69, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108, 112, 116, 120, 126, 132, 138, 144, 152, 160, 168, 176, 184, 192, 200, 208, 220, 240, 260, 280, 300, 320, 360);
 let aryMM_idx = 0;
 
 let start_wait = 0;  //開始までの待ち時間[msec]
 
 //分割音、分割振り関連
-let ndivSound = 1;	//サウンドの分割数（1～４）設定パネルで変更
-let ndivBeat = 1;	//分割振り（1～３）設定パネルで変更
-let divBeat_idx =0;	//一拍内の分割振りインデクス
+let ndivSound = 1;	//サウンドの分割数（1～４）設定パネルでの設定値
+let ndivBeat = 1;	//分割振り（1～３）設定パネルでの設定値
+//let divBeat_idx =0;	//一拍内の分割振りインデクス
 let f_divBeat = false;  //分割振り
+let isBeatPoint = true;   //分割振りで拍子拍点か否かを判別するため
 
 //拍子定義パラメータ関連　Rev6で追加。単純拍子でも統一的に配列を使う。
 
 //let isComplex = false;  //変拍子？　すでにisNormalBeatがあるので、isNormalBeatを使うこと。
-let isDivision = false;  //拍分割モード？
-let isBPM = false;  //BPM表示？
 let isNormalBeat = true;  //単純拍子？
 
-let beatStr = '223';  //変拍子設定文字列
+//以下は使わないかも
+let isDivision = false;  //拍分割モード？　関数のテストのときに臨時的に使っているだけ？
+let isBPM = false;  //BPM表示？
+
+
+let beatStr = '223';  //拍子構成設定文字列
 let exBeat_idx = 0  //拍運動配列のインデクス
 let upB = [];  //拍運動配列　跳ね上げ拍点
 let downB = [];  //拍運動配列　着地拍点
@@ -191,8 +220,9 @@ let duration = [];  //拍運動配列　時間スパン
 let duration0;
 let maxHeight = [];  //拍運動配列　高さ比率
 let maxHeight0;
-
 let start_idx = 0;  //開始拍の拍運動配列インデクス
+let motionType = 0;  //0:拍子ベース 1:音符ベース（分割振り）
+let clickType = 1;  //クリックサウンドの鳴らし方　0:none 1:拍子ベース 2:１/2　3:1/3 4:1/4 (単純拍子のとき)5:音符ベース（変拍子のとき）
 
 //タッピングテンポ設定関連
 let tp0 = performance.now();  //前回タップの時刻
@@ -284,13 +314,15 @@ function resizeCanvas(){
 	cvBeat.style.width = wpx;
 	cvBeat.style.height = hpx;
 	
-	drawBeat();   //拍子数字を書く
+	//setBeat();   //拍子数字を書く
 	if(!isMoving) drawWaiting(0);  //  静止状態のときは、最終拍にボールを置く
 
-	if(DEBUG){
-				ctxBeat.strokeStyle = "yellow";
-		ctxBeat.strokeRect(20, 15, 60, 60)
-	}
+	/*
+		if(DEBUG){
+			ctxBeat.strokeStyle = "yellow";
+			ctxBeat.strokeRect(20, 15, 60, 60)
+		}
+	*/
 }
 
 //ラジオボタンのchecked位置を設定する関数
@@ -335,7 +367,27 @@ function tempoDownLong(){
 	elTempoTxt.textContent = MM;
 }
 
+function toBPM(mm) {
+	//if(isNormalBeat) return mm;
+	//beatStr中の最大値を乗じたものする
+	let n = 1;
+	for(let i = 0; i < beatStr.length; i ++){
+		if(beatStr.charAt(i) > n) n= beatStr.charAt(i);
+	}
+	return mm * n;
+}
+
 //拍子変更と表示
+//---従来の拍子設定からBeat配列設定文字列を作成する
+//入力：Beat, ndivBeat
+//出力：Beat配列設定文字列
+const B2BeatStr = (beat, ndiv) => {
+	let str = '';
+	for(let i = 0; i < beat; i++){
+		str += ndiv;
+	}
+	return str;
+}
 //Beatキャンバスクリック時の処理
 function BeatChange() {
 	if(Beat >= maxBeat){
@@ -343,8 +395,21 @@ function BeatChange() {
 	} else {
 		Beat++;
 	}
-	drawBeat(); //拍子文字を表示
-	if(DEBUG) console.log('　　　　　　　Beat:'+Beat);
+	setBeat();
+
+}
+
+function setBeat(){
+	//従来の拍子設定からBeat配列設定文字列を作成、拍運動配列を作成し、拍子エリア表示も行う
+	const str = B2BeatStr(Beat, ndivBeat);
+	elBeatStr.value = str;  //AD設定パネルのテキストボックスに反映
+	f_divmode = ndivBeat > 1? true: false;
+	motionType = ndivBeat > 1? 1: 0;
+	if(DEBUG) console.log(`＠ｓｅｔBeat 拍子変更→【${str}】 分割振り(音符種別):${ndivBeat}`);
+	makeBeatArray(str,f_divmode);
+	drawExBeat(str, ndivSound);  //将来的に引数をmotionTypeとclickTypeに変更したい
+	//drawBeat(); //拍子文字を表示
+	//if(DEBUG) console.log('　　　　　　　Beat:'+Beat);
 }
 
 //TAPボタンタップの処理
@@ -371,6 +436,7 @@ function Tapping(){
 		}
 		mm0 = 60000 / av;
 		MM = Math.round(mm0);            //整数値に直したら表示
+		BPM = toBPM(MM);
 		elTempoTxt.textContent = MM;
 	}else{
 		seq_count = 0;    //１回でも間隔が開いたらリセット
@@ -417,7 +483,9 @@ function mcToucStart(event) {
 			f_longtap = true;  //このフラグは不要では？
 			f_mousedown = false;
 			//設定パネル表示
-			dispElement(elSetting, true);
+			//現在のパラメータを設定パネルに反映させる
+			dispSetting();
+			//dispElement(elSetting, true);
 		} 
 	}, 600);
 		
@@ -488,6 +556,7 @@ function mcMove(event) {
 	console.log(aryMM_idx);
 	//MMを設定し、表示する
 	MM = aryMM[aryMM_idx];
+	BPM = toBPM(MM);
 	elTempoTxt.textContent = MM;
 	//touchendのときにクリックと判断しないようにフラグを立てる
 	isClick = false;
@@ -527,6 +596,7 @@ function mcMouseMove(event) {
 		if(aryMM_idx < 0) aryMM_idx = 0;
 		//MMを設定し、表示する
 		MM = aryMM[aryMM_idx];
+		BPM = toBPM(MM);
 		elTempoTxt.textContent = MM;
 		//touchendのときにクリックと判断しないようにフラグを立てる
 		isClick = false;
@@ -558,10 +628,7 @@ function mcTouchEnd(event) {
 		if(!isClick)return;
 		//クリックと判断
 		if(isMoving){	//Stop ■ストップ操作
-			isMoving = false;
-			f_stop = true;	//次の拍点で停止させる
-			dispMsg('Halting...');
-			console.log('停止フラグ：' + f_stop);
+			metroStop();
 		}else{
 			//ボールを最終拍においてスタンバイ
 			let rate = 0;
@@ -596,10 +663,7 @@ function mcMouseUp(event) {
 		if(!isClick)return;
 		//クリックと判断
 		if(isMoving){	//Stop ■ストップ操作
-			isMoving = false;
-			f_stop = true;	//次の拍点で停止させる
-			dispMsg('Halting...');
-			console.log('停止フラグ　f_stop：' + f_stop);
+			metroStop();
 			if(MM < 30){
 				//アニメーション停止
 				window.cancelAnimationFrame(rafBall);
@@ -647,8 +711,7 @@ btnQRcode.addEventListener('click', () => {
 	dispElement(elSetting, false);
 	dispElement(elQRsheet, true);
 	//メトロノームの動作停止
-	f_stop = true;
-	
+	metroStop();
 	if (!navigator.clipboard) {
 		dispMsg("'Copy URL' is not available on this bowser.");
 		return;
@@ -694,92 +757,142 @@ btnQRcode.addEventListener('click', () => {
 function drawMark() {
 	//描画エリアの消去（クリア）
 	ctxMain.clearRect(0, 0, cvMain.width, cvMain.height);//キャンバス内全面クリア
-		
-	//正規化座標	
-	const t = (currentTimeStamp() - currentClickTimeStamp + sdelay)/(beatTick(MM * ndivBeat) * duration0);
+	let flying_time = beatTick(BPM) * duration[exBeat_idx];  //現在運動の周期（予定飛行時間）[msec] 途中で倍になる？
+		flying_time = downBeatTimeStamp - upBeatTimeStamp;  //これだと正常動作？
+	//正規化時刻と座標	
+	const t = (currentTimeStamp() - upBeatTimeStamp + sdelay) / flying_time;//★要確認
 	const y = -4 * t * (t - 1);
 	
 	//console.log(x + " " + y);
 	let maxH =  (cvMain.height - 2.1*ball_height);
 	maxH = maxH * maxHeight0;
 	
-	if(divBeat_idx > 0){maxH *= divHrate;}  //分割振り対応
+	//if(divBeat_idx > 0){maxH *= divHrate;}  //分割振り対応
+
+	//テンポが速いときの高さ調整　★要検討。参照するテンポはMMだけとは限らない。特に変拍子の場合
 	let bpm = MM * ndivBeat;
-	if(bpm > 120){ maxH = (1-(bpm - 120)/200) * maxH;}  //テンポが早い場合の高さ制限
-	//console.log('maxH：'+maxH);
+	if(MM > 120){ maxH = (1-(bpm - 120)/200) * maxH;}  //テンポが早い場合の高さ制限
+
 	//ボールを表示
-	//ball.draw(xxU + t * (xxD - xxU), (cvMain.height - ball.radius) - y * maxH);
 	drawBall(xxU + t * (xxD - xxU), (cvMain.height - 0.5 * ball_height) - y * maxH);	
+	no_of_draw++;  //デバグ用描画数カウンタ
+	
 	//■次の描画の予約（お決まりの手続き）
 	rafBall = window.requestAnimationFrame(drawMark);
 
 	//拍点処理
-	//現在時刻が拍点タイプスタンプの手前8msecを切ったら拍点とみなす
-	if(currentTimeStamp() - nextClickTimeStamp + sdelay>= -8 ){  //拍点検出
-		console.log(`●拍点   exBeat_idx=${exBeat_idx}  ${upB[exBeat_idx]}→${downB[exBeat_idx]}　 時間 ${duration[exBeat_idx]}  高さ${maxHeight[exBeat_idx]}`);
-		if(f_stop && divBeat_idx == 0){	//ストップ操作直後の拍点
+	//現在時刻が着地点の拍点タイプスタンプの手前8msecを切ったら拍点とみなす
+	if(currentTimeStamp() - downBeatTimeStamp + sdelay>=　-8 ){  //拍点検出
+		//拍子拍点か判別
+		if(maxHeight.length == 1){  //１拍子のとき
+			isBeatPoint = maxHeight[exBeat_idx] == 1? true: false;  //拍子拍点か判別
+		}else{
+			isBeatPoint = xxU != xxD ? true: false;  //拍子拍点か判別
+		}
+		if(DEBUG) console.log(`${isBeatPoint?'●拍子拍点':'◯拍点'}  更新前：exBeat_idx=${exBeat_idx}  ${upB[exBeat_idx]}→${downB[exBeat_idx]}　 時間 ${duration[exBeat_idx]}  高さ${maxHeight[exBeat_idx]}
+		TS:${ downBeatTimeStamp }
+		`);
+		/*
+		if(DEBUG) console.log(`　　　${beatTick(BPM) * duration[exBeat_idx]}[msec] v.s. ${flying_time}[msec]
+		1周期の描画数：${no_of_draw}  停止フラグ ${f_stop}`);
+		*/
+		
+		no_of_draw = 0;  //カウンタリセット
+		if(f_stop && isBeatPoint){	//ストップ操作直後の拍点で停止Stop
 			//アニメーション停止
 			window.cancelAnimationFrame(rafBall);
 			//描画エリアの消去（クリア）
 			ctxMain.clearRect(0, 0, cvMain.width, cvMain.height);
 			//指標を次の拍点に置いて停止
-			//ball.draw(xxD, cvMain.height - ball.radius);
 			drawBall(xxD, cvMain.height - 0.5 * ball_height);
+			return;
 			
+			//サウンド予約取り消し
+			//	console.log('  【サウンド予約取り消し】');
+			//gain.gain.cancelScheduledValues(0);  //即座にキャンセルされない、代わりに長い音が出たりする。
 		}else{  //★本来の拍点処理ここから
-			console.log(`第${upB[exBeat_idx]}拍　インデクス:${exBeat_idx}`);
+			//インデクス更新　インデクス更新はここに移動2025
+			exBeat_idx ++;
+			if(exBeat_idx >= upB.length) exBeat_idx = 0;
+
+			if(DEBUG) console.log(`　　更新後第${upB[exBeat_idx]}拍　インデクス:${exBeat_idx}`);
+			
+			//次の跳ね上げで使うパラメータをセット
 			xxU = xx0 + (upB[exBeat_idx] - 1) * xpitch;
 			xxD = xx0 + (downB[exBeat_idx] - 1) * xpitch;
 			duration0 = duration[exBeat_idx];
 			maxHeight0 = maxHeight[exBeat_idx];
-			exBeat_idx ++;
-			if(exBeat_idx >= downB.length) exBeat_idx = 0;
 
+			//拍子拍点直後に次のクリックサウンド予約
+			if(isBeatPoint && clickType > 0){  //サウンドありの場合
+				if(DEBUG) console.log(`
+次の拍点のタイムスタンプを計算　クリックサウンド予約`);
+				rsvClickUntilNextBeat(downBeatTimeStamp);  //要検討
+			}
+			//現在と次の拍点のタイムスタンプを更新
+			//rsvClickUntilNextBeat内での処理とかぶるものがある
+			let nextBTS = isNormalBeat? beatTick(MM): beatTick(BPM) * duration[exBeat_idx];
+			if(DEBUG) console.log(`    次の拍点まで${nextBTS}[msec]`);
+			currentClickTimeStamp = nextClickTimeStamp;
+			//nextClickTimeStamp += beatTick(BPM)*duration[exBeat_idx];
+			nextClickTimeStamp += beatTick(BPM);
+			
+			upBeatTimeStamp = downBeatTimeStamp;
+			//downBeatTimeStamp += beatTick(BPM)*duration[exBeat_idx];
+			if(motionType == 0){
+				downBeatTimeStamp += nextBTS;  //Beat
+			}else{
+				downBeatTimeStamp += beatTick(BPM);  //Note
+			}
 			
 		}
-		currentClickTimeStamp = nextClickTimeStamp;
-		//次の拍点のタイムスタンプを計算duration0
-		nextClickTimeStamp += beatTick(MM * ndivBeat)*duration0;
+
 	}
 }    // end of  drawMark
 
 /***********************
-次の拍子拍点までのサウンドを予約
-次の拍点までに分割音がある場合は分割音も予約
-currentBeatTimestamp　現在の拍子拍点のタイムスタンプ[msec]
-span 次の拍子拍点までの時間[msec]
+次の拍子拍点と分割音や音符クリック音のサウンドを予約
+currentTS：現在の拍子拍点のタイムスタンプ[msec]
+変拍子設定文字列の１に相当するテンポbpmを確実に規定しておくことが必要
 */
-function  rsvSoundUntilNextBeat(currentBeatTimestamp, span) {
-	//次の拍子拍点サウンドを予約	
-	rsvClickSound(0,currentBeatTimestamp + span);
-
-	//次の拍点までに分割音がある場合は分割音も予約
-	if(ndivSound > 1){
-		for(let i = 1; i < ndivSound; i++){
-			rsvClickSound(1,currentBeatTimestamp + i * span / ndivSound);
+function  rsvClickUntilNextBeat(currentTS) {
+	//次の拍子拍点のタイムスタンプを求める
+	//単純拍子の場合テンポ設定値MMにもとづく
+	//変拍子の場合は音符テンポに拍運動配列のdurationを乗じたものに
+	let nextBTS;  //次の拍子拍点のタイムスタンプ
+	//拍単位Beatの場合
+	if(motionType == 0) nextBTS= isNormalBeat? beatTick(MM): beatTick(BPM) * duration[exBeat_idx];
+	//音符単位の場合
+	if(motionType == 1){
+		//beatStrで並べられた数値から求める
+		let c = beatStr.charAt(upB[exBeat_idx] - 1);
+		nextBTS = c * beatTick(BPM);
+		if(DEBUG) console.log(`${beatStr}拍位置：${upB[exBeat_idx]} 長さ：${c}`);
+	}
+	
+	if(DEBUG) console.log(`MM = ${MM} BPM = ${BPM}
+	isNormalBeat? ${isNormalBeat} duration:${duration[exBeat_idx]}
+	TS0:${currentClickTimeStamp}`);
+	
+	//次の拍子拍点サウンドを予約　クリック音はsound_type:0
+	if(DEBUG) console.log(`@ rsvClickUntilNextBeatで次の拍子拍点予約　　${nextBTS}[msec]後`);
+	rsvClickSound(0,currentTS + nextBTS);
+	//次の拍子拍点までに分割音がある場合は分割音も予約
+	//clickTypeが、2,3,4の場合それぞれその値で分割
+	if(clickType >= 2 && clickType <= 4){
+		for(let i = 1; i < clickType; i++){
+			if(DEBUG) console.log(`　　Beat分割音（${i}）予約　　${nextBTS / clickType}[msec]後`);
+			rsvClickSound(1,currentTS + i * nextBTS / clickType);
 		}
 	}
-}
-
-function reserveSound() {
-	//■次のサウンドの予約
-	if(DEBUG) console.log('■次のサウンドの予約beatTick = '+beatTick(MM * ndivBeat));
-	const t0 = nextClickTimeStamp;
-	// スケジュール済みクリックの時刻を更新
-	currentClickTimeStamp = t0;
-	//console.log("スケジュール済みクリックの時刻を更新");
-	nextClickTimeStamp += beatTick(MM * ndivBeat);	//[msec]単位
-	if(DEBUG) console.log('nextClickTimeStamp = '+nextClickTimeStamp);
-
-	// 変換した時刻を使ってクリックサウンドを予約
-	if(f_sound){
-		rsvClickSound(0,nextClickTimeStamp);
-		if(DEBUG) console.log('MM:' + MM);
-		//分割音の予約
-		if(ndivSound > 1 && divBeat_idx == 0){
-			for(let i = 1; i < ndivSound; i++){
-				rsvClickSound(1,t0 + i * beatTick(MM) / ndivSound)
-			}
+	//clickTypeが5の場合（noteベースのbpmテンポで
+	if(clickType == 5){
+		let ts = currentTS + beatTick(BPM);
+		while(ts < (currentTS + nextBTS)){
+			rsvClickSound(1,ts);
+			if(DEBUG) console.log(`   Noteベースclick予約　　${ts}[msec]後`);
+			ts += beatTick(BPM);
+			
 		}
 	}
 }
@@ -863,10 +976,10 @@ function drawBeat(){        //拍子エリアに数字を置く
 function metroStart(){  //
 	if(!isOsc){	//初回タップ時のみの処理
 		//オシレータ開始（この段階で音量は０）
-		//ユーザ操作の後にスタートさせる必要がある
+		//ユーザ操作の後にスタートさせる必要があるのでここに置いた。
 		osc.start();
 		isOsc = true;
-		//オシレータ開始時のタイムスタンプを基準にする
+		//オシレータ開始時のタイムスタンプを基準baseTimeStampとする
 		baseTimeStamp = performance.now() - context.currentTime * 1000;
 	}
 	if(f_wakelock && isSupported){
@@ -876,49 +989,66 @@ function metroStart(){  //
 		dispMsg('Screen Wake Lock enabled. The screen will stay on.');
 		f_wakelock = false;
 	}
+	if(DEBUG){
+		 testMakeBeatArray(beatStr, motionType);   //デバグ用
+		console.log(`■metroStart■`);
+		showCurrentParm();
+	}
+
+	
 	//現在時刻を拍点時刻にする
 	currentClickTimeStamp = currentTimeStamp();
+	upBeatTimeStamp = currentTimeStamp();
+	
 	//テンポリスト表示を消す
 	elDivTempoList.style.display = 'none';
 
-	//アニメーション起動
+	//アニメーション
 	//ボールを初期位置に置く
 	exBeat_idx = start_idx;
-	xxU = xx0 + (upB[start_idx] - 1) * xpitch;	//跳ね上げ点
-	xxD = xx0 + (downB[start_idx]-1) * xpitch;  //着地点
+	xxU = xx0 + (upB[exBeat_idx] - 1) * xpitch;	//跳ね上げ点
+	xxD = xx0 + (downB[exBeat_idx]-1) * xpitch;  //着地点
 	duration0 = duration[exBeat_idx];
 	maxHeight0 = maxHeight[exBeat_idx];
-	//xxU = xx0 + ( Beat - 1) * xpitch;	//跳ね上げ点
-	//ball.draw(xxU, cvMain.height - ball.radius);
 	drawBall(xxU, cvMain.height - 0.5 * ball_height);
 
-	nextClickTimeStamp = currentClickTimeStamp + beatTick(MM) * duration[start_idx];  //★要検討
-	exBeat_idx ++;
-	if(exBeat_idx >= upB.length) exBeat_idx = 0;
-	/*
-	if(ndivBeat > 1){  //分割振りのとき
-		nextClickTimeStamp = currentClickTimeStamp + beatTick(MM) / ndivBeat;
-		if(f_sound) rsvClickSound(0,currentClickTimeStamp + beatTick(MM));  //次の拍子拍点サウンドを予約
-		xxD = xxU;	//分割振りでは水平移動しない
-		divBeat_idx = 1;Beat_idx = Beat - 1;
-		console.log('分割振りスタート:' + 'Beat_idx' + Beat_idx);
-	}else{  //分割振りでないとき
-		//次の拍点時刻
-		nextClickTimeStamp = currentClickTimeStamp + beatTick(MM);
-		if(f_sound) rsvClickSound(0,nextClickTimeStamp);  //サウンド予約
-		xxD = xx0;						//着地点　アウフタクトでは着地点は一拍め
-		Beat_idx = 0;
-	}
-*/
+	//次の拍点時刻でサウンド予約★変拍子のときは要検討
+	//この時点で isNormalBeat が正しくセットされていること
+	//拍子テンポ（MM）と対応する音符テンポ（BPM）が正しくセットされていること
+	//開始時は、最初の拍子拍点（1拍目）の予約だけで良い
+	//durationは分割振りのときはすべて１となるのでここでは使えない
+	//if(isNormalBeat){
+		//次の拍子拍点のタイムスタンプ
+		nextClickTimeStamp = currentClickTimeStamp + beatTick(BPM) * beatStr.charAt(upB[exBeat_idx]-1);//★こうすれば変拍子のときも対応可能？
+	//}
+	if(clickType > 0) rsvClickSound(0,nextClickTimeStamp);  //拍子拍点クリック音予約
+	//次の着地点のタイムスタンプ 不要かも
+	downBeatTimeStamp = upBeatTimeStamp + beatTick(BPM) * duration[exBeat_idx];  //デバグ用どこかでmotion用にnextClickTimeStampを使っているかも
+	
+	//インデクス更新は拍点処理のところに移動2025/07/10 08:57
+	//exBeat_idx ++;
+	//if(exBeat_idx >= upB.length) exBeat_idx = 0;
+
 	//アニメーションタイマー起動
 	rafBall = window.requestAnimationFrame(drawMark);
 	isMoving = true;
 	f_stop = false;
+
 	if(DEBUG){
-		console.log(`■■Start■■exBeat_idx=${exBeat_idx}  ${upB[exBeat_idx]}→${downB[exBeat_idx]}　 時間 ${duration[exBeat_idx]}  高さ${maxHeight[exBeat_idx]}`);
+		console.log(`■■Start■■
+		clickType=${clickType}
+		exBeat_idx=${exBeat_idx}  ${upB[exBeat_idx]}→${downB[exBeat_idx]}　 時間 ${duration[exBeat_idx]}  高さ${maxHeight[exBeat_idx]}
+		`);
 	}
 
 }
+function metroStop() {
+	isMoving = false;
+	f_stop = true;	//次の拍点で停止させる
+	dispMsg('Halting...');
+	if(DEBUG) console.log('停止フラグ：' + f_stop);
+}
+
 
 //サウンド予約
 //   soundtype:サウンドの種類 1のとき分割音
@@ -929,7 +1059,7 @@ function rsvClickSound(soundtype, timestamp){
 	//分割音（soundtypeが1のとき）のパラメータ調整
 	if(soundtype == 1){gain0 = 0.5;len *= 0.5}
 	const nextClickTime = timeStampToAudioContextTime(timestamp);
-	console.log(nextClickTime);
+	console.log(　　　`@rsvClickSound   for ${nextClickTime}sec (timestamp=${timestamp}) `);
 	gain.gain.setValueAtTime(gain0, nextClickTime);  //sdelayはボールの座標計算で使うように変更
 	gain.gain.linearRampToValueAtTime(0, nextClickTime + len);  //sdelayはボールの座標計算で使うように変更
 }
@@ -1130,11 +1260,192 @@ function aline(ctx, x1, y1, x2, y2, r, len){
 
 //xx,yyを中心にしたイメージ描画
 function drawBall(xx,yy) {
-	console.log('ボール画像描画');
+	//console.log('ボール画像描画');
 	//xx=0;
 	//yy=0;
 	ctxMain.drawImage(ball_image, xx - 0.5 * ball_width, yy - 0.5 * ball_height, ball_width, ball_height);
 	
+}
+
+//■■■Rev.6 変拍子対応拍子設定文字列と拍運動配列の導入
+
+//設定文字列からBeat配列を作成する
+//beat_strから１文字ずつ取り出して、分割モード設定状態motiontypeも加味して展開
+//拍運動配列のほか、単純拍子か否か（isNormalBeat)、アウフタクト（開始）位置の配列インデクスを設定する。
+function makeBeatArray(beat_str, motion_type) {
+	if(DEBUG) console.log(`■makeBeatArray`);
+	let i;   //forループ用
+	let ch;  //beat_strから取り出した文字
+	let ch0;  //chが全部同じかチェックするため
+	let max0 = 1;
+	let idx = 0;  //配列のインデクス
+	let Beat_pos = 1;  //拍位置
+	isNormalBeat = true;
+	let subHeightRate = 0.7;  //単純拍子の分割振りの高さの割合
+	Beat = beat_str.length;  //拍子
+	start_idx = 0;
+	
+	//配列の初期化
+	upB.length = 0;
+	duration.length = 0;
+	downB.length = 0;
+	maxHeight.length = 0;
+	//exBeat_idx = 0;  //配列のインデクス
+	console.log('     max = ' + max0);
+	if(motion_type == 0){  //分割モードでない場合、設定文字列の最大周期を求めておく
+		for(i = 0; i < beat_str.length; i++){
+			ch = beat_str.charAt(i);
+			if(max0 < ch) max0 = ch;
+		}
+		if(DEBUG) console.log('     max計算後 = ' + max0);
+	}
+	//拍子指定文字列beat_strと分割振りフラグf_divBeatから配列を作り直す。
+	for(i = 0; i < beat_str.length; i++){
+		//1文字ずつ取り出す
+		ch = beat_str.charAt(i);
+		if(i == 0){
+			ch0 = ch;
+		}else{
+			if(ch != ch0) isNormalBeat = false;  //変拍子（単純拍子ではない）
+		}
+		//分割振りかどうかで場合分け
+		if(motion_type > 0){
+			if(DEBUG) console.log('分割振りの処理　ch:' +  ch);
+			//取り出した文字の数だけ繰り返し
+			for(let j = 0; j < ch; j++){
+				if(DEBUG) console.log('   j:' + j);
+				duration[idx] = 1;  //分割振りのときは常に１
+				if(j < (ch - 1)) {  //同じ拍にとどまる
+					upB[idx] = Beat_pos;
+					downB[idx] = Beat_pos;
+					maxHeight[idx] = subHeightRate;
+				}
+				if(j == (ch - 1)){  //次の拍に遷移
+					upB[idx] = Beat_pos;
+					Beat_pos ++;
+					if(Beat_pos == (beat_str.length + 1)){
+						Beat_pos = 1;
+					}
+					downB[idx] = Beat_pos;
+					maxHeight[idx] = 1;
+				}
+				idx ++;
+			}
+		}else{  //分割振りではない場合→OK
+			upB[idx] = Beat_pos;
+			duration[idx] = ch;
+			maxHeight[idx] = (ch / max0) ** 2;
+			Beat_pos ++;
+			if(Beat_pos == beat_str.length + 1){
+				downB[idx] = 1;
+				Beat_pos = 1;
+			}else{
+				downB[idx] = Beat_pos;
+			}
+			idx ++;
+		}
+	}
+	//出来上がった配列をスキャンし、アウフタクト位置start_idxを求める
+	for(i = 0 ; i < upB.length; i++){
+		if(upB[i] == Beat){
+			start_idx = i;
+			break;  //forループ抜ける
+		}
+	}
+	exBeat_idx = 0;  //配列のサイズが変わってインデクスがサイズよりも大きな値になる可能性があるためリセットしておく。
+}
+
+//上記関数のテスト
+function testMakeBeatArray(str, motion_type) {
+	makeBeatArray(str, motion_type);
+	console.log(`
+★ beat配列の確認
+	  設定文字列;　${str}　　配列のサイズ:${downB.length} 単純拍子？ ${isNormalBeat}
+	  アウフタクト位置: ${start_idx}
+■配列の内容`);
+	for(let i = 0; i < downB.length; i ++){
+		//console.log(i  +  '  downB:' + downB[i] +  '  downB:' + downB[i]+ '  duration:' + duration[i]+ 'H:' + maxHeight[i]);
+		console.log(`${i}:   ${upB[i]} → ${downB[i]}   時間 ${duration[i]}  高さ${maxHeight[i]}`);
+	}
+}
+
+//------------------------------------
+//■■拍子エリア表示、拍設定文字列対応バージョン
+//入力：Beat配列設定文字列、分割モード、サウンド分割数
+//取り出した数値に応じて縦ドットを表示する
+//------------------------------------
+//拍子エリアの描画、拍子数字と分割マーク表示
+function drawExBeat(str, ndivSound){        //拍子エリアに数字を置く
+	let str_len = str.length;  //設定文字列桁数（拍点の数）
+	//拍子エリアの背景色
+	let bgcol = isNormalBeat? beat_bgcol: beat_bgcol2;
+	cvBeat.style.backgroundColor = bgcol;
+	let topMargin = 7;     //拍数字の上余白
+	ctxBeat.textBaseline = "top";  //文字の左上を座標とする
+	ctxBeat.font = "bold 30px sans-serif";
+	ctxBeat.fillStyle = beat_col;
+	ctxBeat.strokeStyle = beat_col;
+	xpitch = cvBeat.width / str_len;
+	//xpitchの値に応じて文字の大きさを動的に変える
+	/*
+	const fontSize = canvasWidth / 2;
+				ctx.font = `${fontSize}px serif`; 
+	
+	*/
+	//const fontSize = xpitch;
+	//ctxBeat.font = `bold ${fontSize}px  sans-serif`;
+	if(Beat > 6 )ctxBeat.font =  "bold 26px sans-serif";
+	if(Beat > 9 )ctxBeat.font =  "bold 22px sans-serif";
+	
+
+	
+	xx0 = xpitch / 2;  //0.5拍目の位置
+	let y0 = topMargin;
+	ctxBeat.clearRect(0, 0, cvBeat.width, cvBeat.height);  //描画エリアの消去
+	let x = xx0;
+	let marksize = 3;
+	for(let i = 0; i < str_len; i++){
+		let B_str = (i+1).toString().trim();  //拍点番号
+		ctxBeat.fillText(B_str, x - 0.5 * ctxBeat.measureText(B_str).width, y0); 
+		x += xpitch;
+	}
+
+	//分割サウンド設定（かつサウンドOＮ）の場合は、拍数字の中間に分割を示すドットを入れる。
+	//ただし最終拍の後には入れない。例：１・２・３・４　　１・・２・・３　など
+	ctxBeat.font = "bold 22pt sans-serif";
+	ctxBeat.fillStyle = divdot0_col;
+	x = xx0;
+	if(f_sound == true && ndivSound > 1){
+		for(let bt = 0; bt < str.length - 1;bt++){
+			for(let i = 1; i < ndivSound; i++){
+				x = xx0 +  bt * xpitch+ i * xpitch/ndivSound;
+				ctxBeat.fillText('・', x - 0.5 * ctxBeat.measureText('・').width, y0); 
+			}
+		}
+	}
+
+	//分割振りの表記　分割振りの場合は拍数字の下に縦にドット表示
+　　ctxBeat.font = "bold 22pt sans-serif";
+	ctxBeat.fillStyle = divdot1_col;
+	x = xx0;
+	for(let bt = 0; bt < str.length; bt++){
+		for(let i = 1; i < str.charAt(bt); i++){
+			x = xx0 +  bt * xpitch;
+			y = y0 + i * 10 + 9;
+			ctxBeat.fillText('・', x - 0.5 * ctxBeat.measureText('・').width, y); 
+		}
+	}
+}
+
+//パラメータ確認用
+function showCurrentParm(){
+	console.log(`【CurrentParm】
+	beatStr = [${beatStr}];  isNormalBeat? ${isNormalBeat};
+	MM = ${MM};
+	motionType = ${motionType};
+	clickType = ${clickType};
+	
+`)
 }
 
 //■■■■■■■ 初期化コード ■■■■■■
@@ -1171,6 +1482,24 @@ osc.connect(gain).connect(context.destination);
 //発音はgainでコントロールするため、ブラウザを閉じるまで発振し続ける。
 
 //**********************************
+//デフォルトパラメータの設定
+//4拍子、テンポ96、サウンドON
+//------------------------------
+beatStr = '1111';
+MM = 96;
+BPM = toBPM(MM);
+motionType = 0;
+clickType = 1;
+f_sound = clickType > 0? true: false;
+start_wait = 0;
+if(DEBUG){
+	console.log(`*デフォルトパラメータ`);
+	showCurrentParm();
+}
+
+//この後、URLで指定されたパラメータがあれば、それに置き換わる。
+
+//**********************************
 //URLで拍子、テンポなどを指定
 //　例：?bt=4&mm=120
 //------------------------------
@@ -1183,16 +1512,26 @@ let strBeat= url_params.get('bt');  //拍子（１～6）
 let strMM=url_params.get('mm');  //メトロノームテンポ(10～209)
 let strDivSound=url_params.get('ds');  //サウンド分割(1～4)
 let strDivBeat=url_params.get('db');  //分割振り(1～3)
+let strBeatStr = url_params.get('exb');  //拍子構成文字列(1～3)
 //以下は０も含むので注意
 let strSFlag=url_params.get('bs');  //サウンドON/OFF(0/1)
 let strBST=url_params.get('bst');  //サウンドタイミング(0～6)7段階
+let strWaiting = url_params.get('wt');  //待ち時間(0,1,2)
+
+let strMotionType = url_params.get('mt');  //動きのタイプ(0,1)
+let strClickType = url_params.get('ct');  //クリックサウンドの鳴らし方(0～5)
 
 const pattern ="[^0-9]/g";	//置き換えのパターン、数字以外は半角0に置き換える
 if(strBeat === null){Beat = Beat0}else{		//btが指定されていないときはデフォルト値
 	Beat = parseInt(strBeat.replace(pattern,'0'));
+	beatStr = B2BeatStr(Beat, 1);
 }
-if(strMM === null){MM = MM0}else{		//mmが指定されていないときはデフォルト値
+if(strMM === null){
+	MM = MM0;
+	BPM = toBPM(MM);
+}else{		//mmが指定されていないときはデフォルト値
 	MM = parseInt(strMM.replace(pattern,'0'));
+	BPM = toBPM(MM);
 }
 //以下は設定パネルに反映
 //分割音
@@ -1208,11 +1547,25 @@ if(strDivBeat === null){ndivBeat = 1}else{		//ndivBeatmが指定されていな�
 	if(ndivBeat > 3)ndivBeat = 3;
 	//設定パネルのラジオボタンchckedに反映
 	setRadioValue("dbradio", ndivBeat);
+	//新パラメータに反映
+	beatStr = B2BeatStr(Beat, ndivBeat);
+	motionType = 1;
 }
+//新パラメータに反映
+beatStr = B2BeatStr(Beat, ndivBeat);
+
 //サウンドON/OFF
 let fl;
 if(strSFlag === null){f_sound = true}else{		//ndivSoundが指定されていないときはデフォルト値
-	if(parseInt(strSFlag) == 1){f_sound = true; fl = 1;}else{f_sound = false; fl = 0;}
+	if(parseInt(strSFlag) == 1){
+		f_sound = true;
+		fl = 1;
+		clickType = ndivSound;  //新パラメータに反映
+	}else{
+		f_sound = false;
+		fl = 0;
+		clickType = 0;  //新パラメータに反映
+	}
 	//設定パネルのラジオボタンchckedに反映
 	setRadioValue("radiosound", fl);
 }
@@ -1226,8 +1579,45 @@ if(strBST === null){fl = 3;}else{		//ndivSoundが指定されていないとき�
 	//設定パネルのラジオボタンchckedに反映
 	setRadioValue("radiotiming", fl);
 }
+//待ち時間
+if(strWaiting === null){start_wait = 0}else{		//start_waitが指定されていないときはデフォルト値
+	start_wait = parseInt(strWaiting.replace(pattern,'0'));
+	if(start_wait > 2) start_wait = 2;
+	//設定パネルのラジオボタンchckedに反映
+	setRadioValue("waitingtime", start_wait);
+}
+//動きのタイプ
+if(strMotionType === null){motionType = 0}else{		//start_waitが指定されていないときはデフォルト値
+	motionType = parseInt(strMotionType.replace(pattern,'0'));
+	if(motionType > 1) start_wait = 1;
+	//設定パネルのラジオボタンchckedに反映
+	setRadioValue("motion_type", motionType);
+}
+//クリックサウンドの鳴らし方
+if(strClickType === null){clickType = 0}else{		//start_waitが指定されていないときはデフォルト値
+	clickType = parseInt(strClickType.replace(pattern,'0'));
+	if(clickType > 5) clickType = 5;
+	//設定パネルのラジオボタンchckedに反映
+	setRadioValue("click_type", clickType);
+}
+//拍子構成文字列strBeatStr
+if(DEBUG) console.log(`URL指定の拍子構成文字列【${strBeatStr}】`);
+if(strBeatStr){
+	let check_result = strBeatStr.match(/^[1-9]+$/);
+	if(strBeatStr.match(/^[1-9]+$/)){  //1-9以外の文字が混じっていたらエラー
+		elBeatStr.value = strBeatStr;
+		beatStr = strBeatStr;
+	}
+}
 
 
+f_sound = clickType > 0? true: false;
+if(DEBUG){
+	console.log(`\n*URL取得後パラメータ`);
+	showCurrentParm();
+}
+
+//画面セットアップ
 resizeCanvas();
 elTempoTxt.textContent = MM;
 
@@ -1239,6 +1629,10 @@ xx0 = xpitch/2;
 
 //ヘルプ表示
 drawHelp();
+showCurrentParm();
+f_divmode = motionType > 0? true: false;
+makeBeatArray(beatStr,f_divmode);
+drawExBeat(beatStr, ndivSound);
 
 
 //---DOM関連------------------
@@ -1248,18 +1642,15 @@ cvBeat.style.color = beat_bgcol;
 //設定パネルの背景色設定
 elSetting.style.backgroundColor  = set_bgcol;
 
-//設定パネルを非表示に
-dispElement(elSetting, false);
-//リストボックスを非表示に
-dispElement(elDivTempoList, false);
-//ＱＲコード出力パネルを非表示に
-dispElement(elQRsheet, false);
-
-
+//各種設定パネル、リストボックスを非表示に
+dispElement(elSetting, false);  //従来型設定パネル
+dispElement(elDivTempoList, false);  //リストボックス
+dispElement(elQRsheet, false);  //ＱＲコード出力パネル
+dispElement(elAdSetting, false);  //Advanced設定パネル
 
 
 /***********************************
-Wake Lock関連　
+        Wake Lock関連　
 参考https://github.com/mdn/dom-examples/blob/main/screen-wake-lock-api/script.js
 */
 
@@ -1312,8 +1703,10 @@ const handleVisibilityChange = () => {
 		requestWakeLock();
 	}
 }
+//--- wakeLock関連ここまで------------------------------
 
-//========イベントリスナー関連================
+
+//■■■■■■■■■イベントリスナー関連■■■■■■■■■■■
 //メインキャンバスのイベントリスナーの設定
 cvMain.addEventListener('touchstart', mcToucStart);
 cvMain.addEventListener('mousedown', mcMouseDown);
@@ -1323,16 +1716,40 @@ cvMain.addEventListener('touchend', mcMouseUp);  //処理をmcMouseUpと同じ�
 cvMain.addEventListener('mouseup', mcMouseUp);
 
 //拍子エリアのイベントリスナーの設定
-//拍子キャンバスでのイベントリスナー
-//拍子エリアタッチで拍子を変更（循環）
-//cvBeat.addEventListener('click', BeatChange);
+long_press(cvBeat,BeatChange0,dispEXsetting,600);
+function BeatChange0() {
+	//拍子エリアタップの処理
+	//変拍子設定されているときは、通常の拍子変更はしない。
+	if(isNormalBeat){
+		BeatChange();
+		return;
+	}
+	//変拍子が設定されている場合　　とりあえずAD設定画面を表示
+	dispEXsetting();
+}
+function dispSetting() {
+	//現在のパラメータを設定画面に反映させる。
+	//Click Sound
+	const s = clickType > 0? 1:0;
+	setRadioValue("radiosound", s);
+	//
+	if(clickType > 0 && clickType < 5)setRadioValue("dsradio", clickType);
+	if(isNormalBeat){
+		let n = beatStr.charAt(0);
+		if(n > 0 && n < 4)setRadioValue("dbradio", n);
+	}
+	dispElement(elSetting, true);
+}
 
-cvBeat.addEventListener('touchstart', bcToucStart);
-cvBeat.addEventListener('mousedown', bcMouseDown);
-cvBeat.addEventListener('touchmove', bcMove);
-cvBeat.addEventListener('mousemove', bcMouseMove);
-cvBeat.addEventListener('touchend', bcMouseUp);  //処理をmcMouseUpと同じにした
-cvBeat.addEventListener('mouseup', bcMouseUp);
+function dispEXsetting() {
+	//現在のパラメータをAD設定画面に反映させる。
+	elBeatStr.value = beatStr;
+	setRadioValue("motion_type", motionType);
+	setRadioValue("click_type", clickType);
+	dispElement(elAdSetting, true);
+}
+
+
 
 //ウィンドウリサイズ後のパラメータ確定
 window.addEventListener('resize', resizeCanvas);
@@ -1396,6 +1813,7 @@ elDivTempoList.addEventListener('change', function(e) {
 	let mm = elTempoList.value;
 	//let mm = document.getElementById('TempoList').value;
 	MM = Number(mm);
+	BPM = toBPM(MM);
 	elTempoTxt.textContent = MM;
 	//elDivTempoList.style.display = 'none';
 	dispElement(elDivTempoList, false);
@@ -1415,7 +1833,7 @@ elRadioSound.forEach(function(radioButton) {
 		// this.checked は、イベントが発生したラジオボタンがチェックされているかを示します
 		if (this.checked) {
 			if(this.value == 0){f_sound = false;}else{f_sound = true;}
-			drawBeat();
+			setBeat();
 		}
 	});
 });
@@ -1445,7 +1863,7 @@ elDsRadio.forEach(function(radioButton) {
 	// this.checked は、イベントが発生したラジオボタンがチェックされているかを示します
 	if (this.checked) {
 		ndivSound = this.value;
-		drawBeat();
+		setBeat();
 	}
   });
 });
@@ -1461,7 +1879,7 @@ elDbRadio.forEach(function(radioButton) {
 	if (this.checked) {
 	ndivBeat = this.value;
 	if(DEBUG) console.log('ndivBeat:' + ndivBeat);
-	drawBeat();
+	setBeat();
 	}
   });
 });
@@ -1481,323 +1899,57 @@ elWtRadio.forEach(function(radioButton) {
 	});
 });
 
+//変拍子設定パネルの[Close]ボタン処理
+document.getElementById('btn_close_ex').addEventListener('click', function(e) {
+	//elSetting.style.display = 'none';
+	dispElement(elAdSetting, false);
+});
+
+
+
+//変拍子設定シートの[Start/Stop]ボタン操作
+const elStartStop = document.getElementById('btn_start_stop');  //AD設定パネル
+elStartStop .addEventListener('click', function(e) {
+	if(isMoving){
+		metroStop();
+	}else{
+		metroStart();
+	}
+});
+
+//変拍子設定シートのテキストボックス入力操作
+elBeatStr .addEventListener('input', function(e) {
+	//テキストボックスに入力があるたびに何回も呼び出される。
+	const input_str = elBeatStr.value;
+	//input_strのチェック
+	let check_result = input_str.match(/^[1-9]+$/);
+	console.log(`入力文字列【${input_str}】 check:${check_result}`);
+	if(!check_result){
+		console.log('NG');
+		metroStop();
+	}else{
+		console.log('OK');
+	//MotionとClick Soundラジオボタンの値を取得
+
+	//配列が作られているか確認
+	//makeBeatArray(input_str, false);
+	//testMakeBeatArray(input_str, 1);
+	//拍子エリアに反映
+	drawExBeat(input_str,ndivSound);
+	}
+});
+
+
 window.addEventListener("load", (event) => {
 //  drawBall(xx0 + ( Beat - 1) * xpitch, cvMain.height - 0.5 * ball_height);
 	setTimeout(() => {   //1秒後にボールを置く
 		drawBall(xx0 + ( Beat - 1) * xpitch, cvMain.height - 0.5 * ball_height);
 	}, 700);
-	
 });
 
 //--------------------------以後の関数は確認後に場所を移すこと
-//拍子エリアのtouch
-//touch座標初期化
-function bcToucStart(event) {
-	//f_mousedown = true;  //マウスの場合必要
-	travel = 0;
-	startY = event.pageX;  
-	//移動距離測定用
-	x0 = event.pageX;
-	y0 = event.pageY;
-}
-function bcMouseDown(event) {
-	f_mousedown = true;  //マウスの場合必要
-	travel = 0;
-	startY = event.pageX;  
-	//移動距離測定用
-	x0 = event.pageX;
-	y0 = event.pageY;
-}
-
-//拍子エリアのmove
-function bcMove(event) {
-	event.preventDefault();  //これでスクロール禁止できるのか？→効果ない
-//	if(f_mousedown){　　//マウスの場合ホバリングでもmoveイベントが発生するので必要
-		//移動量積算 upの際に一定量以下ならクリックと判断
-		travel = travel + (x0 - event.pageX) ** 2 + (y0 - event.pageY) ** 2;
-		
-		x0 = event.pageX;
-		y0 = event.pageY;
-	
-		const delta0 = 20;  //左右方向に動いた距離のしきい値、delta0より大きい変位があるごとにBeat更新
-		const yy = event.pageX;
-		//移動量がしきい値以内なら何もしない
-		deltaY = startY - yy;
-		if(Math.abs(deltaY) < delta0) return;
-		
-		startY = event.pageX;
-		//クリック音を出す
-		const now = context.currentTime;
-		gain.gain.setValueAtTime(1, now);
-		gain.gain.linearRampToValueAtTime(0, now + 0.01);
-
-
-		//Beatを増減する
-		if(deltaY > 0){
-			Beat --;
-			if(Beat <= 0){Beat = 1;}
-		}
-		if(deltaY < 0){
-			Beat ++;
-			if(Beat > 12) Beat = 12;
-		}
-		//表示変更
-		drawBeat(); //拍子文字を表示
-//	}
-}
-function bcMouseMove(event) {
-	event.preventDefault();  //これでスクロール禁止できるのか？→効果ない
-	if(f_mousedown){　　//マウスの場合ホバリングでもmoveイベントが発生するので必要
-		//移動量積算 upの際に一定量以下ならクリックと判断
-		travel = travel + (x0 - event.pageX) ** 2 + (y0 - event.pageY) ** 2;
-		
-		x0 = event.pageX;
-		y0 = event.pageY;
-	
-		const delta0 = 50;  //左右方向に動いた距離のしきい値、delta0より大きい変位があるごとにBeat更新
-		const yy = event.pageX;
-		//移動量がしきい値以内なら何もしない
-		deltaY = startY - yy;
-		if(Math.abs(deltaY) < delta0) return;
-		
-		startY = event.pageX;
-		//クリック音を出す
-		const now = context.currentTime;
-		gain.gain.setValueAtTime(1, now);
-		gain.gain.linearRampToValueAtTime(0, now + 0.01);
-
-
-		//Beatを増減する
-		if(deltaY > 0){
-			Beat --;
-			if(Beat <= 0){Beat = 1;}
-		}
-		if(deltaY < 0){
-			Beat ++;
-			if(Beat > 12) Beat = 12;
-		}
-		//表示変更
-		drawBeat(); //拍子文字を表示
-	}
-}
-
-
-function bcMouseUp(event) {
-	if(f_mousedown && travel <= 9)BeatChange();
-	f_mousedown = false;
-	//console.log(   'mouse up  travel=' + travel);
-}
-
-
-//■■■Rev.6 変拍子対応拍子設定文字列と拍運動配列の導入
-
-//設定文字列からBeat配列を作成する
-//beat_strから１文字ずつ取り出して、分割モード設定状態fdivも加味して展開
-//拍運動配列のほか、単純拍子か否か（isNormalBeat)、アウフタクト（開始）位置の配列インデクスを設定する。
-
-function makeBeatArray(beat_str, fdiv) {
-	let i;   //forループ用
-	let ch;  //beat_strから取り出した文字
-	let ch0;  //chが全部同じかチェックするため
-	let max0 = 1;
-	let Beat_pos = 1;  //拍位置
-	isNormalBeat = true;
-	let subHeightRate = 0.7;  //単純拍子の分割振りの高さの割合
-	Beat = beat_str.length;  //拍子
-	start_idx = 0;
-	
-	//配列の初期化
-	upB.length = 0;
-	duration.length = 0;
-	downB.length = 0;
-	maxHeight.length = 0;
-	exBeat_idx = 0;  //配列のインデクス
-	console.log('     max = ' + max0);
-	if(!fdiv){  //分割モードでない場合、設定文字列の最大周期を求めておく
-		for(i = 0; i < beat_str.length; i++){
-			ch = beat_str.charAt(i);
-			if(max0 < ch) max0 = ch;
-		}
-		console.log('     max = ' + max0);
-	}
-	//拍子指定文字列beat_strと分割振りフラグf_divBeatから配列を作り直す。
-	for(i = 0; i < beat_str.length; i++){
-		//1文字ずつ取り出す
-		ch = beat_str.charAt(i);
-		if(i == 0){
-			ch0 = ch;
-		}else{
-			if(ch != ch0) isNormalBeat = false;
-		}
-		//分割振りかどうかで場合分け
-		if(fdiv){
-			console.log('分割振りの処理　ch:' +  ch);
-			//取り出した文字の数だけ繰り返し
-			for(let j = 0; j < ch; j++){
-				console.log('   j:' + j);
-				duration[exBeat_idx] = 1;  //分割振りのときは常に１
-				if(j < (ch - 1)) {  //同じ拍にとどまる
-					upB[exBeat_idx] = Beat_pos;
-					downB[exBeat_idx] = Beat_pos;
-					maxHeight[exBeat_idx] = subHeightRate;
-				}
-				if(j == (ch - 1)){  //次の拍に遷移
-					upB[exBeat_idx] = Beat_pos;
-					Beat_pos ++;
-					if(Beat_pos == (beat_str.length + 1)){
-						Beat_pos = 1;
-					}
-					downB[exBeat_idx] = Beat_pos;
-					maxHeight[exBeat_idx] = 1;
-				}
-				exBeat_idx　++;
-			}
-		}else{  //分割振りではない場合→OK
-			upB[exBeat_idx] = Beat_pos;
-			duration[exBeat_idx] = ch;
-			maxHeight[exBeat_idx] = (ch / max0) ** 2;
-			Beat_pos ++;
-			if(Beat_pos == beat_str.length + 1){
-				downB[exBeat_idx] = 1;
-				Beat_pos = 1;
-			}else{
-				downB[exBeat_idx] = Beat_pos;
-			}
-			exBeat_idx　++;
-		}
-	}
-	//出来上がった配列をスキャンし、アウフタクト位置start_idxを求める
-	for(i = 0 ; i < upB.length; i++){
-		if(upB[i] == Beat){
-			start_idx = i;
-			break;  //forループ抜ける
-		}
-	}
-}
-
-//上記関数のテスト
-function testMakeBeatArray(str, f_divmode) {
-	f_divBeat = f_divmode;
-	makeBeatArray(str, f_divBeat);
-
-	console.log(`
-★ beat配列の確認
-	  設定文字列;　${str}　　配列のサイズ:${downB.length} 単純拍子？ ${isNormalBeat}
-	  アウフタクト位置: ${start_idx}
-■配列の内容`);
-	for(let i = 0; i < downB.length; i ++){
-		//console.log(i  +  '  downB:' + downB[i] +  '  downB:' + downB[i]+ '  duration:' + duration[i]+ 'H:' + maxHeight[i]);
-		console.log(`${i}:   ${upB[i]} → ${downB[i]}   時間 ${duration[i]}  高さ${maxHeight[i]}`);
-	}
-}
-
-//配列が作られているか確認
-testMakeBeatArray('332', false);
-
-//---従来の拍子設定からBeat配列設定文字列を作成する
-//入力：Beat, ndivBeat
-//出力：Beat配列設定文字列
-const B2BeatStr = (beat, ndiv) => {
-	let str = '';
-	for(let i = 0; i < beat; i++){
-		str += ndiv;
-	}
-	return str;
-}
-
-//上記関数のテスト
-console.log('\n  beat_str:' + B2BeatStr(2, 3));
-testMakeBeatArray(B2BeatStr(2, 3), true);
-
-//------------------------------------
-//Beat配列設定文字列から、単純拍子かどうかの判定結果を返す
-//すべて同じ数字が並んでいたらtrue
-/*
-const isNormalBeat = str =>{
-	let char = str.charAt(0);
-	let len = str.length;
-	if(len == 1) return true;
-	//2文字以上の場合
-	for(let i = 1; i < str.length; i++){
-		//1文字ずつ取り出す
-		if(char != str.charAt(i)) return false;
-	}
-	return true;
-}
-
-//上記関数のテスト
-console.log('\n  isNormalBeat:' + isNormalBeat('1122'));
-*/
-
-//------------------------------------
-//■■拍子エリア表示、拍設定文字列対応バージョン
-//入力：Beat配列設定文字列、分割モード、サウンド分割数
-//取り出した数値に応じて縦ドットを表示する
-//------------------------------------
-//拍子エリアの描画、拍子数字と分割マーク表示
-function drawExBeat(str, f_divmode, ndivSound){        //拍子エリアに数字を置く
-	let str_len = str.length;  //設定文字列桁数（拍点の数）
-
-	let topMargin = 7;     //拍数字の上余白
-	ctxBeat.textBaseline = "top";  //文字の左上を座標とする
-	ctxBeat.font = "bold 30px sans-serif";
-	ctxBeat.fillStyle = beat_col;
-	ctxBeat.strokeStyle = beat_col;
-	xpitch = cvBeat.width / str_len;
-	//xpitchの値に応じて文字の大きさを動的に変える
-	/*
-	const fontSize = canvasWidth / 2;
-				ctx.font = `${fontSize}px serif`; 
-	
-	*/
-	//const fontSize = xpitch;
-	//ctxBeat.font = `bold ${fontSize}px  sans-serif`;
-	if(Beat > 6 )ctxBeat.font =  "bold 26px sans-serif";
-	if(Beat > 9 )ctxBeat.font =  "bold 22px sans-serif";
-	
-
-	
-	xx0 = xpitch / 2;  //0.5拍目の位置
-	let y0 = topMargin;
-	ctxBeat.clearRect(0, 0, cvBeat.width, cvBeat.height);  //描画エリアの消去
-	let x = xx0;
-	let marksize = 3;
-	for(let i = 0; i < str_len; i++){
-		let B_str = (i+1).toString().trim();  //拍点番号
-		ctxBeat.fillText(B_str, x - 0.5 * ctxBeat.measureText(B_str).width, y0); 
-		x += xpitch;
-	}
-
-	//分割サウンド設定（かつサウンドOＮ）の場合は、拍数字の中間に分割を示すドットを入れる。
-	//ただし最終拍の後には入れない。例：１・２・３・４　　１・・２・・３　など
-	ctxBeat.font = "bold 22pt sans-serif";
-	ctxBeat.fillStyle = divdot0_col;
-	x = xx0;
-	if(f_sound == true && ndivSound > 1){
-		for(let bt = 0; bt < str.length - 1;bt++){
-			for(let i = 1; i < ndivSound; i++){
-				x = xx0 +  bt * xpitch+ i * xpitch/ndivSound;
-				ctxBeat.fillText('・', x - 0.5 * ctxBeat.measureText('・').width, y0); 
-			}
-		}
-	}
-
-	//分割振りの表記　分割振りの場合は拍数字の下に縦にドット表示
-　　ctxBeat.font = "bold 22pt sans-serif";
-	ctxBeat.fillStyle = divdot1_col;
-	x = xx0;
-	for(let bt = 0; bt < str.length; bt++){
-		for(let i = 1; i < str.charAt(bt); i++){
-			x = xx0 +  bt * xpitch;
-			y = y0 + i * 10 + 9;
-			ctxBeat.fillText('・', x - 0.5 * ctxBeat.measureText('・').width, y); 
-		}
-	}
-}
-
-
-let test_str = '2235223';
-isDivision = true;
-//配列が作られているか確認
-testMakeBeatArray(test_str, isDivision);
-drawExBeat(test_str,isDivision);
+console.log(`初期コード終了後のパラメータ`);
+showCurrentParm();
+BPM = toBPM(MM);
+console.log(`MM = ${MM}  BPM = ${BPM}`);
+//================ end of script ===============================

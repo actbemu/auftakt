@@ -35,8 +35,14 @@
 	</div>
 
     <!-- TEMPO表示、プルダウンリスト表示ボタン -->
-    <div id="tempo">
+    <div id="div_tempo">
+		<span id="tempo">
         60
+		</span>
+		<span id="tempo_type">
+			B
+		</span>
+		<!-- 表示数値が拍のテンポか、分割振りや変拍子の音符のテンポかを示す。Beat/Note -->
     </div>
 	<!-- テンポ調節↑／↓ボタン -->
 
@@ -49,13 +55,13 @@
     <div id="setting">
 		<div id="btn_close_setting" align="right" class="ButtonText">[Close]</div>
 
-		Beat Sound<br>
+		Click Sound<br>
 		<div class="radiorow">
 		<input type="radio" value="1" name="radiosound" checked />ON&nbsp;
 		<input type="radio" value="0" name="radiosound"/>OFF
 		</div>
 
-		Beat Sound Timing<br>
+		Click Sound Timing<br>
 		<div class="radiorow">
 		<small>Late</small>
 		<input type="radio" value="0" name="radiotiming"/>
@@ -71,7 +77,7 @@
 		</div>
 <br>
 
-		Divide Beat Sound into<br>
+		Divide Click Sound into<br>
 		<div class="radiorow">
 		<input type="radio" value=1 name="dsradio" checked/>none&nbsp;
 		<input type="radio" value=2 name="dsradio" />2&nbsp;
@@ -97,7 +103,7 @@
 		</div>
 		<br>
 		<div align="right"  class="ButtonText">
-			<span id="btn_QRcode">[QR code]</span>
+			<span id="btn_QRcode">[Share]</span>
 			<span id="btn_Help">[Help]</span>
 			</a>
 		</div>
@@ -122,6 +128,47 @@
 		</div>
 	</div>
 
+    <!-- 変拍子設定パネル -->
+	<div id="exBeat">
+		<div id="btn_close_ex" align="right" class="ButtonText">[Close]</div>
+		<div id="EXtitle">
+			Advanced Setting
+		</div>
+		<br>
+		<div>
+		Measure Structure<br>
+		<div class="form1">
+		<input id="ex_beat_str" type="text" maxlength="8"  size="10">
+		</div>
+		</div>
+	</br>
+		<div>
+		Motion</br>
+			<div class="form1">
+			<input type="radio" name="motion_type" value="0" checked />Beat
+			<input type="radio" name="motion_type" value="1" />Note
+			</div>
+		</div>
+	</br>
+		<div>
+		Click Sound<br>
+			<div class="form1">
+			<input type="radio" name="click_type" value="0"  />None</br>
+			<input type="radio" name="click_type" value="1" checked/>Beat
+			<div class="foram2" id="normal_beat_division">
+				&nbsp;&nbsp;&nbsp;<input type="radio" name="click_type" value="2" />1/2&nbsp;
+				<input type="radio" name="click_type" value="3" />1/3&nbsp;
+				<input type="radio" name="click_type" value="4" />1/4
+				</div>
+			<input type="radio" name="click_type" value="5" />Note
+			</div>
+		</div>
+	</br>
+		<span id="btn_Share2">[Share]</span>
+		<div id="btn_start_stop" align="right" class="ButtonText">Preview[Start/Stop]</div>
+	</div>
+
+	
   
     <!-- TEMPOプルダウンリスト -->
     <div id="divTempoList">
