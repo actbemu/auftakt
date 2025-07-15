@@ -220,6 +220,10 @@ a:active { color: #29659d }
     margin-left:3em;
 }
 
+#ex_beat_str{
+	font-size:5mm;
+}
+
 #mode_change_alert{
 	width:86%;
 	background-color:#ffeeee;  /*   */
