@@ -1309,11 +1309,11 @@ function drawHelp() {
 	
 	str = 'Tempo up / down';
 	ctxMain.fillText(str, 100, 100);
-	aline(ctxMain, 130, 88, 140, 53, 20, 14);
+	aline(ctxMain, 130, 88, 0.7*cvMain.width , 53, 20, 14);
 
 	str = 'Tapping';
 	ctxMain.fillText(str, 200, 80);
-	aline(ctxMain, 220, 66, 225, 38, 20, 14);
+	aline(ctxMain, 220, 66, 0.95*cvMain.width , 38, 20, 14);
 
 
 	//画面中央タップとスワイプ（センタリング）
@@ -1345,10 +1345,14 @@ function drawHelp() {
 	aline(ctxMain,0.5 * cvMain.width-30, 0.5 * cvMain.height+20+offset_y,0.5 * cvMain.width-4, 0.5 * cvMain.height+4+offset_y, 20, 14);
 
 	//拍子
-	str = 'Tap Beat Area to change Beat. \nLong Tap for advanced setting.';
-	yy = cvMain.height - 45;
+	str = 'Tap Beat Area to Change Beat.';
+	yy = cvMain.height - 60;
 	ctxMain.fillText(str, xx, yy);
-	aline(ctxMain, xx, yy, xx, yy+50, 20,14);
+	str = 'Long Tap to Change Mode.';
+	ctxMain.fillText(str, xx, yy+18);
+	aline(ctxMain, xx, yy+20, xx, yy+50, 20,14);
+
+	
 	//↕　上・下スワイプはunicode矢印
 	ctxMain.font = "30pt sans-serif"
 	ctxMain.fillText('↕', 0.5 * cvMain.width - 50, 0.5 * cvMain.height + 15);
