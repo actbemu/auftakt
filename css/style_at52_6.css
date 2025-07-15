@@ -89,19 +89,17 @@ position:relative;
      top:3px;
 }
 
+/*テンポ関連3つのボタン*/
 #tempoAdjup{
-	left:53%;
+	left:5０%;
 	position:absolute;
 }
-
-
 #tempoAdjdown{
-	left:70%;
+	left:６５%;
 	position:absolute;
 }
-
 #btnTAP{
-	left:90%;
+	left:８０%;
 	position:absolute;
 }
 
