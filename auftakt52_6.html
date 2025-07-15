@@ -24,6 +24,7 @@
 <body>
 
     <div class="wrapper">
+		<div id="main_title_bar">Auftakt5</div>
         <canvas id="myCanvas"></canvas>
         <canvas id="beatCanvas"></canvas>
     </div>
@@ -40,20 +41,31 @@
         60
 		</span>
 		<span id="tempo_type">
-			B
+			/B
 		</span>
 		<!-- 表示数値が拍のテンポか、分割振りや変拍子の音符のテンポかを示す。Beat/Note -->
-    </div>
+    
 	<!-- テンポ調節↑／↓ボタン -->
 
 			<span  class="btnText" id="tempoAdjup">↑</span>
 			<span class="btnText" id="tempoAdjdown">↓</span>
 			<span class="btnText" id="btnTAP">TAP</span>
-
+</div>
 	
     <!-- 設定パネル -->
     <div id="setting">
-		<div id="btn_close_setting" align="right" class="ButtonText">[Close]</div>
+		<div class="titlebar">
+			<div  class="sheet_title">
+				Setting(Normal Mode)
+			</div>
+			<div  class="close_button"  id="btn_close_setting">
+				✕
+			</div>
+		</div>
+		<div align="right">
+			<span class="btn" id="preview0">Preview</span>
+
+		</div>
 
 		Click Sound<br>
 		<div class="radiorow">
@@ -102,9 +114,9 @@
 		</div>
 		</div>
 		<br>
-		<div align="right"  class="ButtonText">
-			<span id="btn_QRcode">[Share]</span>
-			<span id="btn_Help">[Help]</span>
+		<div align="right">
+			<span class="btn" id="btn_QRcode">Share</span>
+			<span class="btn" id="btn_Help">Help</span>
 			</a>
 		</div>
 
@@ -112,11 +124,20 @@
 
     <!-- QRコード表示パネル -->
 	<div id="QRsheet">
-		<div id="btn_close_QR" align="right" class="ButtonText">[Close]</div>
+		<div class="titlebar">
+			<div  class="sheet_title">
+				Share
+			</div>
+			<div  class="close_button"  id="btn_close_QR">
+				✕
+			</div>
+		</div>
+
 		<div id="QRtitle">
 			You can use the following QR code and URL to record and share your settings.(The URL has been copied to your clipboard.)
 			
 		</div>
+		
 		<br>
 		<div id="URL">https://actbemu.github.io/auftakt/auftakt52_4.html</div>
 		<div id="QR"></div>
@@ -130,15 +151,25 @@
 
     <!-- 変拍子設定パネル -->
 	<div id="exBeat">
-		<div id="btn_close_ex" align="right" class="ButtonText">[Close]</div>
-		<div id="EXtitle">
-			Advanced Setting
+		<div class="titlebar">
+			<div  class="sheet_title">
+				Setting(Advanced Mode)
+			</div>
+			<div  class="close_button"  id="btn_close_ex">
+				✕
+			</div>
 		</div>
+
+		<div align="right">
+			<span class="btn" id="preview1">Preview</span>
+
+		</div>
+		
 		<br>
 		<div>
 		Measure Structure<br>
 		<div class="form1">
-		<input id="ex_beat_str" type="text" maxlength="8"  size="10">
+		<input id="ex_beat_str" type="text" maxlength="8"  size="10" value="1111">
 		</div>
 		</div>
 	</br>
@@ -164,11 +195,29 @@
 			</div>
 		</div>
 	</br>
-		<span id="btn_Share2">[Share]</span>
-		<div id="btn_start_stop" align="right" class="ButtonText">Preview[Start/Stop]</div>
+		<div align="right">
+		<span class="btn" id="btn_Share2">Share</span>
+		</div>
 	</div>
 
-	
+	<!-- 設定モード切替プロンプト -->
+	<div id="mode_change_alert" align="center">
+		
+		<div class="titlebar">
+			<div  class="sheet_title">
+				Switch Setting
+			</div>
+			<div  class="close_button"  id="btn_mChange_close">
+				✕
+			</div>
+		</div>
+		<br>
+		<div align="cendter">
+			<p>
+			<span class="btn" id="btn_mode_switch">Switch to Advanced Mode</span></p><br>
+			<p><span class="btn" id="btn_mode_cancel">Cancel</span></p>
+		</div>
+	</div>
   
     <!-- TEMPOプルダウンリスト -->
     <div id="divTempoList">
