@@ -438,7 +438,7 @@ function resizeCanvas(){
 	cvMain.setAttribute('width', w);
 	cvMain.setAttribute('height', 0.8 * h);  //wrapperを上下に8.5:1.5に分ける
 	wpx = w + 'px';
-	hpx = 0.85 * h + 'px';
+	hpx = 0.8 * h + 'px';
 	if(DEBUG) console.log('   wpx: ' + wpx + '   hpx = ' +  hpx);
 	cvMain.style.width = wpx;
 	cvMain.style.height = hpx;
@@ -449,8 +449,8 @@ function resizeCanvas(){
 	
 	//const el_beat = document.getElementById('beatCanvas');
 	cvBeat.setAttribute('width', w);
-	cvBeat.setAttribute('height', 0.15 * h);
-	hpx = 0.15 * h + 'px';
+	cvBeat.setAttribute('height', 0.2 * h);
+	hpx = 0.2 * h + 'px';
 	cvBeat.style.width = wpx;
 	cvBeat.style.height = hpx;
 	
@@ -2036,8 +2036,11 @@ elBtnMdCancel.addEventListener('click', function(e) {
 
 
 //その他のリスナー***************************************************
-//ウィンドウリサイズ後のパラメータ確定
-window.addEventListener('resize', resizeCanvas);
+//ウィンドウリサイズ後のレイアウト関連パラメータ更新
+window.addEventListener('resize', function() {
+	resizeCanvas();
+	drawExBeat(beatStr, motionType);
+});
 
 //リロード禁止
 window.addEventListener("beforeunload", function (event) {
