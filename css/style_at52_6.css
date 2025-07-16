@@ -3,7 +3,11 @@ html, body{height: 100%; width: 100%;}
 html, body { overflow-y: hidden; overflow-ｘ: hidden; } 
 body {
   /*-webkit-touch-callout:none;  リンク長押しのポップアップ(※1)を無効化*/
-  -webkit-user-select:none;   /*テキスト長押しの選択ボックス(※2)を無効化*/
+   /*-webkit-user-select:none;  テキスト長押しの選択ボックス(※2)を無効化*/
+	-webkit-user-select: auto; /* Safari, Chrome */
+     -moz-user-select: auto; /* Firefox */
+     -ms-user-select: auto; /* IE 10+ */
+     user-select: auto; /* Standard */
 }
 canvas{display: block;}
 
@@ -190,6 +194,7 @@ a:active { color: #29659d }
 #QR{
     margin-left:3em;
     padding: 2mm;
+	pointer-events:auto;
 }
 
 #URL{
