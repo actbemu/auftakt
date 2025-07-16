@@ -92,7 +92,7 @@ position:relative;
      top:3px;
 }
 
-/*テンポ関連3つのボタン*/
+/*テンポ関連3つのボタン
 #tempoAdjup{
 	left:5０%;
 	position:absolute;
@@ -105,6 +105,11 @@ position:relative;
 	left:８０%;
 	position:absolute;
 }
+*/
+
+#div_tempo { display: table; width: 100%;}
+#div_tempo_txt { display: table-cell; text-align: center; }
+#div_tempo_btn { display: table-cell; text-align: right; }
 
 #divTempoList{
     top:50px;
@@ -273,6 +278,7 @@ a:active { color: #29659d }
 .titlebar { display: table; width: 100%; background-color:#507ea4; color:#fef4f4; }
 .sheet_title { display: table-cell; text-align: center; }
 .close_button  { display: table-cell; text-align: right; }
+
 
 #main_title_bar{
 	text-align: center;
