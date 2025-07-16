@@ -895,11 +895,16 @@ btnHelp.addEventListener('click', () => {
 	dispElement(elSetting, false);
 	drawHelp();
 });
-// QRコード出力処理（[QR code]がクリックされたら）------------------------------
-const btnQRcode = document.getElementById("btn_QRcode");
-btnQRcode.addEventListener('click', () => {
-	//設定パネルを消し、QRコード出力シートを表示
-	dispElement(elSetting, false);
+
+//QRコード出力処理（[Share]がクリックされたら）------------------------------
+const btnShare0 = document.getElementById("btn_share0");
+btnShare0.addEventListener('click', dispShareSheet);
+const btnShare1 = document.getElementById("btn_share1");
+btnShare1.addEventListener('click', dispShareSheet);
+
+function dispShareSheet(){
+		//設定パネルを消し、QRコード出力シートを表示
+	clearAllSheets();
 	dispElement(elQRsheet, true);
 	//メトロノームの動作停止
 	metroStop();
@@ -907,18 +912,24 @@ btnQRcode.addEventListener('click', () => {
 		dispMsg("'Copy URL' is not available on this bowser.");
 		return;
 	}
-	//デフォルト値の場合はＵＲＬに含めない。
+	//BASE_URLにパラメータを追加
 	let txt = BASE_URL + "?mm=" + MM ;
-	if(Beat != 4){txt += "&bt=" + Beat;}
+	txt += '&exb=' + beatStr;
+	//デフォルト値の場合はＵＲＬに含めない
+	if(motionType != 0) txt += '&mt=' + motionType;
+	if(clickType != 1) txt += '&ct=' +clickType;
+	if(sdelay_idx != 3){txt += "&bst=" + sdelay_idx;}
 	/*
+	if(Beat != 4){txt += "&bt=" + Beat;}
 	if(ndivSound > 1){txt += "&ds=" + ndivSound;}
 	if(ndivBeat > 1){txt += "&db=" + ndivBeat;}
+	if(!f_sound)txt += "&bs=0"
 	*/
-	if(sdelay_idx != 3){txt += "&bst=" + sdelay_idx;}
-	if(!f_sound)txt += "&bs=0";
+	
 	navigator.clipboard.writeText(txt).then(		() => {
 		dispMsg('URL successfully Copied');},() => {
 		dispMsg('Copy failure');});
+	
 	//出力シート上に設定値、QRコード、URLを表示
 	el_csBeat.textContent = Beat;
 	el_csTempo.textContent = MM;
@@ -945,7 +956,7 @@ btnQRcode.addEventListener('click', () => {
 		height: 128,
 		correctLevel : QRCode.CorrectLevel.H
 	}); 
-});  //end of event listener btnQRcode
+}
 
 
 //放物運動描画と拍点処理======================================
@@ -1735,6 +1746,8 @@ setDefaultPara();
 //**********************************
 //URLで拍子、テンポなどを指定
 //　例：?bt=4&mm=120
+//パラメータ一覧
+//Normalモード用
 //------------------------------
 // URLを取得
 let url = new URL(window.location.href);
@@ -1748,11 +1761,11 @@ let strDivSound=url_params.get('ds');  //サウンド分割(1～4)
 let strDivBeat=url_params.get('db');  //分割振り(1～3)
 */
 let strBeatStr = url_params.get('exb');  //拍子構成文字列(1～3)
+
 //以下は０も含むので注意
 let strSFlag=url_params.get('bs');  //サウンドON/OFF(0/1)
-let strBST=url_params.get('bst');  //サウンドタイミング(0～6)7段階
+let strBST=url_params.get('bst');  //サウンドタイミング調整(0～6)7段階
 let strWaiting = url_params.get('wt');  //待ち時間(0,1,2)
-
 let strMotionType = url_params.get('mt');  //動きのタイプ(0,1)
 let strClickType = url_params.get('ct');  //クリックサウンドの鳴らし方(0～5)
 
