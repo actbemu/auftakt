@@ -93,9 +93,6 @@ const BASE_URL = location.protocol+'//'+location.host+location.pathname;
 if(DEBUG) console.log(BASE_URL);
 
 //----色関連-----------------
-//const ball_col = '#082752';   //ボールの色濃い藍#082752
-//const ball_col = '#165e83';   //ボールの色 藍#165e83
-//const ball_col = '#38b48b';   //、琥珀色#bf783a
 
 //通常モード・共通
 const mc_bgcol = '#fff6f5';  //メインキャンバス桜色、胡粉色 #fffffc
@@ -110,8 +107,9 @@ const pie_col = '#e8d3d1';  //待機時パイチャート　桜鼠 さくらね�
 const msg_col = '#e6b422';  //Ｂｅａｔ Areaのメッセージ　黄金 #e6b422
 
 //ADモード
-const mc_bgcol2 = '#dbebc4';  //メインキャンバス２　アスパラガスグリーン#dbebc4
-const beat_bgcol2 = '#192f60';  //拍子エリアADモード背景色アイアンブルー#192f60
+const mc_bgcol2 = '#d6e9ca';  //メインキャンバス２　アスパラガスグリーン#dbebc4
+//const beat_bgcol2 = '#192f60';  //拍子エリアADモード背景色アイアンブルー#192f60　#c5c56a　抹茶色
+const beat_bgcol2 = '#69821b';  //拍子エリアADモード背景色アイアンブルー#192f60　#c5c56a　抹茶色
 
 
 //-----DOMエレメント関連
@@ -204,8 +202,11 @@ let rafBall;	//request animation frameのインスタンス（停止するとき
 let rafCDC;  //開始待機時のパイチャート表示アニメーションrequest animation frame　　Count Down Chart
 
 // 6.29 ballを翡翠玉のイメージに変更
-const ball_image = new Image();
-ball_image.src = './images/ball.gif';
+const ball_image0 = new Image();
+ball_image0.src = './images/ball_green.gif';
+const ball_image1 = new Image();
+ball_image1.src = './images/ball_brown.gif';
+
 //実際に表示する玉の大きさ
 const ball_width = 40;
 const ball_height = 40;
@@ -555,7 +556,7 @@ function dispADSetting() {
 	console.log(`@dispADSetting`);
 	let txt = isMoving? 'Stop': 'Preview';
 	elPreview1.textContent = txt;
-	dispElement(elAdSetting. true);
+	dispElement(elAdSetting, true);
 }
 
 //拍子変更時の処理セットNormalモード用---------------------------------------
@@ -1378,7 +1379,8 @@ function drawBall(xx,yy) {
 	//console.log('ボール画像描画');
 	//xx=0;
 	//yy=0;
-	ctxMain.drawImage(ball_image, xx - 0.5 * ball_width, yy - 0.5 * ball_height, ball_width, ball_height);
+	const ballImage = isAdMode? ball_image1:ball_image0;  //モードによってボール画像を変える
+	ctxMain.drawImage(ballImage, xx - 0.5 * ball_width, yy - 0.5 * ball_height, ball_width, ball_height);
 }
 
 
