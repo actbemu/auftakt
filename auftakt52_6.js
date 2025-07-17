@@ -154,7 +154,7 @@ const elDbRadio = document.querySelectorAll('input[name="dbradio"][type="radio"]
 const elWtRadio = document.querySelectorAll('input[name="waitingtime"][type="radio"]');
 
 //変拍子設定パネル（AD設定パネル）
-const elAdSetting = document.getElementById('exBeat');  //変拍子設定パネル(AD設定パネル)
+const elAdSetting = document.getElementById('ad_setting');  //変拍子設定パネル(AD設定パネル)
 const elBeatStr = document.getElementById('ex_beat_str');  //拍子構成設定文字列
 const elPreview1 = document.getElementById('preview1');  //AD設定パネルpreviewボタン
 const elCTRadio = document.querySelectorAll('input[name="click_type"][type="radio"]');
@@ -642,23 +642,23 @@ function mcToucStart(event) {
 	if(DEBUG) console.log('aryMM.length:' + aryMM.length);
 	//長押し処理
 	timer = setTimeout(() => {
-		if(DEBUG) console.log(`touch長押し：設定画面表示　isAdModeは　${isAdMode}`);
 		
 		if((travel < travel0) && f_mousedown == true){  //600msec間の累積移動量^2が少ない場合は長押しと判定
+			if(DEBUG) console.log(`touch長押し：設定画面表示　isAdModeは　${isAdMode}`);
 			//600msecの間にupされていなければlongtapと判定、という意味からすると!f_mouse_upのほうが論理的にわかりやすか。
 			f_longtap = true;  //このフラグは不要では？
 			f_mousedown = false;
 			//設定パネル表示
-				//設定パネル表示
-			f_mousedown = false;
 			if(isAdMode){
 				//dispElement(elSetting, true);
-				dispElement(elAdSetting, true);
-				//dispADSetting();
+				if(DEBUG) console.log(`AD設定画面表示　isAdModeは　${isAdMode}`);
+				//dispElement(elAdSetting, true);
+				dispADSetting();
 				//dispElement(elAdSetting, true);
 			}else{
 				//現在のパラメータを設定パネルに反映させる
 				setParaNSheet();
+				if(DEBUG) console.log(`Normal設定画面表示　isAdModeは　${isAdMode}`);
 				dispElement(elSetting, true);
 			}
 
@@ -919,7 +919,7 @@ function dispShareSheet(){
 	if(motionType != 0) txt += '&mt=' + motionType;
 	if(clickType != 1) txt += '&ct=' +clickType;
 	if(sdelay_idx != 3){txt += "&bst=" + sdelay_idx;}
-
+	//touch長押し：設定画面表示
 	//出力シート上にQRコード、URLを表示
 	document.getElementById('QR').textContent = '';　　//QRコード描画前にエリア内消去
 	var qrcode = new QRCode('QR', {
