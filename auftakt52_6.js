@@ -166,7 +166,7 @@ const el_csTempo = document.getElementById('csTempo');
 const el_csBSD = document.getElementById('csBSD');  //Beat Sound Divsion
 const el_csBMD = document.getElementById('csBMD');  //Beat Motion Divsion
 const el_URL = document.getElementById('URL');
-const el_QR = document.getElementById('QR');
+const el_QR = document.getElementById('QR');  //未使用？
 const el_dBSD = document.getElementById('dBSD');
 const el_dBMD = document.getElementById('dBMD');
 
@@ -931,10 +931,9 @@ function dispShareSheet(){
 		dispMsg('Copy failure');});
 	
 	//出力シート上に設定値、QRコード、URLを表示
-	el_csBeat.textContent = Beat;
-	el_csTempo.textContent = MM;
 	/*
-	el_csBSD.textContent = ndivSound;
+	el_csBeat.textContent = Beat;
+	el_csTempo.textContent = MM;el_csBSD.textContent = ndivSound;
 	if(ndivSound > 1){
 		dispElement(el_dBSD, true);
 	}else{
@@ -2248,5 +2247,42 @@ if(isAdMode){
 if(DEBUG) console.log(`isAdMode:${isAdMode}`)
 setTheme();
 if(DEBUG) console.log(`Normal 【${s_beatStr[0]}】  Advanced 【${s_beatStr[1]}】　current【${beatStr}】 isNormalBeat ${isNormalBeat}`);
+
+
+//-----QRコードコピーできるかのトライアル
+document.getElementById('btn_copy_QR').addEventListener('click', function(e) {
+	console.log('CopyQR button clicked!!');
+	const elQRimg = document.querySelector('div img');  //CSSのセレクターで目的のimgタグエレメントを取得
+	const canvas = document.createElement('canvas');
+	canvas.width = elQRimg.naturalWidth;
+	canvas.height = elQRimg.naturalHeight;
+	const ctx = canvas.getContext('2d');
+	ctx.drawImage(elQRimg, 0, 0);
+
+	// Canvas から Blob オブジェクトを生成
+	canvas.toBlob(async (blob) => {
+		// 画像データをクリップボードに書き込む
+		const item = new ClipboardItem({
+			'image/png': blob
+		});
+		await navigator.clipboard.write([item]);
+		dispMsg('QR Code successfully Copied');
+	});
+});
+
+//-----URL copyボタンが押されたときの処理
+document.getElementById('btn_copy_URL').addEventListener('click', function(e) {
+	console.log('CopyURL button clicked!!');
+	if (!navigator.clipboard) {
+		dispMsg("[Copy URL] is not available on this bowser.");
+		return;
+	}
+	const elURL = document.getElementById('URL');
+	const txt = elURL.textContent;
+	navigator.clipboard.writeText(txt).then(
+		() => {dispMsg('URL successfully Copied');},
+		() => {dispMsg('Copy failure');}
+	);
+});
 
 //================ end of script ===============================
