@@ -44,14 +44,7 @@ position:relative;
     overflow-x: hidden;
 }
 
-/*
-img{
-		-webkit-user-select: auto; /* Safari, Chrome */
-     -moz-user-select: auto; /* Firefox */
-     -ms-user-select: auto; /* IE 10+ */
-     user-select: auto; /* Standard */
-}
-*/
+
 
 /*
 #myButtons{
@@ -160,10 +153,6 @@ select{
     font-weight:bold;
     color:#29659d;
 }
-a:link { color: #29659d; }
-a:visited { color: #29659d;  }
-a:hover { color: #29659d }
-a:active { color: #29659d }
 
 #msgbox{
     color: #9f4b23;
@@ -177,6 +166,7 @@ a:active { color: #29659d }
     text-align:center;
 }
 
+/*QRシート　　Shareボタンで表示されるシート*/
 #QRsheet{
     overflow-wrap: anywhere;
     top:70px;
@@ -214,8 +204,9 @@ a:active { color: #29659d }
     color:#250d00;
 }
 
-#exBeat{
-    overflow-wrap: anywhere;
+/*AD設定シート*/
+#ad_setting{
+    /*overflow-wrap: anywhere;*/
     top:60px;
     left:5%;
     width:90%;
@@ -227,7 +218,7 @@ a:active { color: #29659d }
     color:#222233;
     font-size:2.9vh;
     user-select: text;
-		border-style:solid;
+	border-style:solid;
 	border-width:2px;
 	border-color:#507ea4;
 }
@@ -243,6 +234,7 @@ a:active { color: #29659d }
 	font-size:5mm;
 }
 
+/*モード変更時のプロンプト*/
 #mode_change_alert{
 	width:90%;
 	background-color:#ffeeee;  /*   */
@@ -261,6 +253,7 @@ a:active { color: #29659d }
 	border-color:#507ea4;
 }
 
+/*各設定シート内ボタンのデザイン*/
 .btn{
 	font-size:1１pt;
 	color:#222233;
@@ -288,6 +281,7 @@ a:active { color: #29659d }
 }
 */
 
+/*設定シートなど　タイトルバーのデザインと「✕」の配置**/
 .titlebar { display: table; width: 100%; background-color:#507ea4; color:#fef4f4; }
 .sheet_title { display: table-cell; text-align: center; }
 .close_button  { display: table-cell; text-align: right; }
@@ -301,11 +295,14 @@ a:active { color: #29659d }
 	background-color:#250d00;
 }
 
+/*2つの設定シートのPreviewボタン*/
 #preview1{
 	top:10px;
 }
 #preview2{
 	top:10px;
 }
+
+/*QRシートのコピーボタン*/
 .copy_button{text-align:right;}
 #btn_copy_QR{text-align:right}
