@@ -919,35 +919,8 @@ function dispShareSheet(){
 	if(motionType != 0) txt += '&mt=' + motionType;
 	if(clickType != 1) txt += '&ct=' +clickType;
 	if(sdelay_idx != 3){txt += "&bst=" + sdelay_idx;}
-	/*
-	if(Beat != 4){txt += "&bt=" + Beat;}
-	if(ndivSound > 1){txt += "&ds=" + ndivSound;}
-	if(ndivBeat > 1){txt += "&db=" + ndivBeat;}
-	if(!f_sound)txt += "&bs=0"
-	*/
-	
-	navigator.clipboard.writeText(txt).then(		() => {
-		dispMsg('URL successfully Copied');},() => {
-		dispMsg('Copy failure');});
-	
-	//出力シート上に設定値、QRコード、URLを表示
-	/*
-	el_csBeat.textContent = Beat;
-	el_csTempo.textContent = MM;el_csBSD.textContent = ndivSound;
-	if(ndivSound > 1){
-		dispElement(el_dBSD, true);
-	}else{
-		dispElement(el_dBSD, false);  //デフォルト値の場合は表示しない
-	}
-	el_csBMD.textContent = ndivBeat;
-	if(ndivSound > 1){
-		dispElement(el_dBMD, true);
-	}else{
-		dispElement(el_dBMD, false);
-	}
-	*/
-	el_URL.textContent = txt;
 
+	//出力シート上にQRコード、URLを表示
 	document.getElementById('QR').textContent = '';　　//QRコード描画前にエリア内消去
 	var qrcode = new QRCode('QR', {
 		text: txt,
@@ -955,6 +928,8 @@ function dispShareSheet(){
 		height: 128,
 		correctLevel : QRCode.CorrectLevel.H
 	}); 
+
+	el_URL.textContent = txt;
 }
 
 
