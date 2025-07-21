@@ -96,22 +96,23 @@ position:relative;
      top:3px;
 }
 
-/*テンポ関連3つのボタン
+/*テンポ関連3つのボタン*/
 #tempoAdjup{
-	left:5０%;
-	position:absolute;
+	width:1.2em;
+	text-align:center;
 }
 #tempoAdjdown{
-	left:６５%;
-	position:absolute;
+	width:1.2em;
+	text-align:center;
 }
-#btnTAP{
-	left:８０%;
-	position:absolute;
-}
-*/
 
-#div_tempo { display: table; width: 100%;}
+#btnTAP{
+	width:2.1em;
+	text-align:center;
+}
+
+
+#div_tempo { display: table; width: 100%;}/*テンポ関連表示、ボタンエリア*/
 #div_tempo_txt { display: table-cell; text-align: center; }
 #div_tempo_btn { display: table-cell; text-align: right; }
 
@@ -206,7 +207,7 @@ select{
 
 /*AD設定シート*/
 #ad_setting{
-    /*overflow-wrap: anywhere;*/
+    overflow-wrap: anywhere;
     top:60px;
     left:5%;
     width:90%;
@@ -271,17 +272,8 @@ select{
     text-decoration: none;
 }
 
-/*
-.sheet_title{
-	text-align:center;
-	margin:0;
-	background: #507ea4;
-	border-radius-left: 9px;
-	color:#fef4f4;
-}
-*/
 
-/*設定シートなど　タイトルバーのデザインと「✕」の配置**/
+/*設定シートなど　タイトルバーのデザインと「✕」の配置*/
 .titlebar { display: table; width: 100%; background-color:#507ea4; color:#fef4f4; }
 .sheet_title { display: table-cell; text-align: center; }
 .close_button  { display: table-cell; text-align: right; }
