@@ -1,10 +1,24 @@
 /*
-【auftakt52_6.js】
+【auftakt52_６.js】
 */
 /************* 本スクリプトの目的・成果 ***************
 ・変拍子対応
-　　　変拍子についての参考サイト：https://kensukeinage.com/rhythm_time/
-
+　　変拍子についての参考サイト：https://kensukeinage.com/rhythm_time/
+●ユーザインタフェースに関すること。
+・動作モードをノーマル/アドヴァンスドの２つのモードを用意。適宜切り替えて使用
+・ノーマルモードでは従来通りのインタフェース（将来的には共通にする？）
+・ADモードでは、拍子設定は設定画面で行うことから拍子エリアクリックで設定画面が開く。
+・同様にメイン画面長押しでも設定画面が開く
+・モードの切替は、どちらのモードにおいても拍子エリア長押し
+●テンポの表示
+　　ノーマルモードではBeatベースのみ（単純なメトロノームと同様）。あえて/Bとは付記しない。
+　　ADモードでは、BeatベースとNoteベースを状況に応じて表示切替できるようにする。それぞれ/B  /Nと表記
+●motionTypeとclickType
+　　ADモードで、従来の分割振りやクリック音の分割機能を、motion typeとclick typeに変更。考え方も、
+  分割ではなく、Beat（拍）ベースかNote（音符）ベースかというように変更。
+  　　クリック音についてはその他にBeatの1/2, 1/3, 1/4を選択できるようにした。
+●小節構成文字列という考え方　beatStr 変拍子などの設定
+　2025/07/21時点では、桁数はhtmlにて規定。15
 
 変拍子対応構想
 ・拍子エリアの長押しで設定画面表示→■済み 25/07/09(15:57)
@@ -12,7 +26,8 @@
 
 
 記録↓
-テンポ表示　/B /Nタップで切り替えOK
+2025/07/21 16:50 ADモードでのテンポ表示　/B /Nタップで切り替え。スワイプやTAPの
+内部処理をMMに統一。表示はsetTempo()に任せる形に
 
 2025/07/19 22:38 モード切替時に所望の動作をしないバグ。ほぼ解決か？関数間
 で重複する処理などを整理した。makeBeatArray、setTheme、setTempoなど
@@ -29,17 +44,7 @@
 
 
 【今後の課題・考慮点など】
-・拍子設定、表示の詰め
-　　　リストボックスとの連携、↑↓ボタンでtempoType切り替え、TAP動作
-変拍子の場合、テンポ表示の/B  /Nモードに従ってテンポ操作できることが理想か。
-/Bの場合、次の拍によって数値が変化することも許容（ユーザに理解してもらえるか？
-変拍子を使う場合、ユーザはごくまれと考える。）動的に変わる状況でTAPで設定するのは無理だろう。
-TAPは変拍子の場合は消すか/Nモードに限定すべきか
-  TAPが使えない場合とは？ADモードにおいて変拍子でtempoType ==0;(Beat)の場合
-     !isNormalMode && !isNormalBeat && tempoType == 0
-    setTempoの中で処理する
-↑↓ボタンは表示とそのモードに連携するのが自然
-リストボックスも連携しようと思えば可能。
+・拍子設定、表示の詰め　ほぼ解決か
 
    
 ・背景画像、1/4、1/3、1/2のラインまたは色の変化
@@ -47,22 +52,6 @@ TAPは変拍子の場合は消すか/Nモードに限定すべきか
 
 ・変拍子設定パネルのパラメータ反映
 ・URLからパラメータ取得→■済み 25/07/09(16:29)
-→URL指定の拍子構成文字列はテキストボックスには反映されるが、実際の動作には反映されていない。
-・クリック音の出し方（分割振り、変拍子、分割モードとは独立に、分割音を出すのか。）
-resizeCanvas()にどこまで含めるか？サイズの決定だけにするか、画面とパラメータの設定まで含めるか。
-2025/07/08 15:30 htmlで設定シート試作。分割ではなく、ベースとするものをBeatかNoteで区別。
-clickサウンドについては、Beat間をいくつに分けるかを選択できるようにした。
-テンポ表示についてもBeatベースかNoteベースかで、末尾にB/Nを付して表記するようにしてみる。ただしあまり一般的ではない。
-
-拍子エリアの数字と縦ドット。設定によってはドットの数が多くなるかも。そのときはどうするか。小さめの円とドットにして多少スペースを稼ぐことはできる。
-
-特に変拍子の場合のテンポはNoteベースとなり３００くらいまで使うことになる。
-テンポの変換は、単純拍子の場合は従来通り。変拍子のときは、文字列の１に対応するテンポ。
-ユーザがMeasure Strucureに打ち込んでいる際に単純拍子／変拍子の判別によって動的にテンポの表記も変えるのか？
-変拍子の場合は８分音符ベースで小節内の構成割をするケースが多いので、
-やるとしたら８分音符のテンポ設定／表示に切り替えるという手がある。
-→当面MMをテンポの基本とし、随時BPMも用いる。BPM変換の際は toBPM(MM)を使う。
-
 
 isNormalで変拍子か単純拍子かを判別
 　変拍子：無音、拍点、分割（8部音符）の３種。「変拍子設定画面」で設定。分割の間隔は1duration単位。拍子拍点の識別は不要
@@ -74,32 +63,11 @@ isNormalで変拍子か単純拍子かを判別
 この場合は、（基本）設定画面で分割振りを指定したものと区別できない。この場合は、分割振りと分割音は独立して設定できるようにする。
 ただ、それを変拍子設定画面で用意するかどうかは検討の余地あり。
 →２拍３連をやりたい場合は、基本設定画面で行うことになる。
-そのへんの使い分けがユーザーに理解してもらえるか？・ＭＭとBPMの使い分けを整理。表示テンポについて、両者を色分けして表示することも検討。
-　→isNormalBeatを使い、単純拍子、変拍子で切り替え。
-		isNormalBeatのときは従来のMM（拍子拍点の偏移速度）、
-		変拍子の場合はいわゆる８分音符のテンポ
- 
-
-	・変拍子のときは、八分音符のテンポが２００前後になることもざらにあり、
-今のままだと、高さ制限により、打ち上げ高さが低くなっている。
-	分割モードか否かで、高さ制限も考慮する必要がある。
-	→拍運動配列のdurationとbpmから計算した実時間のdurationの最小値をもとに、最高点を低くする。
-・基本モード（単純拍子と分割振り、分割音）のユーザインタフェースを維持したうえで、変拍子対応。
-・変拍子のときに、拍子エリアをクリックした途端に単純拍子になってしまわないようにする必要がある。
-→変拍子のときは拍子エリアクリック時に、拍子変更ではなく、設定画面を開くようにするなど。
-
-
-
-
-変拍子設定画面は半透明にして、プレビュー機能を用意する。
-設定文字列を入力してプレビューして決定するという段階が踏めるように考慮する。
-
-
 */
 
 //■■■■■■■ 定数・変数宣言、定義 ■■■■■■
 //----- グローバル変数の宣言・定義 -----------------
-const DEBUG = false;  //デバグ用 主にconsole表示 
+const DEBUG = true;  //デバグ用 主にconsole表示 
 var no_of_draw = 0;  //描画カウンタ
 
 //公開URL　　QRコード出力で使用
@@ -120,6 +88,9 @@ const divdot1_col = '#ee836f';	//分割時のドット珊瑚朱色 #ee836f
 //const cntdwn_col = '#b48a76';	//deprecated　カウントダウン数字の色　梅染 うめぞめ#b48a76　　桜鼠
 const pie_col = '#e8d3d1';	//待機時パイチャート　桜鼠 さくらねず#e9dfe5、薄桜 #fdeff2
 const msg_col = '#e6b422';	//Ｂｅａｔ Areaのメッセージ　黄金 #e6b422
+
+const triplet_line_col = '#e6b422';  //３連音符ラインの色
+const sixteenth_note_line_col = '#ee836f';  //16分音符ラインの色
 
 //ADモード
 const mc_bgcol2 = '#d6e9ca';	//メインキャンバス２　アスパラガスグリーン#dbebc4
@@ -997,22 +968,23 @@ function drawMark() {
 	const y = -4 * t * (t - 1);
 
 	//console.log(x + " " + y);
-	let maxH = (cvMain.height - 2.1 * ball_height);
-	maxH = maxH * maxHeight0;
+	let maxH = (cvMain.height - 2.5 * ball_height);  //テンポ表示部分を割り引く
+	maxH = maxH * maxHeight0;  //分割拍の高さmaxHeight0
 
 	//if(divBeat_idx > 0){maxH *= divHrate;}  //分割振り対応
 
 	//テンポが速いときの高さ調整　★要検討。参照するテンポはMMだけとは限らない。特に変拍子の場合
 	let bpm = MM * ndivBeat;
-	if (MM > 120) {
+	if (MM > 120) {  	//テンポが早い場合の高さ制限
 		maxH = (1 - (bpm - 120) / 200) * maxH;
 	}
-	//テンポが早い場合の高さ制限
 
 	//ボールを表示
 	drawBall(xxU + t * (xxD - xxU), (cvMain.height - 0.5 * ball_height) - y * maxH);
-	no_of_draw++;
-	//デバグ用描画数カウンタ
+	no_of_draw++;  //デバグ用描画数カウンタ
+
+	//３連符(0.88888)、１６分音符(0.75)のライン描画
+	drawMarkerLines(maxH);
 
 	//■次の描画の予約（お決まりの手続き）
 	rafBall = window.requestAnimationFrame(drawMark);
@@ -1365,6 +1337,10 @@ function drawWaiting(rate) {
 	//ball.draw(xx0 + ( Beat - 1) * xpitch, cvMain.height - ball.radius);
 	//if (DEBUG)console.log('xx0: ' + xx0 + 'cvMain.height:' + cvMain.height);
 	drawBall(xx0 + (Beat - 1) * xpitch, cvMain.height - 0.5 * ball_height);
+
+	//３連符(0.88888)、１６分音符(0.75)のライン描画
+	//drawMarkerLines(maxH); //maxHが決まらないので
+	
 	//パイチャート描画
 	if (rate > 0.01) {
 		startAngle = 1.5 * Math.PI;
@@ -1491,6 +1467,32 @@ function drawBall(xx, yy) {
 	const ballImage = isNormalMode? ball_image0 : ball_image1;//モードによってボール画像を変える
 	
 	ctxMain.drawImage(ballImage, xx - 0.5 * ball_width, yy - 0.5 * ball_height, ball_width, ball_height);
+}
+
+//
+function drawLine(xx0, yy0, xx1, yy1, col){
+	ctxMain.strokeStyle = col;
+	ctxMain.beginPath();
+	ctxMain.moveTo(xx0, yy0);
+	ctxMain.lineTo(xx1, yy1);
+	ctxMain.stroke();
+}
+
+function drawMarkerLines(max_height) {
+	//3３連符(0.88888)、１６分音符(0.75)のライン描画
+	if(isNormalMode && motionType == 0 && MM <= 120){
+		const lineH3 = 0.8888 * max_height;
+		const lineH16 = 0.75 * max_height;
+		//drawLineを使って線を引く(ボール上端が触れるタイミング)
+		let yl = cvMain.height - ball_height - lineH3;
+		drawLine(0, yl, cvMain.width, yl, triplet_line_col);
+		yl = cvMain.height - ball_height - lineH16;
+		drawLine(0, yl, cvMain.width, yl, sixteenth_note_line_col);
+		yl = cvMain.height - ball_height - max_height;  //頂点
+		drawLine(0, yl, cvMain.width, yl, sixteenth_note_line_col);
+		//yl = cvMain.height - ball_height;  //着地点
+		//drawLine(0, yl, cvMain.width, yl, sixteenth_note_line_col);
+	}
 }
 
 //拍子エリアの描画、拍子数字と分割マーク表示＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
@@ -1770,7 +1772,12 @@ function setTempo() {
 			elTempoTxt.textContent = tempo_value;
 			elTempoType.textContent = '/N';	//Note
 		}
-			dispElement(elTap, fl);
+		//TAPボタンの表示/非表示
+		if(isNormalBeat){
+			elTap.style.display = 'table-cell';
+		}else{
+			dispElement(elTap, false);
+		}
 	}
 	//スワイプ用配列のインデクス、現在のMMに相当するaryMM_idxを求めておく
 	let i;
