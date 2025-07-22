@@ -4,6 +4,8 @@
 /************* 本スクリプトの目的・成果 ***************
 ・変拍子対応
 　　変拍子についての参考サイト：https://kensukeinage.com/rhythm_time/
+　　このページで「３＋２＋２」などと書いている。
+  
 ●ユーザインタフェースに関すること。
 ・動作モードをノーマル/アドヴァンスドの２つのモードを用意。適宜切り替えて使用
 ・ノーマルモードでは従来通りのインタフェース（将来的には共通にする？）
@@ -67,7 +69,7 @@ isNormalで変拍子か単純拍子かを判別
 
 //■■■■■■■ 定数・変数宣言、定義 ■■■■■■
 //----- グローバル変数の宣言・定義 -----------------
-const DEBUG = false;  //デバグ用 主にconsole表示 
+const DEBUG = true;  //デバグ用 主にconsole表示 
 var no_of_draw = 0;  //描画カウンタ
 
 //公開URL　　QRコード出力で使用
@@ -1497,14 +1499,13 @@ function drawMarkerLines(max_height) {
 
 //拍子エリアの描画、拍子数字と分割マーク表示＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 //------------------------------------
-//■■拍子エリア表示、小節構成文字列拍設定文字列対応バージョン
-//入力：Beat配列設定文字列、分割モード、サウンド分割数
+//■■拍子エリア表示、小節構成文字列（拍設定文字列）対応バージョン
+//入力：小節構成文字列、サウンド分割数（クリックタイプ）
 //取り出した数値に応じてドットを表示する
 //------------------------------------
 function drawExBeat(str, clicktype) {
 	//拍子エリアに数字を置く
-	let str_len = str.length;
-	//設定文字列桁数（拍点の数）
+	let str_len = str.length;  //設定文字列桁数（拍点の数）
 	//拍子エリアの背景色
 	let bgcol = isNormalMode ? beat_bgcol: beat_bgcol2 ;
 	cvBeat.style.backgroundColor = bgcol;
@@ -2399,7 +2400,10 @@ elBtnMdCancel.addEventListener('click', function(e) {
 	//アラート画面OFF
 });
 
-//-----QRコードコピーできるかのトライアル
+//-----QRコードをクリップボードにコピー
+//PCではＯＫ
+//Pixel 7proではＮＧか？
+/*
 document.getElementById('btn_copy_QR').addEventListener('click', function(e) {
 	console.log('CopyQR button clicked!!');
 	const elQRimg = document.querySelector('div img');
@@ -2421,6 +2425,27 @@ document.getElementById('btn_copy_QR').addEventListener('click', function(e) {
 	}
 	);
 });
+*/
+
+//参考：https://nigimitama.hatenablog.jp/entry/2023/03/13/073000
+const copyImage = async () => {
+        //const img = document.getElementById("img");
+		const img =  document.querySelector('div img');
+        const responsePromise = await fetch(img.src);
+        const blob = responsePromise.blob();
+        const data = [new ClipboardItem({ "image/png": blob })];
+
+        navigator.clipboard.write(data).then(
+          () => { console.log("success");dispMsg('QR Code successfully Copied'); },
+          (msg) => { console.log(`fail: `);dispMsg('QR Code copy failed'); }
+        );
+      };
+
+      //const button = document.getElementById("copyButton");
+      //button.addEventListener("click", copyImage);
+
+document.getElementById('btn_copy_QR').addEventListener('click',copyImage);
+
 
 //-----URL copyボタンが押されたときの処理
 document.getElementById('btn_copy_URL').addEventListener('click', function(e) {
