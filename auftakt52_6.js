@@ -69,7 +69,7 @@ isNormalで変拍子か単純拍子かを判別
 
 //■■■■■■■ 定数・変数宣言、定義 ■■■■■■
 //----- グローバル変数の宣言・定義 -----------------
-const DEBUG = false;  //デバグ用 主にconsole表示 
+const DEBUG = true;  //デバグ用 主にconsole表示 
 var no_of_draw = 0;  //描画カウンタ
 
 //公開URL　　QRコード出力で使用
@@ -695,7 +695,7 @@ function mcMouseDown(event) {
 		//600msec間の累積移動量が小さければ長押し
 		if (DEBUG)
 			console.log(`◆mouse長押し：${isNormalMode ? 'Normal': 'AD'}設定画面表示`);
-		if ((travel <= travel0) && mousedown == true) {
+		if ((travel <= travel0) && f_mousedown == true) {
 			f_longtap = true;
 			//mouseupなどで使う
 			//設定パネル表示
