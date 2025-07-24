@@ -1485,13 +1485,21 @@ function drawMarkerLines(max_height) {
 	if(isNormalMode && motionType == 0 && MM <= 120){
 		const lineH3 = 0.8888 * max_height;
 		const lineH16 = 0.75 * max_height;
+		ctxMain.font = "8pt sans-serif";
 		//drawLineを使って線を引く(ボール上端が触れるタイミング)
+		//1/3
 		let yl = cvMain.height - ball_height - lineH3;
 		drawLine(0, yl, cvMain.width, yl, triplet_line_col);
+		ctxMain.fillStyle = triplet_line_col;
+		ctxMain.fillText('1/3', 10, yl + 12);
+		//1/4
 		yl = cvMain.height - ball_height - lineH16;
 		drawLine(0, yl, cvMain.width, yl, sixteenth_note_line_col);
+		ctxMain.fillStyle = sixteenth_note_line_col;
+		ctxMain.fillText('1/4', 10, yl + 12);
 		yl = cvMain.height - ball_height - max_height;  //頂点
 		drawLine(0, yl, cvMain.width, yl, sixteenth_note_line_col);
+		ctxMain.fillText('1/4', 10, yl + 12);
 		//yl = cvMain.height - ball_height;  //着地点
 		//drawLine(0, yl, cvMain.width, yl, sixteenth_note_line_col);
 	}
