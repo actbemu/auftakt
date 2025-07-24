@@ -89,10 +89,10 @@ const divdot0_col = '#e7e7eb';	//分割時のドット紫水晶 #e7e7eb
 const divdot1_col = '#ee836f';	//分割時のドット珊瑚朱色 #ee836f
 //const cntdwn_col = '#b48a76';	//deprecated　カウントダウン数字の色　梅染 うめぞめ#b48a76　　桜鼠
 const pie_col = '#e8d3d1';	//待機時パイチャート　桜鼠 さくらねず#e9dfe5、薄桜 #fdeff2
-const msg_col = '#e6b422';	//Ｂｅａｔ Areaのメッセージ　黄金 #e6b422
+const msg_col = '#e6b422';	//Beat Areaのメッセージ　黄金 #e6b422
 
 const triplet_line_col = '#e6b422';  //３連音符ラインの色
-const sixteenth_note_line_col = '#ee836f';  //16分音符ラインの色
+const sixteenth_note_line_col = '#507ea4';  //16分音符ラインの色
 
 //ADモード
 const mc_bgcol2 = '#d6e9ca';	//メインキャンバス２　アスパラガスグリーン#dbebc4
