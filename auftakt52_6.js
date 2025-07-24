@@ -94,14 +94,19 @@ const msg_col = '#e6b422';	//Beat Areaのメッセージ　黄金 #e6b422
 const triplet_line_col = '#e6b422';  //３連音符ラインの色
 const sixteenth_note_line_col = '#507ea4';  //16分音符ラインの色
 
+//テンポ表示タイプ別の色
+const tempo_color0 = '#0f2350';  //濃い藍#0f2350 /B用
+const tempo_color1 = '#ec6800';  //人参色
+
 //ADモード
 const mc_bgcol2 = '#d6e9ca';	//メインキャンバス２　アスパラガスグリーン#dbebc4
-//const beat_bgcol2 = '#192f60';	  //拍子エリアADモード背景色アイアンブルー#192f60　#c5c56a　抹茶色
-const beat_bgcol2 = '#69821b';	//拍子エリアADモード背景色アイアンブルー#192f60　#c5c56a　抹茶色
+//const beat_bgcol2 = '#192f60';	  //拍子エリアADモード背景色アイアンブルー#192f60
+const beat_bgcol2 = '#69821b';	//拍子エリアADモード背景色　#c5c56a　抹茶色
 
 //-----DOMエレメント関連
 //パネルの「✕」タップのインベントリスナーなど、インベントリスナー単独で使う場合は、イベントリスナーのところで定義
 //基本画面エレメント
+const elWrap = document.getElementById('main_wrap');
 const elMainTitleBar = document.getElementById('main_title_bar');	//アプリタイトルバー
 const cvMain = document.getElementById("myCanvas");	//動指標が動くcanvas
 const ctxMain = cvMain.getContext("2d");	//描画用インスタンス
@@ -1499,7 +1504,7 @@ function drawMarkerLines(max_height) {
 		ctxMain.fillText('1/4', 10, yl + 12);
 		yl = cvMain.height - ball_height - max_height;  //頂点
 		drawLine(0, yl, cvMain.width, yl, sixteenth_note_line_col);
-		ctxMain.fillText('1/4', 10, yl + 12);
+		ctxMain.fillText('1/2', 10, yl + 12);
 		//yl = cvMain.height - ball_height;  //着地点
 		//drawLine(0, yl, cvMain.width, yl, sixteenth_note_line_col);
 	}
@@ -1751,6 +1756,11 @@ function setTheme() {
 	cvBeat.style.backgroundColor = bgcol;
 	//拍子エリアセット
 	drawExBeat(beatStr, clickType);
+	//タイトルバーと枠線の色
+	elWrap.style.borderColor = bgcol;
+	elMainTitleBar.style.backgroundColor = bgcol;
+	elMainTitleBar.textContent = isNormalMode?'Auftakt5--Normal Mode':'Auftakt5--Advanced Mode';
+	
 }
 
 //画面のテンポ表示、リストボックスなどの選択状態を更新する
@@ -1769,17 +1779,32 @@ function setTempo() {
 	if (isNormalMode) {		//ノーマルモードの場合MM一択
 		tempo_value = MM;
 		elTempoTxt.textContent = tempo_value;
+		elTempoTxt.style.color = tempo_color0;
 		elTempoType.textContent = '';  //「/B」は表示しない
+		elTempoUp.style.color = tempo_color0;
+		elTempoDown.style.color = tempo_color0;
+		elTap.style.color = tempo_color0;
+		
 	} else {							//ADモードの場合
 		if(tempoType == 0){	//MM
 			tempo_value = MM;
+			elTempoTxt.style.color = tempo_color0;
 			elTempoTxt.textContent = tempo_value;
+			elTempoType.style.color = tempo_color0;
 			elTempoType.textContent = '/B';	//Beat
+			elTempoUp.style.color = tempo_color0;
+			elTempoDown.style.color = tempo_color0;
+			elTap.style.color = tempo_color0;
 		}else{	//BPM
 			tempo_value = toBPM(MM);
 			BPM = tempo_value;
+			elTempoTxt.style.color = tempo_color1;
 			elTempoTxt.textContent = tempo_value;
+			elTempoType.style.color = tempo_color1;
 			elTempoType.textContent = '/N';	//Note
+			elTempoUp.style.color = tempo_color1;
+			elTempoDown.style.color = tempo_color1;
+			elTap.style.color = tempo_color1;
 		}
 		//TAPボタンの表示/非表示
 		if(isNormalBeat){
@@ -2206,6 +2231,9 @@ elBtnMdSW.addEventListener('click', function(e) {
 	makeBeatArray(beatStr, motionType);
 	drawExBeat(beatStr, clickType);
 	setTempo();
+	//タイトルバーと枠線の色（拍子エリアと同色）
+	const col = isNormalMode? beat_bgcol: beat_bgcol2;
+	elMainTitleBar.style.backgroundColor = col;
 	if (DEBUG) console.log(`Normal 【${s_beatStr[0]}】  Advanced 【${s_beatStr[1]}】　current【${beatStr}】 isNormalBeat ${isNormalBeat}`);
 	//該当するモードのカラーに変更して設定シートを開く
 	openSettingSheet()
