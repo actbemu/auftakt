@@ -13,11 +13,14 @@ canvas{display: block;}
 wrapperについて参考サイト
 http://qiita.com/ShinyaOkazawa/items/9e662bf2121548f79d5f
 */
+
 .wrapper{
   width: 100%;
   height: 100%;
+}
+#main_wrap{
 	border-style:solid;
-	border-color:#250d00;
+	border-color:#25000;
 }
 
 #parent{
