@@ -47,10 +47,16 @@
 			</span>
 		</div>
 		<div id="div_tempo_btn">
+			<!-- TAPボタンのレイアウト安定化させるため表組みにしてみる -->
+			<table id="table_tempo_btn">
+			<tr>
 			<!-- テンポ調節↑／↓ボタン -->
-			<span  class="btnText" id="tempoAdjup">↑</span>&nbsp;
-			<span class="btnText" id="tempoAdjdown">↓</span>&nbsp;
-			<span class="btnText" id="btnTAP">TAP</span>&nbsp;
+			<td class="td_tempo_btn"><span  class="btnText" id="tempoAdjup">↑</span>&nbsp;</td>
+			<td class="td_tempo_btn"><span class="btnText" id="tempoAdjdown">↓</span>&nbsp;</td>
+			<!-- TAPボタン -->
+			<td class="td_tempo_btn"><span class="btnText" id="btnTAP">TAP</span></td>
+			</tr>
+			</table>
 		</div>
 	</div>
 	
