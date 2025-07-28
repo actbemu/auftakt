@@ -5,6 +5,12 @@
 ・変拍子対応
 　　変拍子についての参考サイト：https://kensukeinage.com/rhythm_time/
 　　このページで「３＋２＋２」などと書いている。
+
+バグ関連
+PCで、マウスDownでないときもスワイプ（move）処理が行われる。
+別モードの設定画面が現れることがある。
+
+
   
 ●ユーザインタフェースに関すること。
 ・動作モードをノーマル/アドヴァンスドの２つのモードを用意。適宜切り替えて使用
@@ -22,9 +28,6 @@
 ●小節構成文字列という考え方　beatStr 変拍子などの設定
 　2025/07/21時点では、桁数はhtmlにて規定。15
 
-変拍子対応構想
-・拍子エリアの長押しで設定画面表示→■済み 25/07/09(15:57)
-・この画面での設定の場合は、テンポとその表示はMMではなくBPMに。表示された数値がMMかBPMかは、文字色で区別。
 
 
 記録↓
@@ -46,25 +49,14 @@
 
 
 【今後の課題・考慮点など】
-・拍子設定、表示の詰め　ほぼ解決か
 
-   
-・背景画像、1/4、1/3、1/2のラインまたは色の変化
-設定シートの語句、motion typeなど両モードで合わせる必要がある？Beat Sound→Clickなど
-
-・変拍子設定パネルのパラメータ反映
-・URLからパラメータ取得→■済み 25/07/09(16:29)
-
-isNormalで変拍子か単純拍子かを判別
+isNormalBeatで変拍子か単純拍子かを判別
 　変拍子：無音、拍点、分割（8部音符）の３種。「変拍子設定画面」で設定。分割の間隔は1duration単位。拍子拍点の識別は不要
 　単純拍子（従来通り）：無音、８分音符、３連符、１６分音符の４種。「設定画面」で設定。分割の間隔は表示テンポ（MM）の周期を分割数で除したもの。
 　単純拍子の場合、拍子拍点で分割音を予約する必要がある。従来はdivBeat_idxが0か否かで判別していた。
 	→更新前のxxUとxxDが異なっていれば拍子拍点とみなされる。  
 
-ちょっと面倒なのは、変拍子設定文字列で、単純拍子を指定した場合。「33」「1111」など
-この場合は、（基本）設定画面で分割振りを指定したものと区別できない。この場合は、分割振りと分割音は独立して設定できるようにする。
-ただ、それを変拍子設定画面で用意するかどうかは検討の余地あり。
-→２拍３連をやりたい場合は、基本設定画面で行うことになる。
+
 */
 
 //■■■■■■■ 定数・変数宣言、定義 ■■■■■■
@@ -73,9 +65,12 @@ const DEBUG = true;  //デバグ用 主にconsole表示
 var no_of_draw = 0;  //描画カウンタ
 
 //公開URL　　QRコード出力で使用
-const BASE_URL = location.protocol + '//' + location.host + location.pathname;
-if (DEBUG)
-	console.log(BASE_URL);
+let BASE_URL = location.protocol + '//' + location.host + location.pathname;
+//AndroidでQRコードのコピーができなかったので、マニュアルなどに使うQRコードをPCで作る場合は
+//以下を有効にする。
+BASE_URL = 'https://actbemu.github.io/auftakt/auftakt52_6.html';
+
+if (DEBUG) console.log(`BASE_URL:${BASE_URL}`);
 
 //----色関連-----------------
 
@@ -202,13 +197,13 @@ const ball_height = 40;
 //各種ステータスフラグ（動作コントロール用）
 let isMoving = false;	//動作中かどうか
 let isOsc = false;	//オシレータ起動中か
+let isNormalMode = true;  //モード切替用
 
 //フラグ
 let f_stop = false;	//直後の拍点で停止させるためのフラグ
 let f_wakelock = true;	//初回スタート時にWake Lockアクティブにする。
 let f_sound = true;	//クリックサウンドON/OFFフラグ
-let f_mousedown = false;	//マウススイッチON
-let f_mouseup = false;	//マウススイッチUP
+let f_mousedown = false;	//マウススイッチON／タッチスタート
 let f_rafCDC = false;	//カウントダウンアニメーション起動中
 
 //タイムスタンプ
@@ -243,10 +238,7 @@ let ndivBeat = 1;	//分割振り（1～３）設定パネルでの設定値
 //let divBeat_idx =0;	//一拍内の分割振りインデクス
 let isBeatPoint = true;	//分割振りで拍子拍点か否かを判別するため
 
-let isNormalMode;  //モード切替用実質的にisNormalBeatと同じ働き
-let isAdMode = false;  //アドヴァンストモード、変拍子モード？設定画面、ユーザインタフェースの切り替え用
 
-//以下は使わないかも
 
 //タッピングテンポ設定関連
 let tp0 = performance.now();	//前回タップの時刻
@@ -634,24 +626,25 @@ let isClick = false;
 function mcToucStart(event) {
 	event.preventDefault();  //イベントの処理を続けるのを阻止する。
 	f_mousedown = true;
-	f_mouseup = false;
-	//各種編集初期化
+
+	//各種変数の初期化
 	startY = event.touches[0].pageY;  //[0]最初のタッチだけを検知する。
 	if (DEBUG) console.log('◆スワイプスタート　at　Y=' + startY);
 	x0 = event.touches[0].pageX;
 	y0 = event.touches[0].pageY;
 	travel = 0;
-	f_longtap = false;
 	//フラグリセット
+	f_longtap = false;
 	isClick = true;
 	//現在のMMに相当するaryMM_idxを求めておく
 	aryMM_idx = getIndexOfAryMM(MM);
-	//長押し検出と処理
+	
+	//長押し検出タイマーと処理
 	timer = setTimeout( () => {
-		//600msec後の処理
+		//600msec後の処理＝長押ししたときの処理
 		if ((travel < travel0) && f_mousedown) {
 			//600msec間の累積移動量^2が少ない場合は長押しと判定
-			if (DEBUG)  console.log(`touch長押し：設定画面表示${isNormalMode?'ノーマルモード':'ADモード'} 　isAdModeは　${isAdMode}`);
+			if (DEBUG)  console.log(`touch長押し：設定画面表示  ${isNormalMode?'ノーマルモード':'ADモード'}`);
 			//600msecの間にupされていなければlongtapと判定、という意味からすると!f_mouse_upのほうが論理的にわかりやすか。
 			f_longtap = true;  //このフラグは不要では？
 			f_mousedown = false;
@@ -693,8 +686,9 @@ function mcMouseDown(event) {
 	y0 = event.pageY;
 	//長押し検出
 	travel = 0;
+	//フラグリセット
 	f_longtap = false;
-	isClick = true;
+	isClick = true;  //mouse_up/touch_end までの間にmoveしなければクリックと判断
 	timer = setTimeout( () => {
 		//停止はclearInterval(timer)
 		//600msec間の累積移動量が小さければ長押し
@@ -765,6 +759,7 @@ function mcMove(event) {
 //マウスドラッグ時の処理-----------------------------------------------
 function mcMouseMove(event) {
 	if (DEBUG)console.log('◆Move');
+	isClick = false;  //すこしでもmoveしたらクリックとは見做さない。
 	if (f_mousedown) {
 		//マウスの場合ホバリングでもmoveイベントが発生するので必要
 		//長押し検出用に移動量積算
@@ -804,37 +799,28 @@ function mcMouseMove(event) {
 		MM = aryMM[aryMM_idx];
 		//BPM = toBPM(MM);  //setTempoの中で処理する
 		setTempo();
-		//touchendのときにクリックと判断しないようにフラグを立てる
-		isClick = false;
 	}
 }
 //タッチ終了時の処理---------------------------------------------------
 function mcTouchEnd(event) {
 	if (DEBUG) console.log('◆Touch End');
-	//clearInterval(timer);
-	//f_mousedown = false;
+	clearInterval(timer);  //長押し判別タイマー停止
+	f_mousedown = false;
 
-	clearInterval(timer);
-	//長押し判別タイマー停止
+	//待機時間カウントダウン中のときはカウントダウン中止する
 	if (f_rafCDC) {
-		//待機時間カウントダウン中のときはカウントダウン中止する
 		//カウントダウンタイマーを止める
 		window.cancelAnimationFrame(rafCDC);
 		f_rafCDC = false;
 		//ボールを最終拍においてスタンバイ
 		drawWaiting(0);
-		f_mouseup = true;
-		f_mousedown = false;
 		return;
 	}
-	f_mouseup = true;
-	f_mousedown = false;
+
 	if (f_longtap) {
 		touch = false;
 	} else {
-		//clearTimeout(timer);
-		if (!isClick)
-			return;
+		if (!isClick) return;
 		//クリックと判断
 		if (isMoving) {
 			//Stop ■ストップ操作
@@ -842,11 +828,10 @@ function mcTouchEnd(event) {
 		} else {
 			//ボールを最終拍においてスタンバイ
 			let rate = 0;
-			if (start_wait > 0)
-				rate = 100;
+			if (start_wait > 0)  rate = 100;
 			drawWaiting(rate);
 			ct0 = performance.now();
-			//描画タイマー起動
+			//カウントダウンパイチャート描画タイマー起動
 			rafCDC = window.requestAnimationFrame(drawCounDownChart);
 			f_rafCDC = true;
 		}
@@ -855,20 +840,18 @@ function mcTouchEnd(event) {
 //マウスup時の処理--------------------------------------------------
 function mcMouseUp(event) {
 	if (DEBUG) console.log('◆Mouse Up');
-	clearInterval(timer);
-	//長押し判別タイマー停止
+	clearInterval(timer);  //長押し判別タイマー停止
+	f_mousedown = false;
+
 	if (f_rafCDC) {
 		//カウントダウンタイマーを止める
 		window.cancelAnimationFrame(rafCDC);
 		f_rafCDC = false;
 		//ボールを最終拍においてスタンバイ
 		drawWaiting(0);
-		f_mouseup = true;
-		f_mousedown = false;
 		return;
 	}
-	f_mouseup = true;
-	f_mousedown = false;
+
 	if (f_longtap) {
 		touch = false;
 	} else {
@@ -887,7 +870,6 @@ function mcMouseUp(event) {
 				ctxMain.clearRect(0, 0, cvMain.width, cvMain.height);
 				//ボールを最終拍においてスタンバイ
 				drawWaiting(0);
-				f_mouseup = true;
 				f_mousedown = false;
 				var t1 = context.currentTime;
 				gain.gain.cancelScheduledValues(t1);
