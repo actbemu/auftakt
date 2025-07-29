@@ -2164,13 +2164,35 @@ const handleVisibilityChange = () => {
 
 //■■■■■■■■■イベントリスナー関連■■■■■■■■■■■
 //メインキャンバスのイベントリスナーの設定**********************************
-cvMain.addEventListener('touchstart', mcToucStart);
+//cvMain.addEventListener('touchstart', mcToucStart);
 //cvMain.addEventListener('mousedown', mcMouseDown);
-cvMain.addEventListener('touchmove', mcMove);
+//cvMain.addEventListener('touchmove', mcMove);
 //cvMain.addEventListener('mousemove', mcMouseMove);
 //cvMain.addEventListener('mouseup', mcMouseUp);
 //処理をmcMouseUpと同じにした
-cvMain.addEventListener('touchend', mcMouseUp);
+//cvMain.addEventListener('touchend', mcMouseUp);
+
+//isPC = chkIfPC();  //PCかスマホかの判定
+//isPC = true;  //判定がうまくいかないので強制的にPCにするときは、コメントを外す。
+if(chkIfPC()){
+	//PC用イベントリスナー
+	//メインキャンバス
+	cvMain.addEventListener('mousedown', mcMouseDown);
+	cvMain.addEventListener('mousemove', mcMouseMove);
+	cvMain.addEventListener('mouseup', mcMouseUp);
+	//タッピング
+	elTap.addEventListener('click', Tapping);
+
+}else{
+	//スマホ、タブレット用イベントリスナー
+	//メインキャンバス
+	cvMain.addEventListener('touchstart', mcToucStart);
+	cvMain.addEventListener('touchmove', mcMove);
+	cvMain.addEventListener('touchend', mcMouseUp);
+	//タッピング
+	elTap.addEventListener('touchstart', Tapping);
+
+}
 //----テンポUP/Downボタンをタップ/長押ししたときの処理
 long_press(elTempoUp, tempoUpNormal, tempoUpLong, 500);
 long_press(elTempoDown, tempoDownNormal, tempoDownLong, 500);
@@ -2261,26 +2283,9 @@ window.addEventListener("beforeunload", function(event) {
 //他のタブ、アプリに画面が変わったどうかのリスナー
 document.addEventListener('visibilitychange', handleVisibilityChange);
 
-/*
-isPC = true;  //判定がうまくいかないので強制的にPCにするときは、コメントを外す。
-if(isPC){
-	//PC用イベントリスナー
-	//拍子エリアタッチで拍子を変更（循環）
-	cvBeat.addEventListener('click', BeatChange);
-	//document.getElementById('beatCanvas').addEventListener('click', BeatChange);
-	//タッピング
-	elTap.addEventListener('click', Tapping);
-	if(DEBUG) console.log('PC用Listener');
-}else{
-	//スマホ、タブレット用イベントリスナー
-	//拍子エリアタッチで拍子を変更（循環）
-	//document.getElementById('beatCanvas')
-	cvBeat.addEventListener('touchstart', BeatChange);
-	//タッピング
-	elTap.addEventListener('touchstart', Tapping);
-if(DEBUG) console.log('スマホ用Listener');
-}
-*/
+
+
+
 
 //設定パネル関連*************************************************************************
 //Normal設定パネルのラジオボタン、イベントリスナー処理*************************************
