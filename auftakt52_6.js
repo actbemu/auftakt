@@ -2165,12 +2165,16 @@ const handleVisibilityChange = () => {
 //■■■■■■■■■イベントリスナー関連■■■■■■■■■■■
 //メインキャンバスのイベントリスナーの設定**********************************
 //cvMain.addEventListener('touchstart', mcToucStart);
-//cvMain.addEventListener('mousedown', mcMouseDown);
+cvMain.addEventListener('mousedown', mcMouseDown);
 //cvMain.addEventListener('touchmove', mcMove);
-//cvMain.addEventListener('mousemove', mcMouseMove);
-//cvMain.addEventListener('mouseup', mcMouseUp);
+cvMain.addEventListener('mousemove', mcMouseMove);
+cvMain.addEventListener('mouseup', mcMouseUp);
 //処理をmcMouseUpと同じにした
 //cvMain.addEventListener('touchend', mcMouseUp);
+//タッピングボタン
+//elTap.addEventListener('click', Tapping);
+//elTap.addEventListener('touchstart', Tapping);
+elTap.addEventListener('mousedown', Tapping);
 
 //isPC = chkIfPC();  //PCかスマホかの判定
 //isPC = true;  //判定がうまくいかないので強制的にPCにするときは、コメントを外す。
@@ -2181,7 +2185,7 @@ if(chkIfPC()){
 	cvMain.addEventListener('mousemove', mcMouseMove);
 	cvMain.addEventListener('mouseup', mcMouseUp);
 	//タッピング
-	elTap.addEventListener('click', Tapping);
+	elTap.addEventListener('pointerdown', Tapping);
 
 }else{
 	//スマホ、タブレット用イベントリスナー
@@ -2190,7 +2194,7 @@ if(chkIfPC()){
 	cvMain.addEventListener('touchmove', mcMove);
 	cvMain.addEventListener('touchend', mcMouseUp);
 	//タッピング
-	elTap.addEventListener('touchstart', Tapping);
+	//elTap.addEventListener('touchstart', Tapping);
 
 }
 //----テンポUP/Downボタンをタップ/長押ししたときの処理
@@ -2212,9 +2216,7 @@ elDivTempoList.addEventListener('change', function(e) {
 	dispElement(elDivTempoList, false);
 });
 
-//タッピングボタン
-//elTap.addEventListener('click', Tapping);
-elTap.addEventListener('touchstart', Tapping);
+
 
 //拍子エリアのイベントリスナーの設定***************************************
 long_press(cvBeat, clickCvBeat, l_clickCvBeat, 600);
