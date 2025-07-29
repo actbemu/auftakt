@@ -718,7 +718,7 @@ function mcMouseDown(event) {
 //スワイプ動作時の処理-----------------------------------------------------
 function mcMove(event) {
 	event.preventDefault();
-	if (DEBUG)console.log('◆mouseMove');
+	if (DEBUG)console.log('◆Move');
 	//長押し検出用に移動量積算
 	travel = travel + (x0 - event.touches[0].pageX) ** 2 + (y0 - event.touches[0].pageY) ** 2;
 	
@@ -762,7 +762,7 @@ function mcMove(event) {
 }
 //マウスドラッグ時の処理-----------------------------------------------
 function mcMouseMove(event) {
-	if (DEBUG)console.log('◆Move');
+	if (DEBUG)console.log('◆mouseMove');
 	isClick = false;  //すこしでもmoveしたらクリックとは見做さない。
 	if (f_mousedown) {
 		//マウスの場合ホバリングでもmoveイベントが発生するので必要
@@ -1261,7 +1261,7 @@ function long_press(el, nf, lf, sec) {
 	}
 	)
 
-	el.addEventListener('touchmove', () => {
+	el.addEventListener('mousedown', () => {
 		if (touch) return;
 		longclick = false;
 		timer = setTimeout( () => {
@@ -2166,9 +2166,9 @@ const handleVisibilityChange = () => {
 //メインキャンバスのイベントリスナーの設定**********************************
 cvMain.addEventListener('touchstart', mcToucStart);
 //cvMain.addEventListener('mousedown', mcMouseDown);
-//cvMain.addEventListener('touchmove', mcMove);
-cvMain.addEventListener('touchmove', mcMouseMove);
-//cvMain.addEventListener('touchend', mcMouseUp);
+cvMain.addEventListener('touchmove', mcMove);
+//cvMain.addEventListener('mousemove', mcMouseMove);
+//cvMain.addEventListener('mouseup', mcMouseUp);
 //処理をmcMouseUpと同じにした
 cvMain.addEventListener('touchend', mcMouseUp);
 //----テンポUP/Downボタンをタップ/長押ししたときの処理
