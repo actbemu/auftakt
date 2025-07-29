@@ -1768,6 +1768,7 @@ function setTempo() {
 		elTempoUp.style.color = tempo_color0;
 		elTempoDown.style.color = tempo_color0;
 		elTap.style.color = tempo_color0;
+		dispElement(elTap, true);  //TAPボタンは必ず表示
 		
 	} else {							//ADモードの場合
 		if(tempoType == 0){	//MM
