@@ -5,6 +5,7 @@
 ・変拍子対応
 　　変拍子についての参考サイト：https://kensukeinage.com/rhythm_time/
 　　このページで「３＋２＋２」などと書いている。
+・マウス、タブレット共通イベントリスナー　potinter...のお試し
 
 バグ関連
 PCで、マウスDownでないときもスワイプ（move）処理が行われる。
@@ -31,6 +32,9 @@ PCで、マウスDownでないときもスワイプ（move）処理が行われ�
 
 
 記録↓
+2025/07/28 08:50 別モードの設定画面が現れることがあるバグ。見つからず。
+無駄なフラグやコードを少し整理。
+
 2025/07/21 16:50 ADモードでのテンポ表示　/B /Nタップで切り替え。スワイプやTAPの
 内部処理をMMに統一。表示はsetTempo()に任せる形に
 
@@ -61,7 +65,7 @@ isNormalBeatで変拍子か単純拍子かを判別
 
 //■■■■■■■ 定数・変数宣言、定義 ■■■■■■
 //----- グローバル変数の宣言・定義 -----------------
-const DEBUG = true;  //デバグ用 主にconsole表示 
+const DEBUG = false;  //デバグ用 主にconsole表示 
 var no_of_draw = 0;  //描画カウンタ
 
 //公開URL　　QRコード出力で使用
@@ -114,7 +118,7 @@ const elTempoDown = document.getElementById('tempoAdjdown');	//↓
 const elTap = document.getElementById('btnTAP');	//TAPボタン
 const elDivTempoList = document.getElementById('divTempoList');	//テンポリストのdivエレメント
 const elTempoList = document.getElementById('tempoList');	//テンポリストのエレメント
-const elMsgBox = document.getElementById('msgbox');	//設定モード変更時のアラート画面
+const elMsgBox = document.getElementById('msgbox');	//メッセージボックス
 const elModeChange = document.getElementById('mode_change_alert');	//設定モード変更時のアラート画面
 const elBtnMdSW = document.getElementById('btn_mode_switch');	//モード変更ボタン
 const elBtnMdCancel = document.getElementById('btn_mode_cancel');	//キャンセルボタン
@@ -385,8 +389,8 @@ function dispElement(elm, sw) {
 
 }
 
-//メッセージエリアにtxtを表示し、３秒後に消す--------------------------------------
-function dispMsg(txt) {
+//メッセージエリアにtxtを表示し、msec[msec]秒後に消す-----------------
+function dispMsg(txt, msec) {
 	//console.log(elMsgBox.textContent);
 	elMsgBox.style.color = msg_col;
 	elMsgBox.textContent = txt;
@@ -395,7 +399,7 @@ function dispMsg(txt) {
 		//3秒後に消す
 		elMsgBox.textContent = '';
 	}
-	, 3000);
+	, msec);
 }
 
 //currentTime[sec]をDOMHighResTimeStamp[msec]に変換して返す--------------
@@ -558,7 +562,7 @@ function setBeat(is_normal_mode) {
 		//旧パラメータ使わなければ不要
 		//f_divmode = ndivBeat > 1? true: false;
 		motionType = ndivBeat > 1 ? 1 : 0;
-		if (DEBUG) console.log(`＠ｓｅｔBeat 拍子変更→【${str}】 分割振り(音符種別):${ndivBeat}`);
+		if (DEBUG) console.log(`＠setBeat 拍子変更→【${str}】 分割振り(音符種別):${ndivBeat}`);
 	}
 	makeBeatArray(beatStr, motionType);
 	pushPara(is_normal_mode?  0: 1);
@@ -714,7 +718,7 @@ function mcMouseDown(event) {
 //スワイプ動作時の処理-----------------------------------------------------
 function mcMove(event) {
 	event.preventDefault();
-	if (DEBUG)console.log('◆mouseMove');
+	if (DEBUG)console.log('◆Move');
 	//長押し検出用に移動量積算
 	travel = travel + (x0 - event.touches[0].pageX) ** 2 + (y0 - event.touches[0].pageY) ** 2;
 	
@@ -758,7 +762,7 @@ function mcMove(event) {
 }
 //マウスドラッグ時の処理-----------------------------------------------
 function mcMouseMove(event) {
-	if (DEBUG)console.log('◆Move');
+	if (DEBUG)console.log('◆mouseMove');
 	isClick = false;  //すこしでもmoveしたらクリックとは見做さない。
 	if (f_mousedown) {
 		//マウスの場合ホバリングでもmoveイベントが発生するので必要
@@ -912,7 +916,7 @@ function dispShareSheet() {
 	//メトロノームの動作停止
 	metroStop();
 	if (!navigator.clipboard) {
-		dispMsg("'Copy URL' is not available on this bowser.");
+		dispMsg("'Copy URL' is not available on this bowser.", 3000);
 		return;
 	}
 	//BASE_URLにパラメータを追加
@@ -962,10 +966,9 @@ function drawMark() {
 
 	//if(divBeat_idx > 0){maxH *= divHrate;}  //分割振り対応
 
-	//テンポが速いときの高さ調整　★要検討。参照するテンポはMMだけとは限らない。特に変拍子の場合
-	let bpm = MM * ndivBeat;
+	//テンポが速いときの高さ調整
 	if (MM > 120) {  	//テンポが早い場合の高さ制限
-		maxH = (1 - (bpm - 120) / 200) * maxH;
+		maxH = (1 - (MM - 120) / 500) * maxH;
 	}
 
 	//ボールを表示
@@ -1137,7 +1140,7 @@ function metroStart() {
 		//wakelock = enableWakeLock();
 		requestWakeLock();
 		//console.log('enableWakeLock:' + wakelock.loked);
-		dispMsg('Screen Wake Lock enabled. The screen will stay on.');
+		dispMsg('Screen Wake Lock enabled. The screen will stay on.', 3000);
 		f_wakelock = false;
 	}
 	makeBeatArray(beatStr, motionType);
@@ -1205,7 +1208,7 @@ function metroStop() {
 	//次の拍点で停止させる
 	elPreview0.textContent = 'Preview';
 	elPreview1.textContent = 'Preview';
-	dispMsg('Halting...');
+	dispMsg('Halting...', 1500);
 	if (DEBUG)
 		console.log('停止フラグ：' + f_stop);
 }
@@ -1259,8 +1262,7 @@ function long_press(el, nf, lf, sec) {
 	)
 
 	el.addEventListener('mousedown', () => {
-		if (touch)
-			return;
+		if (touch) return;
 		longclick = false;
 		timer = setTimeout( () => {
 			longclick = true;
@@ -1281,8 +1283,7 @@ function long_press(el, nf, lf, sec) {
 		}
 	}
 	);
-}
-//function long_press
+}  //function long_press
 
 //開始待機カウントダウン処理-------------------------------------------
 //   アウフタクトにボールを置いて、rateに相当するパイチャートを描画
@@ -1747,11 +1748,12 @@ function setTheme() {
 
 //画面のテンポ表示、リストボックスなどの選択状態を更新する
 //テンポ表示更新時はかならずこの関数を使う。
-//Normalモード時は常にMM　tempo_textは表示せず
+//Normalモード時は常にMM、tempo_textは表示せず
 //ADモード時は両方のtempoTypeに対応
 //ここでは指定されたtempoTypeに応じた表示と
 //リストボックス、スワイプ用配列のインデクス設定を行う
 //MMとＢＰＭはつねにセットで現在値を保持していることが前提（基本はＭＭ）
+//TAPボタン表示の制御もここで行う。
 function setTempo() {
 	if(DEBUG) console.log(`■setTempo MM=${MM} BPM=${BPM} type ${tempoType == 0?'/B':'/N'}`);
 	let tempo_value;  //ここで扱うテンポの値
@@ -1766,6 +1768,7 @@ function setTempo() {
 		elTempoUp.style.color = tempo_color0;
 		elTempoDown.style.color = tempo_color0;
 		elTap.style.color = tempo_color0;
+		dispElement(elTap, true);  //TAPボタンは必ず表示
 		
 	} else {							//ADモードの場合
 		if(tempoType == 0){	//MM
@@ -1789,8 +1792,10 @@ function setTempo() {
 			elTap.style.color = tempo_color1;
 		}
 		//TAPボタンの表示/非表示
+		if(DEBUG) console.log(`@setTempo TAPボタン ${isNormalBeat?'表示':'非表示'}`);
 		if(isNormalBeat){
-			elTap.style.display = 'table-cell';
+			//elTap.style.display = 'table-cell';
+			dispElement(elTap, true);
 		}else{
 			dispElement(elTap, false);
 		}
@@ -1837,11 +1842,24 @@ function openSettingSheet() {
 	dispElement(isNormalMode ? elSetting : elAdSetting, true);
 }
 
+//PCか否かを判定する
+//参考：https://www.site-convert.com/archives/2188
+let isPC;  //値は'load'のあとに決まる
+function chkIfPC() {
+  if (navigator.userAgent.match(/iPhone|Android.+Mobile/)) {
+    return false;  //PCではない
+  } else {
+    return true;  //PC
+  }
+}
+
+
 //■■■■■■■ 初期化コード ■■■■■■■■■■■■■■■■■■
 // PCかそれ以外かの判定
 //ユーザーエージェントから、スマホかPCかの判別→PCで誤判別のため使用せず
 //イベントリスナーでのclick、touchstartの切り替えに使う
 //https://www.sejuku.net/blog/51336
+/*
 let isPC = false;
 let ua = navigator.userAgent;
 let iphone = ua.indexOf('iPhone') > 0;
@@ -1858,6 +1876,7 @@ if (iphone || androidSp || ipad || androidT) {
 		console.log('PCです。');
 	isPC = true;
 }
+*/
 
 //サウンドオシレータ起動
 const context = new AudioContext();
@@ -2096,9 +2115,9 @@ let isSupported = false;
 
 if ('wakeLock'in navigator) {
 	isSupported = true;
-	dispMsg('Screen Wake Lock API supported');
+	dispMsg('Screen Wake Lock API supported', 3000);
 } else {
-	dispMsg('Wake lock is not supported by this browser.');
+	dispMsg('Wake lock is not supported by this browser.', 3000);
 }
 
 let requestWakeLock = null;
@@ -2113,7 +2132,7 @@ if (isSupported) {
 		try {
 			wakeLock = await navigator.wakeLock.request('screen');
 
-			dispMsg('<< Wake Lock is active.>>');
+			dispMsg('<< Wake Lock is active.>>', 3000);
 
 			// listen for our release event
 			wakeLock.onrelease = function(ev) {
@@ -2122,7 +2141,7 @@ if (isSupported) {
 			wakeLock.addEventListener('release', () => {
 				// if wake lock is released alter the button accordingly
 				//changeUI('released');
-				dispMsg('** Wake Lock is released. **');
+				dispMsg('** Wake Lock is released. **', 3000);
 			}
 			);
 
@@ -2131,7 +2150,7 @@ if (isSupported) {
 			//wakeButton.dataset.status = 'off';
 			//wakeButton.textContent = 'Turn Wake Lock ON';
 			//statusElem.textContent = `${err.name}, ${err.message}`;
-			dispMsg('Wake Lock request failed.');
+			dispMsg('Wake Lock request failed.', 3000);
 		}
 	}
 	// requestWakeLock()
@@ -2146,13 +2165,39 @@ const handleVisibilityChange = () => {
 
 //■■■■■■■■■イベントリスナー関連■■■■■■■■■■■
 //メインキャンバスのイベントリスナーの設定**********************************
-cvMain.addEventListener('touchstart', mcToucStart);
+//cvMain.addEventListener('touchstart', mcToucStart);
 cvMain.addEventListener('mousedown', mcMouseDown);
-cvMain.addEventListener('touchmove', mcMove);
+//cvMain.addEventListener('touchmove', mcMove);
 cvMain.addEventListener('mousemove', mcMouseMove);
-cvMain.addEventListener('touchend', mcMouseUp);
-//処理をmcMouseUpと同じにした
 cvMain.addEventListener('mouseup', mcMouseUp);
+//処理をmcMouseUpと同じにした
+//cvMain.addEventListener('touchend', mcMouseUp);
+//タッピングボタン
+//elTap.addEventListener('click', Tapping);
+//elTap.addEventListener('touchstart', Tapping);
+elTap.addEventListener('mousedown', Tapping);
+
+//isPC = chkIfPC();  //PCかスマホかの判定
+//isPC = true;  //判定がうまくいかないので強制的にPCにするときは、コメントを外す。
+if(chkIfPC()){
+	//PC用イベントリスナー
+	//メインキャンバス
+	cvMain.addEventListener('mousedown', mcMouseDown);
+	cvMain.addEventListener('mousemove', mcMouseMove);
+	cvMain.addEventListener('mouseup', mcMouseUp);
+	//タッピング
+	elTap.addEventListener('pointerdown', Tapping);
+
+}else{
+	//スマホ、タブレット用イベントリスナー
+	//メインキャンバス
+	cvMain.addEventListener('touchstart', mcToucStart);
+	cvMain.addEventListener('touchmove', mcMove);
+	cvMain.addEventListener('touchend', mcMouseUp);
+	//タッピング
+	//elTap.addEventListener('touchstart', Tapping);
+
+}
 //----テンポUP/Downボタンをタップ/長押ししたときの処理
 long_press(elTempoUp, tempoUpNormal, tempoUpLong, 500);
 long_press(elTempoDown, tempoDownNormal, tempoDownLong, 500);
@@ -2172,9 +2217,7 @@ elDivTempoList.addEventListener('change', function(e) {
 	dispElement(elDivTempoList, false);
 });
 
-//タッピングボタン
-elTap.addEventListener('click', Tapping);
-elTap.addEventListener('touch', Tapping);
+
 
 //拍子エリアのイベントリスナーの設定***************************************
 long_press(cvBeat, clickCvBeat, l_clickCvBeat, 600);
@@ -2243,26 +2286,9 @@ window.addEventListener("beforeunload", function(event) {
 //他のタブ、アプリに画面が変わったどうかのリスナー
 document.addEventListener('visibilitychange', handleVisibilityChange);
 
-/*
-isPC = true;  //判定がうまくいかないので強制的にPCにするときは、コメントを外す。
-if(isPC){
-	//PC用イベントリスナー
-	//拍子エリアタッチで拍子を変更（循環）
-	cvBeat.addEventListener('click', BeatChange);
-	//document.getElementById('beatCanvas').addEventListener('click', BeatChange);
-	//タッピング
-	elTap.addEventListener('click', Tapping);
-	if(DEBUG) console.log('PC用Listener');
-}else{
-	//スマホ、タブレット用イベントリスナー
-	//拍子エリアタッチで拍子を変更（循環）
-	//document.getElementById('beatCanvas')
-	cvBeat.addEventListener('touchstart', BeatChange);
-	//タッピング
-	elTap.addEventListener('touchstart', Tapping);
-if(DEBUG) console.log('スマホ用Listener');
-}
-*/
+
+
+
 
 //設定パネル関連*************************************************************************
 //Normal設定パネルのラジオボタン、イベントリスナー処理*************************************
@@ -2439,7 +2465,7 @@ document.getElementById('btn_copy_QR').addEventListener('click', function(e) {
 			'image/png': blob
 		});
 		await navigator.clipboard.write([item]);
-		dispMsg('QR Code successfully Copied');
+		dispMsg('QR Code successfully Copied', 3000);
 	}
 	);
 });
@@ -2454,8 +2480,8 @@ const copyImage = async () => {
         const data = [new ClipboardItem({ "image/png": blob })];
 
         navigator.clipboard.write(data).then(
-          () => { console.log("success");dispMsg('QR Code successfully Copied'); },
-          (msg) => { console.log(`fail: `);dispMsg('QR Code copy failed'); }
+          () => { console.log("success");dispMsg('QR Code successfully Copied', 3000); },
+          (msg) => { console.log(`fail: `);dispMsg('QR Code copy failed', 3000); }
         );
       };
 
@@ -2469,16 +2495,17 @@ document.getElementById('btn_copy_QR').addEventListener('click',copyImage);
 document.getElementById('btn_copy_URL').addEventListener('click', function(e) {
 	console.log('CopyURL button clicked!!');
 	if (!navigator.clipboard) {
-		dispMsg("[Copy URL] is not available on this bowser.");
+		dispMsg("[Copy URL] is not available on this bowser.", 3000);
 		return;
 	}
 	const elURL = document.getElementById('URL');
 	const txt = elURL.textContent;
 	navigator.clipboard.writeText(txt).then( () => {
-		dispMsg('URL successfully Copied');
+		dispMsg('URL successfully Copied', 3000);
 	}
 	, () => {
 		dispMsg('Copy failure');
+		dispMsg('URL copy failed.', 3000);
 	}
 	);
 });
@@ -2492,6 +2519,7 @@ document.getElementById('tempo_type').addEventListener('click', function(e) {
 });
 
 window.addEventListener("load", (event) => {
+	isPC = chkIfPC();  //PCかスマホかの判定
 	elTempoTxt.font = "20pt sans-serif";
 	//  drawBall(xx0 + ( Beat - 1) * xpitch, cvMain.height - 0.5 * ball_height);
 	setTimeout( () => {
@@ -2499,30 +2527,28 @@ window.addEventListener("load", (event) => {
 		drawBall(xx0 + (Beat - 1) * xpitch, cvMain.height - 0.5 * ball_height);
 	}
 	, 700);
+	
 }
 );
 
 //====↑イベントリスナー関連　ここまで =================
 
 //-----初期化コードの続き---以後の関数は確認後に場所を移すこと
-if (DEBUG)
-	console.log(`初期コード終了後のパラメータ`);
-if (DEBUG)
-	console.log(`Normal 【${s_beatStr[0]}】  Advanced 【${s_beatStr[1]}】　current【${beatStr}】
+if (DEBUG)  console.log(`この端末は${isPC? 'PC':'SmartPhone'}です。`);
+
+if (DEBUG)  console.log(`初期コード終了後のパラメータ`);
+if (DEBUG)  console.log(`Normal 【${s_beatStr[0]}】  Advanced 【${s_beatStr[1]}】　current【${beatStr}】
 	isNormalBeat ${isNormalBeat} ${isNormalMode?'ノーマルモード':'ADモード'}`);
 
 BPM = toBPM(MM);
-if (DEBUG)
-	console.log(`MM = ${MM}  BPM = ${BPM}`);
+if (DEBUG)  console.log(`MM = ${MM}  BPM = ${BPM}`);
 
 makeBeatArray(beatStr, motionType);
-if (DEBUG)
-	console.log(`Normal 【${s_beatStr[0]}】  Advanced 【${s_beatStr[1]}】　current【${beatStr}】
+if (DEBUG) console.log(`Normal 【${s_beatStr[0]}】  Advanced 【${s_beatStr[1]}】　current【${beatStr}】
 	isNormalBeat ${isNormalBeat} ${isNormalMode?'ノーマルモード':'ADモード'}`);
 pushPara(isNormalBeat ? 0 : 1)
 
-if (DEBUG)
-	console.log(`----
+if (DEBUG) console.log(`----
 	Normal 【${s_beatStr[0]}】  Advanced 【${s_beatStr[1]}】　current【${beatStr}】
 	isNormalBeat ${isNormalBeat} ${isNormalMode?'ノーマルモード':'ADモード'}`);
 
@@ -2535,13 +2561,11 @@ if (isNormalMode) {
 } else {
 	setParaADSheet();
 }
-if (DEBUG)
-	console.log(`Normal 【${s_beatStr[0]}】  Advanced 【${s_beatStr[1]}】　current【${beatStr}】
+if (DEBUG) console.log(`Normal 【${s_beatStr[0]}】  Advanced 【${s_beatStr[1]}】　current【${beatStr}】
 	isNormalBeat ${isNormalBeat} ${isNormalMode?'ノーマルモード':'ADモード'}`);
 setTheme();
 
-if (DEBUG)
-	console.log(`Normal 【${s_beatStr[0]}】  Advanced 【${s_beatStr[1]}】　current【${beatStr}】
+if (DEBUG) console.log(`Normal 【${s_beatStr[0]}】  Advanced 【${s_beatStr[1]}】　current【${beatStr}】
 	isNormalBeat ${isNormalBeat} ${isNormalMode?'ノーマルモード':'ADモード'}`);
 
 setTempo();
