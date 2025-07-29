@@ -1241,7 +1241,7 @@ function long_press(el, nf, lf, sec) {
 	let longtap = false;
 	let touch = false;
 	let timer;
-	el.addEventListener('pointerdown', () => {
+	el.addEventListener('touchstart', () => {
 		touch = true;
 		longtap = false;
 		timer = setTimeout( () => {
@@ -1251,7 +1251,7 @@ function long_press(el, nf, lf, sec) {
 		, sec);
 	}
 	)
-	el.addEventListener('pointerup', () => {
+	el.addEventListener('touchend', () => {
 		if (!longtap) {
 			clearTimeout(timer);
 			nf();
@@ -1261,7 +1261,7 @@ function long_press(el, nf, lf, sec) {
 	}
 	)
 
-	el.addEventListener('pointermove', () => {
+	el.addEventListener('touchmove', () => {
 		if (touch) return;
 		longclick = false;
 		timer = setTimeout( () => {
@@ -2164,13 +2164,13 @@ const handleVisibilityChange = () => {
 
 //■■■■■■■■■イベントリスナー関連■■■■■■■■■■■
 //メインキャンバスのイベントリスナーの設定**********************************
-cvMain.addEventListener('pointerdown', mcToucStart);
+cvMain.addEventListener('touchstart', mcToucStart);
 //cvMain.addEventListener('mousedown', mcMouseDown);
 //cvMain.addEventListener('touchmove', mcMove);
-cvMain.addEventListener('pointermove', mcMouseMove);
+cvMain.addEventListener('touchmove', mcMouseMove);
 //cvMain.addEventListener('touchend', mcMouseUp);
 //処理をmcMouseUpと同じにした
-cvMain.addEventListener('pointerup', mcMouseUp);
+cvMain.addEventListener('touchend', mcMouseUp);
 //----テンポUP/Downボタンをタップ/長押ししたときの処理
 long_press(elTempoUp, tempoUpNormal, tempoUpLong, 500);
 long_press(elTempoDown, tempoDownNormal, tempoDownLong, 500);
@@ -2192,7 +2192,7 @@ elDivTempoList.addEventListener('change', function(e) {
 
 //タッピングボタン
 //elTap.addEventListener('click', Tapping);
-elTap.addEventListener('pointerdown', Tapping);
+elTap.addEventListener('touchstart', Tapping);
 
 //拍子エリアのイベントリスナーの設定***************************************
 long_press(cvBeat, clickCvBeat, l_clickCvBeat, 600);
