@@ -152,6 +152,11 @@ select{
     margin-left:2em;
 }
 
+#radio_timing{
+	font-size:3vh;
+	margin-left:3mm;
+}
+
 .ButtonText{
      font-size:3vh;
     font-weight:bold;
