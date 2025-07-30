@@ -310,3 +310,15 @@ select{
 	margin:mm 3mm;
 	padding:1mm;
 }
+
+#chk_line{
+	position:absolute;
+	left:4px;
+	top:50%;
+	width:18px;
+	height:18px;
+	border: solid 2px #165e83;
+	border-radius: 5px;
+
+
+}
