@@ -77,15 +77,28 @@
 			<span class="btn" id="preview0">Preview</span>
 
 		</div>
-
-		Click Sound<br>
+		◆Motion(Takt) Type<br>
+		<div class="radiorow">
+		<input type="radio" value=1 name="dbradio" checked/>Beat&nbsp;
+		<input type="radio" value=2 name="dbradio" />1/2&nbsp;
+		<input type="radio" value=3 name="dbradio" />1/3&nbsp;
+		</div>
+		<br>
+		◆Click Sound<br>
 		<div class="radiorow">
 		<input type="radio" value="1" name="radiosound" checked />ON&nbsp;
 		<input type="radio" value="0" name="radiosound"/>OFF
 		</div>
-
-		Click Sound Timing<br>
+&nbsp;Type
 		<div class="radiorow">
+		<input type="radio" value=1 name="dsradio" checked/>Beat</br>
+		<input type="radio" value=2 name="dsradio" />1/2&nbsp;
+		<input type="radio" value=3 name="dsradio" />1/3&nbsp;
+		<input type="radio" value=4 name="dsradio" />1/4&nbsp;
+		</div>
+<br>
+		◆Click Sound Timing<br>
+		<div id="radio_timing">
 		<small>Late</small>
 		<input type="radio" value="0" name="radiotiming"/>
 		<input type="radio" value="1" name="radiotiming"/>
@@ -100,23 +113,10 @@
 		</div>
 <br>
 
-		Click Sound<br>
-		<div class="radiorow">
-		<input type="radio" value=1 name="dsradio" checked/>Beat</br>
-		<input type="radio" value=2 name="dsradio" />1/2&nbsp;
-		<input type="radio" value=3 name="dsradio" />1/3&nbsp;
-		<input type="radio" value=4 name="dsradio" />1/4&nbsp;
-		</div>
 
-		Motion（Takt）<br>
-		<div class="radiorow">
-		<input type="radio" value=1 name="dbradio" checked/>Beat&nbsp;
-		<input type="radio" value=2 name="dbradio" />1/2&nbsp;
-		<input type="radio" value=3 name="dbradio" />1/3&nbsp;
-		</div>
-		<br>
+
 		<div id="wakelockdiv">
-		Waiting Time to Start<br>
+		◆Waiting Time to Start<br>
 		<div class="radiorow">
 		<input type="radio" value="0" name="waitingtime"  checked/>0 sec&nbsp;
 		<input type="radio" value="2000" name="waitingtime" />2 sec&nbsp;
@@ -178,14 +178,14 @@
 		
 		<br>
 		<div>
-		Measure Structure<br>
+		◆Measure Structure<br>
 		<div class="form1">
 		<input id="ex_beat_str" type="text" maxlength="15"  size="10" value="1111">
 		</div>
 		</div>
 	</br>
 		<div>
-		Motion</br>
+		◆Motion</br>
 			<div class="form1">
 			<input type="radio" name="motion_type" value="0" checked />Beat
 			<input type="radio" name="motion_type" value="1" />Note
@@ -193,7 +193,7 @@
 		</div>
 	</br>
 		<div>
-		Click Sound<br>
+		◆Click Sound<br>
 			<div class="form1">
 			<input type="radio" name="click_type" value="0"  />None</br>
 			<input type="radio" name="click_type" value="1" checked/>Beat
