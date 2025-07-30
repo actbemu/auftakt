@@ -11,6 +11,9 @@
 PCで、マウスDownでないときもスワイプ（move）処理が行われる。
 別モードの設定画面が現れることがある。
 
+1/3,1/4ライン表示関連
+静止中、チェックボックスのチェックを外したとき、線だけ消せないので、結局キャンバスクリアということになる。
+ボール描画、resize処理と兼ねることはできないか。→setThemeの中で、ラインとボールのセッティングを行うようにする。
 
   
 ●ユーザインタフェースに関すること。
@@ -118,6 +121,7 @@ const elTempoDown = document.getElementById('tempoAdjdown');	//↓
 const elTap = document.getElementById('btnTAP');	//TAPボタン
 const elDivTempoList = document.getElementById('divTempoList');	//テンポリストのdivエレメント
 const elTempoList = document.getElementById('tempoList');	//テンポリストのエレメント
+const elChkLine = document.getElementById('chk_line');	//1/3,1/4ライン表示チェックボックス
 const elMsgBox = document.getElementById('msgbox');	//メッセージボックス
 const elModeChange = document.getElementById('mode_change_alert');	//設定モード変更時のアラート画面
 const elBtnMdSW = document.getElementById('btn_mode_switch');	//モード変更ボタン
@@ -174,6 +178,7 @@ let start_idx = 0;	//開始拍の拍運動配列インデクスmakeBeatArrayで�
 let exBeat_idx = 0	//拍運動配列のインデクス
 let duration0;
 let maxHeight0;
+let maxH0;
 //==========================
 //新旧パラメータ互換性関連
 let Beat;	//拍子（単純拍子）
@@ -415,7 +420,8 @@ function timeStampToAudioContextTime(timeStamp) {
 
 //表示領域の描画===========================================
 function resizeCanvas() {
-	const wrapper = document.querySelector('.wrapper');
+	//const wrapper = document.querySelector('.wrapper');
+	const wrapper = document.getElementById('main_wrap');
 	//let w = wrapper.clientWidth;    //wrapper.widthでは値が取得できなかった
 	//let h = wrapper.clientHeight;
 	//if(DEBUG) console.log('wrapper.clientWidth:' + wrapper.clientWidth);
@@ -824,9 +830,9 @@ function mcTouchEnd(event) {
 	if (f_longtap) {
 		touch = false;
 	} else {
-		if (!isClick) return;
+		if(!isClick) return;
 		//クリックと判断
-		if (isMoving) {
+		if(isMoving) {
 			//Stop ■ストップ操作
 			metroStop();
 		} else {
@@ -950,7 +956,7 @@ function dispShareSheet() {
 function drawMark() {
 	//描画エリアの消去（クリア）
 	ctxMain.clearRect(0, 0, cvMain.width, cvMain.height);
-	//キャンバス内全面クリア
+
 	let flying_time = beatTick(BPM) * duration[exBeat_idx];
 	//現在運動の周期（予定飛行時間）[msec] 途中で倍になる？
 	flying_time = downBeatTimeStamp - upBeatTimeStamp;
@@ -971,6 +977,8 @@ function drawMark() {
 		maxH = (1 - (MM - 120) / 500) * maxH;
 	}
 
+	//maxHをグローバル変数に保存
+	maxH0 = maxH;
 	//ボールを表示
 	drawBall(xxU + t * (xxD - xxU), (cvMain.height - 0.5 * ball_height) - y * maxH);
 	no_of_draw++;  //デバグ用描画数カウンタ
@@ -1013,6 +1021,8 @@ function drawMark() {
 			ctxMain.clearRect(0, 0, cvMain.width, cvMain.height);
 			//指標を次の拍点に置いて停止
 			drawBall(xxD, cvMain.height - 0.5 * ball_height);
+			//1/3,1/4ライン表示
+			drawMarkerLines(maxH);
 			return;
 
 			//サウンド予約取り消し
@@ -1204,13 +1214,13 @@ function metroStart() {
 //動作 Stop------------------------------------------------------
 function metroStop() {
 	isMoving = false;
+	//フラグを立てて次の拍点で停止させる
 	f_stop = true;
-	//次の拍点で停止させる
+	//設定シートのPreviewボタン表示
 	elPreview0.textContent = 'Preview';
 	elPreview1.textContent = 'Preview';
 	dispMsg('Halting...', 1500);
-	if (DEBUG)
-		console.log('停止フラグ：' + f_stop);
+	if (DEBUG) console.log('停止フラグ：' + f_stop);
 }
 
 //サウンド予約=============================================
@@ -1319,17 +1329,20 @@ function drawCounDownChart() {
 //開始待機画面描画-------------------------------------------------------
 //アウフタクトにボールを置いて、rate(0 - 1)に相当するグラフを描画
 //rateを0にすると、単にアウフタクト（最終拍）にボールを置く関数として使える。
+//1/3,1/4ライン表示も行う
 function drawWaiting(rate) {
 	if(DEBUG) console.log('■drawWaiting()');
 	//ボールを最終拍においてスタンバイ
-	ctxMain.clearRect(0, 0, cvMain.width, cvMain.height);
 	//キャンバス内全面クリア
+	ctxMain.clearRect(0, 0, cvMain.width, cvMain.height);
+
 	//ball.draw(xx0 + ( Beat - 1) * xpitch, cvMain.height - ball.radius);
 	//if (DEBUG)console.log('xx0: ' + xx0 + 'cvMain.height:' + cvMain.height);
 	drawBall(xx0 + (Beat - 1) * xpitch, cvMain.height - 0.5 * ball_height);
 
 	//３連符(0.88888)、１６分音符(0.75)のライン描画
-	//drawMarkerLines(maxH); //maxHが決まらないので
+	//let maxH = cvMain.height - 2.5 * ball_height; //maxHが決まらない場合
+	drawMarkerLines(maxH0);
 	
 	//パイチャート描画
 	if (rate > 0.01) {
@@ -1470,7 +1483,8 @@ function drawLine(xx0, yy0, xx1, yy1, col){
 
 function drawMarkerLines(max_height) {
 	//3３連符(0.88888)、１６分音符(0.75)のライン描画
-	if(isNormalMode && motionType == 0 && MM <= 120){
+	
+	if(isNormalMode && motionType == 0 && elChkLine.checked){
 		const lineH3 = 0.8888 * max_height;
 		const lineH16 = 0.75 * max_height;
 		ctxMain.font = "8pt sans-serif";
@@ -1740,10 +1754,13 @@ function setTheme() {
 	//拍子エリアセット
 	drawExBeat(beatStr, clickType);
 	//タイトルバーと枠線の色
+	elWrap.style.borderWidth = '2px';
 	elWrap.style.borderColor = bgcol;
 	elMainTitleBar.style.backgroundColor = bgcol;
 	elMainTitleBar.textContent = isNormalMode?'Auftakt5--Normal Mode':'Auftakt5--Advanced Mode';
-	
+
+	//待機状態表示
+	drawWaiting(0);
 }
 
 //画面のテンポ表示、リストボックスなどの選択状態を更新する
@@ -2074,6 +2091,8 @@ if (DEBUG) {
 
 //画面セットアップ
 resizeCanvas();
+maxH0 = cvMain.height - 2.5 * ball_height;
+
 setTempo();
 if (DEBUG)
 	console.log(`2115画面セットアップの直後
@@ -2262,6 +2281,8 @@ elBtnMdSW.addEventListener('click', function(e) {
 	if (DEBUG) console.log(`Normal 【${s_beatStr[0]}】  Advanced 【${s_beatStr[1]}】　current【${beatStr}】 isNormalBeat ${isNormalBeat}`);
 	//該当するモードのカラーに変更して設定シートを開く
 	openSettingSheet()
+	//マークラインのチェックボックス表示コントロール
+	elChkLine.style.display = isNormalMode?'inline':'none';
 });
 
 //モード変更アラートでキャンセルボタンが押されたとき
@@ -2516,6 +2537,12 @@ document.getElementById('tempo_type').addEventListener('click', function(e) {
 	//テンポのタイプをクリックしたときだけ。ここだけ
 	tempoType = tempoType == 0? 1: 0;
 	setTempo();
+});
+
+//1/3,1/4ライン表示チェックボックスがクリックされたとき
+elChkLine.addEventListener('change', function(e){
+	if(DEBUG) console.log(`◆Line checkbox clicked! ${isMoving?'動作中': '停止中'}`);
+	if(!isMoving) setTheme();
 });
 
 window.addEventListener("load", (event) => {
