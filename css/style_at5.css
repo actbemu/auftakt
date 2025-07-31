@@ -116,7 +116,7 @@ position:relative;
 
 
 #div_tempo { display: table; width: 100%;}/*テンポ関連表示、ボタンエリア*/
-#div_tempo_txt { display: table-cell; text-align: center; }
+#div_tempo_txt { display: table-cell; text-align: left; width:8em; }
 #div_tempo_btn { display: table-cell; text-align: right; }
 
 #divTempoList{
@@ -150,6 +150,11 @@ select{
 .radiorow{
     font-size:3.2vh;
     margin-left:2em;
+}
+
+#radio_timing{
+	font-size:3vh;
+	margin-left:3mm;
 }
 
 .ButtonText{
@@ -301,3 +306,24 @@ select{
 /*QRシートのコピーボタン*/
 .copy_button{text-align:right;}
 #btn_copy_QR{text-align:right}
+
+#table_tempo_btn{
+	border-collapse: collapse;
+}
+
+.td_tempo_btn{
+	margin:mm 3mm;
+	padding:1mm;
+}
+
+#chk_line{
+	position:absolute;
+	left:4px;
+	top:50%;
+	width:18px;
+	height:18px;
+	border: solid 2px #165e83;
+	border-radius: 5px;
+
+
+}
