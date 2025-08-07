@@ -973,9 +973,16 @@ function drawMark() {
 		no_of_draw = 0;
 
 		if (f_stop && isBeatPoint) {
+			//■停止処理
 			//ストップ操作直後の拍点で停止Stop
 			//アニメーション停止
 			window.cancelAnimationFrame(rafBall);
+			//予約されたサウンドを停止したいが…
+			//osc.stop();
+			//gain.gain.value = 0;
+			//接続: osc => gain => dest.
+			//osc.connect(gain).connect(context.destination);
+			//isOsc = false;
 			//描画エリアの消去（クリア）
 			ctxMain.clearRect(0, 0, cvMain.width, cvMain.height);
 			//指標を次の拍点に置いて停止
@@ -1098,14 +1105,14 @@ function rsvClickUntilNextBeat(currentTS) {
 }
 
 //メトロノームのON/OFF　開始/停止---------------------------------------------
+//★将来的には、引数で開始拍位置を指定できるようにする。
+//クリックサウンドスクリプトで、アウフタクトから始まるのに対応するため。
+
 function metroStart() {
-	//
-	//現在モードの設定シートの設定を取得しパラメータに反映する。
-	//pushPara(isNormalMode? 0:1);
 	elPreview0.textContent = 'Stop';
 	elPreview1.textContent = 'Stop';
+	//初回タップ時の1回のみオシレータ開始、基準タイムスタンプ取得
 	if (!isOsc) {
-		//初回タップ時のみの処理
 		//オシレータ開始（この段階で音量は０）
 		//ユーザ操作の後にスタートさせる必要があるのでここに置いた。
 		osc.start();
@@ -1113,10 +1120,9 @@ function metroStart() {
 		//オシレータ開始時のタイムスタンプを基準baseTimeStampとする
 		baseTimeStamp = performance.now() - context.currentTime * 1000;
 	}
+	//初回タップ時のみWake Lock起動
 	if (f_wakelock && isSupported) {
-		//wakelock = enableWakeLock();
 		requestWakeLock();
-		//console.log('enableWakeLock:' + wakelock.loked);
 		dispMsg('Screen Wake Lock enabled. The screen will stay on.', 3000);
 		f_wakelock = false;
 	}
@@ -1128,11 +1134,12 @@ function metroStart() {
 		console.log(`■metroStart■`);
 		showCurrentParm();
 	}
+	//タイムスタンプ処理
 	//現在時刻を拍点時刻にする
 	currentClickTimeStamp = currentTimeStamp();
 	upBeatTimeStamp = currentTimeStamp();
 
-	//テンポリスト表示を消す
+	//テンポリストボックス表示を消す
 	elDivTempoList.style.display = 'none';
 
 	//アニメーション
@@ -1169,7 +1176,7 @@ function metroStart() {
 		rsvByCTarray(nextClickTimeStamp);
 	}
 	
-	//次の着地点のタイムスタンプ 不要かも
+	//次の着地点のタイムスタンプ
 	downBeatTimeStamp = upBeatTimeStamp + beatTick(BPM) * duration[exBeat_idx];
 	//デバグ用どこかでmotion用にnextClickTimeStampを使っているかも
 
@@ -1195,7 +1202,7 @@ function metroStop() {
 	//設定シートのPreviewボタン表示
 	elPreview0.textContent = 'Preview';
 	elPreview1.textContent = 'Preview';
-	dispMsg('Halting...', 1500);
+	dispMsg('Halting...', 1000);
 	if (DEBUG) console.log('停止フラグ：' + f_stop);
 }
 
@@ -1587,16 +1594,6 @@ function showCurrentParm() {
 `)
 }
 
-//通常モード、　ＡＤモードの色の切り替え-----------------------------------------
-function changeColorSet() {
-	//isNormalModeに基づいて背景色などを変更
-	//cvMain、cvBeat、elTempoTxt、elTempoType
-	if (isNormalMode) {//通常モード
-		
-	} else {//ADモード
-	}
-}
-
 //拍子エリアタップの処理----------------------------------------------------
 function clickCvBeat() {
 	if (DEBUG)console.log(`◆cvBeat clicked ${isNormalMode?'ノーマルモード':'ADモード'}`);
@@ -1855,7 +1852,7 @@ function makeClickTimingArray(beatStr, clickSoundStr) {
 	let acc = 0;  //音価アキュムレータ
 	//正規表現の置き換えで、空白、/（スラッシュ）を除去
 	const pattern = /[ _\/]/g;
-	let csString = clickSoundStr.(pattern, '');
+	let csString = clickSoundStr.replace(pattern, '');
 	if(DEBUG) console.log(`『${clickSoundStr}』→『${csString}』`)  //OK!
 	//配列の初期化
 	aryCT.length = 0;
@@ -1976,20 +1973,25 @@ let strMM = url_params.get('mm');
 let strDivSound=url_params.get('ds');  //サウンド分割(1～4)
 let strDivBeat=url_params.get('db');  //分割振り(1～3)
 */
-let strBeatStr = url_params.get('exb');
+
 //拍子構成文字列(1～3)
+let strBeatStr = url_params.get('exb');
+
 
 //以下は０も含むので注意
-let strSFlag = url_params.get('bs');
+
 //サウンドON/OFF(0/1)
-let strBST = url_params.get('bst');
+let strSFlag = url_params.get('bs');
 //サウンドタイミング調整(0～6)7段階
-let strWaiting = url_params.get('wt');
+let strBST = url_params.get('bst');
 //待ち時間(0,1,2)
-let strMotionType = url_params.get('mt');
+let strWaiting = url_params.get('wt');
 //動きのタイプ(0,1)
+let strMotionType = url_params.get('mt');
+//クリックサウンドの鳴らし方(0～5, 9)
 let strClickType = url_params.get('ct');
-//クリックサウンドの鳴らし方(0～5)
+//クリックサウンドスクリプト
+let strCSScript = url_params.get('cs');
 
 const pattern = "[^0-9]/g";
 //置き換えのパターン、数字以外は半角0に置き換える
@@ -2109,6 +2111,11 @@ if (strBeatStr) {
 		elBeatStr.value = strBeatStr;
 		beatStr = strBeatStr;
 	}
+}
+//クリックサウンドスクリプト
+if(strCSScript){
+	clickType = 9;
+	elCTScript.value = strCSScript;
 }
 
 f_sound = clickType > 0 ? true : false;
@@ -2610,6 +2617,8 @@ if (DEBUG) console.log(`----
 showCurrentParm();
 //URLパラメータで、変拍子指定されている場合は、カラーテーマをＡＤモードで起動
 isNormalMode = isNormalBeat;
+//URLパラメータでクリックサウンドスクリプトが指定されていたら、clickType==9 ならADモード。
+if(clickType == 9) isNormalMode = false;
 //isNormalBeatでもAD設定として扱うことがあるのでmakeBeatArrayの外で設定する。
 if (isNormalMode) {
 	setParaNSheet();
@@ -2625,14 +2634,15 @@ if (DEBUG) console.log(`Normal 【${s_beatStr[0]}】  Advanced 【${s_beatStr[1]
 
 setTempo();
 
-//上記関数のテスト
+//テンポに該当するインデクスを求める関数のテスト
+/*
 let vv0 = 56;
 let vv = getIndexOfAryMM(vv0);
 if(DEBUG) console.log(`入力値:${vv0} aryMM_idx:${vv}`);
 if(DEBUG) console.log(`aryMM[]=${aryMM[vv]}`);
-
+*/
 //クリックサウンドスクリプト関連テスト
-
+/*
 clickType = 9;
 //ボレロの配列
 makeClickTimingArray('33', '1[111]_1[111]_11_/_1[111]_1[111]_[111111]');
@@ -2641,5 +2651,5 @@ for(let i = 0; i < aryCT.length; i++){
 	console.log(`${i}:${aryCT[i]}
 	`);
 }
-
+*/
 //================ end of script ===============================
