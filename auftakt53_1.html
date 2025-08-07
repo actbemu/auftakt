@@ -1,0 +1,286 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<!-- ver.2　Rev.5 QRコード画面、ボタン画像ではなくCSSで対応-->
+    <meta charset="utf-8">
+	<meta name="keywords" content="Metrononme, Auftakt">
+    <link rel="stylesheet" href="./css/style_at53_1.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data:; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+	<script type="text/javascript" src="./auftakt53_1.js" defer ></script>
+	
+<!-- ファビコンなどの設定
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="./images/apple-touch-icon.png" sizes="180x180">
+<link rel="icon" type="image/png" href="./images/android-touch-icon.png" sizes="192x192">
+ <link rel="manifest" href="/manifest.json">
+
+	<link rel="shortcut icon" href="./favicon.ico">
+     <link rel="icon" href="./favicon.ico">
+-->
+<title>Metronome: Auftakt 5 ver.2 Rev.6</title>
+</head>
+<body>
+
+    <div id="main_wrap">
+		<div id="main_title_bar">Auftakt5</div>
+        <canvas id="myCanvas"></canvas>
+        <canvas id="beatCanvas"></canvas>
+    </div>
+<!--	<div class="wrapper"> -->
+	<!-- メッセージボックス -->
+			<div id="msgbox">
+				Metronome： Auftakt5 Ver.2R6 @K. Kimura
+			</div>
+<!--	</div> -->
+
+    <!-- TEMPO表示、プルダウンリスト表示ボタン -->
+    <div id="div_tempo">
+		<div id="div_tempo_txt">
+			<span id="tempo">
+	        60
+			</span>
+			<span id="tempo_type">
+				<!-- 表示数値が拍のテンポか、分割振りや変拍子の音符のテンポかを示す。Beat/Note -->
+				/B
+			</span>
+		</div>
+		<div id="div_tempo_btn">
+			<!-- TAPボタンのレイアウト安定化させるため表組みにしてみる -->
+			<table id="table_tempo_btn">
+			<tr>
+			<!-- テンポ調節↑／↓ボタン -->
+			<td class="td_tempo_btn"><span  class="btnText" id="tempoAdjup">↑</span>&nbsp;</td>
+			<td class="td_tempo_btn"><span class="btnText" id="tempoAdjdown">↓</span>&nbsp;</td>
+			<!-- TAPボタン -->
+			<td class="td_tempo_btn"><span class="btnText" id="btnTAP">TAP</span></td>
+			</tr>
+			</table>
+		</div>
+	</div>
+    <!-- 1/3,1/4ライン表示チェックボックス -->
+<input id="chk_line" type="checkbox" />
+
+	
+    <!-- 設定パネル -->
+    <div id="setting">
+		<div class="titlebar">
+			<div  class="sheet_title">
+				Setting(Normal Mode)
+			</div>
+			<div  class="close_button"  id="btn_close_setting">
+				✕
+			</div>
+		</div>
+		<div align="right">
+			<span class="btn" id="preview0">Preview</span>
+
+		</div>
+		◆Motion(Takt) Type<br>
+		<div class="radiorow">
+		<input type="radio" value=1 name="dbradio" checked/>Beat&nbsp;
+		<input type="radio" value=2 name="dbradio" />1/2&nbsp;
+		<input type="radio" value=3 name="dbradio" />1/3&nbsp;
+		</div>
+		<br>
+		◆Click Sound<br>
+		<div class="radiorow">
+		<input type="radio" value="1" name="radiosound" checked />ON&nbsp;
+		<input type="radio" value="0" name="radiosound"/>OFF
+		</div>
+&nbsp;Type
+		<div class="radiorow">
+		<input type="radio" value=1 name="dsradio" checked/>Beat</br>
+		<input type="radio" value=2 name="dsradio" />1/2&nbsp;
+		<input type="radio" value=3 name="dsradio" />1/3&nbsp;
+		<input type="radio" value=4 name="dsradio" />1/4&nbsp;
+		</div>
+<br>
+		◆Click Sound Timing<br>
+		<div id="radio_timing">
+		<small>Late</small>
+		<input type="radio" value="0" name="radiotiming"/>
+		<input type="radio" value="1" name="radiotiming"/>
+		<input type="radio" value="2" name="radiotiming" />
+		
+		<input type="radio" value="3" name="radiotiming"  checked/>
+		
+		<input type="radio" value="4" name="radiotiming" />
+		<input type="radio" value="5" name="radiotiming" />
+		<input type="radio" value="6" name="radiotiming"/>
+		<small>Early</small>
+		</div>
+<br>
+
+
+
+		<div id="wakelockdiv">
+		◆Waiting Time to Start<br>
+		<div class="radiorow">
+		<input type="radio" value="0" name="waitingtime"  checked/>0 sec&nbsp;
+		<input type="radio" value="2000" name="waitingtime" />2 sec&nbsp;
+		<input type="radio" value="4000" name="waitingtime" />4 sec&nbsp;
+		
+		</div>
+		</div>
+		<br>
+		<div align="right">
+			<span class="btn" id="btn_share0">Share</span>
+			<span class="btn" id="btn_Help">Help</span>
+		</div>
+
+    </div>  <!--  設定画面ここまで  -->
+
+    <!-- QRコード表示パネル -->
+	<div id="QRsheet">
+		<div class="titlebar">
+			<div  class="sheet_title">
+				Share
+			</div>
+			<div  class="close_button"  id="btn_close_QR">
+				✕
+			</div>
+		</div>
+
+		<div id="QRtitle">
+			You can use the following QR code and URL to record and share your settings.
+		</div>
+		<br>
+		<div class="copy_button">
+		<div id="QR"></div>
+		<span class="btn" id="btn_copy_QR">Copy QR</span>
+		</div>
+	</br>
+		<div id="URL">https://actbemu.github.io/auftakt/auftakt52_4.html</div>
+		<div class="copy_button">
+		<span class="btn" id="btn_copy_URL">Copy URL</span>
+		</div>
+	</br>
+
+	</div>
+
+    <!-- AD設定パネル -->
+	<div id="ad_setting">
+		<div class="titlebar">
+			<div  class="sheet_title">
+				Setting(Advanced Mode)
+			</div>
+			<div  class="close_button"  id="btn_close_ex">
+				✕
+			</div>
+		</div>
+
+		<div align="right">
+			<span class="btn" id="preview1">Preview</span>
+
+		</div>
+		
+		</br>
+		<div>
+		◆Measure Structure<br>
+		<div class="form1">
+		<input id="ex_beat_str" type="text" maxlength="40"  size="10" value="1111">
+		</div>
+		
+		
+		<div>
+		◆Motion</br>
+			<div class="form1">
+			<input type="radio" name="motion_type" value="0" checked />Beat
+			<input type="radio" name="motion_type" value="1" />Note
+			</div>
+		</div>
+	
+		<div>
+		◆Click Sound<br>
+			<div class="form1">
+				<input type="radio" name="click_type" value="0"  />None</br>
+				<input type="radio" name="click_type" value="1" checked/>Beat
+				<div class="form2" id="normal_beat_division">
+					&nbsp;&nbsp;&nbsp;<input type="radio" name="click_type" value="2" />1/2&nbsp;
+					<input type="radio" name="click_type" value="3" />1/3&nbsp;
+					<input type="radio" name="click_type" value="4" />1/4
+				</div>
+				<input type="radio" name="click_type" value="5" />Note<br>
+				<input type="radio" name="click_type" value="9" />Script<br>
+				<input id="cs_str" type="text" maxlength="100"  size="8" value="01010101">
+		</div>
+		</div>
+		</div>
+	
+		<div align="right">
+			<span class="btn" id="btn_share1">Share</span>
+		</div>
+	</div>
+
+	<!-- 設定モード切替プロンプト -->
+	<div id="mode_change_alert" align="center">
+		
+		<div class="titlebar">
+			<div  class="sheet_title">
+				Switch Setting Mode
+			</div>
+			<div  class="close_button"  id="btn_mChange_close">
+				✕
+			</div>
+		</div>
+		<br>
+		<div align="cendter">
+			<p>
+			<span class="btn" id="btn_mode_switch">Switch to Advanced Mode</span></p><br>
+			<p><span class="btn" id="btn_mode_cancel">Cancel</span></p>
+		</div>
+	</div>
+  
+    <!-- TEMPOプルダウンリスト -->
+    <div id="divTempoList">
+        <select id="tempoList" size="8">
+		<option value="10">10</option>
+		<option value="20">20</option>
+		<option value="30">30</option>
+		<option value="35">35</option>
+		<option value="40">40</option>
+		<option value="42">42 Grave</option>
+		<option value="44">44</option>
+		<option value="46">46 Largo</option>
+		<option value="48">48</option>
+		<option value="50">50</option>
+		<option value="52">52 Adagio</option>
+		<option value="54">54</option>
+		<option value="56">56 Lento</option>
+		<option value="58">58</option>
+		<option value="60">60</option>
+		<option value="63">63</option>
+		<option value="66">66</option>
+		<option value="69">69</option>
+		<option value="72">72 Andante</option>
+		<option value="76">76</option>
+		<option value="80">80</option>
+		<option value="84">84</option>
+		<option value="88">88</option>
+		<option value="92">92</option>
+		<option value="96" selected>96 Moderato</option>
+		<option value="100">100</option>
+		<option value="104">104</option>
+		<option value="108">108 Allegretto</option>
+		<option value="112">112</option>
+		<option value="116">116</option>
+		<option value="120">120</option>
+		<option value="126">126</option>
+		<option value="132">132 Allegro</option>
+		<option value="138">138</option>
+		<option value="144">144</option>
+		<option value="152">152</option>
+		<option value="160">160 Vivace</option>
+		<option value="168">168</option>
+		<option value="176">176</option>
+		<option value="184">184 Presto</option>
+		<option value="192">192</option>
+		<option value="200">200</option>
+		<option value="208">208</option>
+        </select>
+    </div>
+	
+</body>
+</html>
