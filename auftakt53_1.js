@@ -5,19 +5,16 @@
 クリックサウンドスクリプト対応（Keepメモ参照）
 ADモードに実装する
 
-記録
+記録↓
+2025/08/08 20:32　埋め込みコマンドで任意のn連符、またしても一発で実装できた。
 2025/08/06 20:26　基本動作、一発で所望の動作確認できた。
 --
-今後、ADモードでのテキストボックス入力
-metroStartだけでなく、動作中の予約
-スクリプトが複数小節に渡る場合の予約方法
-(予約中のものが全部発火されたか検出できると楽)
 
 */
 
 //■■■■■■■ 定数・変数宣言、定義 ■■■■■■
 //----- グローバル変数の宣言・定義 -----------------
-const DEBUG = false;  //デバグ用 主にconsole表示 
+const DEBUG = true;  //デバグ用 主にconsole表示 
 var no_of_draw = 0;  //描画カウンタ
 
 //公開URL　　QRコード出力で使用
@@ -894,6 +891,9 @@ function dispShareSheet() {
 		txt += '&ct=' + clickType;
 	if (sdelay_idx != 3) {
 		txt += "&bst=" + sdelay_idx;
+	}
+	if(clickType ==9){
+		txt += "&cs=" + elCTScript.value;
 	}
 	//touch長押し：設定画面表示
 	//出力シート上にQRコード、URLを表示
@@ -1850,6 +1850,7 @@ function makeClickTimingArray(beatStr, clickSoundStr) {
 	let ch;  //取り出した文字
 	let nv = 1;  //積算単位音価
 	let acc = 0;  //音価アキュムレータ
+	let aryV = [];  //n連符のn保存用
 	//正規表現の置き換えで、空白、/（スラッシュ）を除去
 	const pattern = /[ _\/]/g;
 	let csString = clickSoundStr.replace(pattern, '');
@@ -1872,6 +1873,21 @@ function makeClickTimingArray(beatStr, clickSoundStr) {
 			aryCT[idx] = acc;
 			idx++;
 			acc += nv * ch;
+		}
+		else if(ch == '{'){
+			if(DEBUG)console.log(`「{」検出　i=${i}`);
+			i++;
+			ch = '';
+			while (csString.charAt(i) != '.') {
+				if(DEBUG)console.log(`   i=${i} ch=${csString.charAt(i)}`);
+				ch += csString.charAt(i++);
+			}
+			if(DEBUG)console.log(`${ch}連符　i=${i}`);
+			nv = nv / ch;
+			aryV.push(ch);
+		}
+		else if(ch == '}'){
+			nv = nv * aryV.pop();  //音価を元に戻す
 		}
 	}
 	return;
@@ -2652,4 +2668,13 @@ for(let i = 0; i < aryCT.length; i++){
 	`);
 }
 */
+clickType = 9;
+//n連符処理のチェック
+makeClickTimingArray('1111', '10{8.01111111}1/1111');
+if(DEBUG) console.log(`aryMM[]=${aryCT}`);
+for(let i = 0; i < aryCT.length; i++){
+	console.log(`${i}:${aryCT[i]}
+	`);
+}
+
 //================ end of script ===============================
