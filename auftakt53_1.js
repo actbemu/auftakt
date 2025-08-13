@@ -19,7 +19,7 @@ ADモードに実装する
 
 //■■■■■■■ 定数・変数宣言、定義 ■■■■■■
 //----- グローバル変数の宣言・定義 -----------------
-const DEBUG = false;  //デバグ用 主にconsole表示 
+const DEBUG = true;  //デバグ用 主にconsole表示 
 var no_of_draw = 0;  //描画カウンタ
 
 //公開URL　　QRコード出力で使用
@@ -1773,7 +1773,8 @@ function getURLPara(url) {
 	//クリックサウンドスクリプト
 	//このパラメータが指定されていたら必ずスクリプトモードにする
 	//すなわち、clickType = 9;isNormalMode = false;
-	if(strCSScript){
+	if(DEBUG){console.log(`《${strCSScript}》`)}
+	if(strCSScript.length > 0){
 		clickType = 9;
 		isNormalMode = false;
 		csScript = strCSScript;
@@ -1784,7 +1785,7 @@ function getURLPara(url) {
 	f_sound = clickType > 0 ? true : false;
 
 	//対応するモードのPULL用配列に格納
-	pullPara(isNormalMode? 0: 1);
+	pushPara(isNormalMode? 0: 1);
 	if (DEBUG) {
 		showCurrentParm('URL取得後パラメータ');
 	}
@@ -2160,7 +2161,7 @@ const handleVisibilityChange = () => {
 setDefaultPara();  //モード切替用push,pull配列に入れる
 //デフォルトはノーマルモード
 isNormalMode = true;
-pullPara(0);  //ノーマルモードのデフォルト値をグローバル変数にセット
+pullPara(0);  //ノーマルモードのデフォルト値をpullしてグローバル変数にセット
 isNormalBeat = true;
 BPM = toBPM(MM);
 
