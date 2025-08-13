@@ -6,20 +6,20 @@
 ADモードに実装する
 
 記録↓
+2025/08/13 13:30 細かいバグ潰し
+2025/08/13 11:40 初期化ルーチン整理
 2025/08/08 20:32　埋め込みコマンドで任意のn連符、またしても一発で実装できた。
 2025/08/06 20:26　基本動作、一発で所望の動作確認できた。
 --
-バグ
-ノーマルモードでもスクリプトが実行されてしまう→URLパラメータ起動したとき。
-ノーマルモードで設定変更しているうちに正常にもどる。→URLパラメータ取得後の動作をデバグ
-・初期化のなかで、いろいろパラメータをいじっている影響もある。
-
-PUSH、PULLにスクリプトが含まれていない。
+バグ？
+デバッグ用パラメータ一覧にクリックサウンドスクリプトが空文字のまま
+初回起動待機時、マウスクリックが反応しないことが多い
+常にmousemoveイベント処理が実行される。
 */
 
 //■■■■■■■ 定数・変数宣言、定義 ■■■■■■
 //----- グローバル変数の宣言・定義 -----------------
-const DEBUG = false;  //デバグ用 主にconsole表示 
+const DEBUG = true;  //デバグ用 主にconsole表示 
 var no_of_draw = 0;  //描画カウンタ
 
 //公開URL　　QRコード出力で使用
@@ -133,7 +133,7 @@ let maxHeight0;
 let maxH0;
 //==========================
 //新旧パラメータ互換性関連
-let Beat;	//拍子（単純拍子）
+let Beat;	//拍子（単純拍子）URLパラメータ取得のときだけ使う
 let clickType0 = clickType;	//クリック音 off→onに戻したときの復帰用
 //基本パラメータの保存用配列　0:Normal  1:Advanced
 let s_beatStr = [];
@@ -645,21 +645,21 @@ function mcMouseDown(event) {
 	//フラグリセット
 	f_longtap = false;
 	isClick = true;  //mouse_up/touch_end までの間にmoveしなければクリックと判断
+				//全くmoveしないというのは条件として厳しい
 	timer = setTimeout( () => {
 		//停止はclearInterval(timer)
 		//600msec間の累積移動量が小さければ長押し
 		if (DEBUG)
 			console.log(`◆mouse長押し：${isNormalMode ? 'Normal': 'AD'}設定画面表示`);
 		if ((travel <= travel0) && f_mousedown == true) {
+			//mouseupなどで使うフラグ立てる
 			f_longtap = true;
-			//mouseupなどで使う
-			//設定パネル表示
+			//モードに応じた設定パネル表示
 			f_mousedown = false;
 			if (isNormalMode) {
-				dispADSetting();
-				//dispElement(elAdSetting, true);
-			} else {
 				dispElement(elSetting, true);
+			} else {
+				dispADSetting();
 			}
 
 		}
@@ -783,9 +783,9 @@ function mcTouchEnd(event) {
 			metroStop();
 		} else {
 			//ボールを最終拍においてスタンバイ
-			let rate = 0;
-			if (start_wait > 0)  rate = 100;
-			drawWaiting(rate);
+			//let rate = 0;
+			//if (start_wait > 0)  rate = 1;
+			drawWaiting(start_wait == 0? 0: 1);
 			ct0 = performance.now();
 			//カウントダウンパイチャート描画タイマー起動
 			rafCDC = window.requestAnimationFrame(drawCounDownChart);
@@ -795,7 +795,7 @@ function mcTouchEnd(event) {
 }
 //マウスup時の処理--------------------------------------------------
 function mcMouseUp(event) {
-	if (DEBUG) console.log('◆Mouse Up');
+	if (DEBUG) console.log(`◆Mouse Up　travel=${travel} travel0=${travel0} isClick=${isClick}`);
 	clearInterval(timer);  //長押し判別タイマー停止
 	f_mousedown = false;
 
@@ -811,13 +811,14 @@ function mcMouseUp(event) {
 	if (f_longtap) {
 		touch = false;
 	} else {
-		if (!isClick){
+		if (travel >= 10){ //down中にポインタがズレたときはクリックとはみなさない。
 			return;
 		}
-
-		//クリックと判断
+		//ズレ（travel）が一定以下のときはクリックと判断
+		//動作中の場合は停止処理
 		if (isMoving) {
 			//Stop ■ストップ操作
+			if(DEBUG)console.log('→◆◆キャンバスクリック→動作停止！');
 			metroStop();
 			if (MM < 30) {
 				//アニメーション停止
@@ -831,15 +832,12 @@ function mcMouseUp(event) {
 				gain.gain.cancelScheduledValues(t1);
 				return;
 			}
+		//動作中でない場合は開始処理
 		} else {
-			console.log('停止フラグ　f_stop：' + f_stop);
-			//ボールを最終拍においてスタンバイ
-			let rate = 0;
-			if (start_wait > 0)
-				rate = 1;
-			drawWaiting(rate);
+			if(DEBUG)console.log('→◆◆キャンバスクリック→動作開始！');
+			drawWaiting(start_wait == 0? 0: 1);
 			ct0 = performance.now();
-			//描画タイマー起動
+			//パイチャート描画タイマー起動
 			rafCDC = window.requestAnimationFrame(drawCounDownChart);
 			f_rafCDC = true;
 		}
@@ -1288,8 +1286,7 @@ function drawCounDownChart() {
 		window.cancelAnimationFrame(rafCDC);
 		f_rafCDC = false;
 		if (DEBUG)
-			console.log('タイマー破棄　rafCDC:' + rafCDC);
-
+			console.log('待機パイチャート表示タイマー破棄　rafCDC:' + rafCDC);
 		metroStart();
 	} else {
 		//次の描画の予約
@@ -1300,16 +1297,16 @@ function drawCounDownChart() {
 
 //開始待機画面描画-------------------------------------------------------
 //アウフタクトにボールを置いて、rate(0 - 1)に相当するグラフを描画
-//rateを0にすると、単にアウフタクト（最終拍）にボールを置く関数として使える。
+//rafCDC割込みで呼ばれる
+//rate[pieの面積]を0にすると、単にアウフタクト（最終拍）にボールを置く関数として使える。
 //1/3,1/4ライン表示も行う
 function drawWaiting(rate) {
-	if(DEBUG) console.log('■drawWaiting()');
+	if(DEBUG) console.log('パイチャートアニメ表示■drawWaiting()');
 	//ボールを最終拍においてスタンバイ
 	//キャンバス内全面クリア
 	ctxMain.clearRect(0, 0, cvMain.width, cvMain.height);
 
-	//ball.draw(xx0 + ( Beat - 1) * xpitch, cvMain.height - ball.radius);
-	//if (DEBUG)console.log('xx0: ' + xx0 + 'cvMain.height:' + cvMain.height);
+	//ボールを最終拍に
 	drawBall(xx0 + (Beat - 1) * xpitch, cvMain.height - 0.5 * ball_height);
 
 	//３連符(0.88888)、１６分音符(0.75)のライン描画
@@ -1673,62 +1670,39 @@ function getURLPara(url) {
 	//クリックサウンドスクリプト
 	let strCSScript = url_params.get('cs');
 	
-	//
+	//取得した文字列からパラメータに落とし込む
 	//置き換えのパターン、数字以外は半角0に置き換える
 	const pattern = "[^0-9]/g";
+	
+	//拍子
 	//btが指定されていないときはデフォルト値
 	if (strBeat === null) {
-		Beat = Beat0
+		Beat = Beat0;
 	} else {
 		Beat = parseInt(strBeat.replace(pattern, '0'));
-		beatStr = B2BeatStr(Beat, 1);
 	}
+	beatStr = B2BeatStr(Beat, 1);
+	
+	//テンポ
 	//mmが指定されていないときはデフォルト値
 	if (strMM != null) {
 		MM = parseInt(strMM.replace(pattern, '0'));
 		BPM = toBPM(MM);
 	}
-	
-	//以下は設定パネルに反映
-	/*
-	//分割音
-	if(strDivSound === null){ndivSound = 1}else{		//ndivSoundが指定されていないときはデフォルト値
-		ndivSound = parseInt(strDivSound.replace(pattern,'0'));
-		if(ndivSound > 4) ndivSound = 4;
-		//設定パネルのラジオボタンchckedに反映
-		setRadioValue("dsradio", ndivSound);
-	}
-	//分割振り
-	if(strDivBeat === null){ndivBeat = 1}else{		//ndivBeatmが指定されていないときはデフォルト値
-		ndivBeat = parseInt(strDivBeat.replace(pattern,'0'));
-		if(ndivBeat > 3)ndivBeat = 3;
-		//設定パネルのラジオボタンchckedに反映
-		setRadioValue("dbradio", ndivBeat);
-		//新パラメータに反映
-		beatStr = B2BeatStr(Beat, ndivBeat);
-		motionType = 1;
-	}
-	*/
-	//新パラメータに反映
-	//敢えてこの段階で反映しなくても大丈夫か？
-	//beatStr = B2BeatStr(Beat, ndivBeat);
-	
-	//サウンドON/OFF
+
+	//クリックサウンドON/OFF
 	let fl;
 	if (strSFlag === null) {
 		f_sound = true
 	} else {
-		//ndivSoundが指定されていないときはデフォルト値
 		if (parseInt(strSFlag) == 1) {
 			f_sound = true;
 			fl = 1;
 			clickType = ndivSound;
-			//新パラメータに反映
 		} else {
 			f_sound = false;
 			fl = 0;
 			clickType = 0;
-			//新パラメータに反映
 		}
 		//設定パネルのラジオボタンchckedに反映
 		console.log(`*****clickType=${clickType}`);
@@ -2129,11 +2103,8 @@ isPC = chkIfPC();  //PCかスマホかの判定
 //画面サイズ確定
 resizeCanvas();
 
-/***********************************
-        Wake Lock関連　
-参考https://github.com/mdn/dom-examples/blob/main/screen-wake-lock-api/script.js
-*/
-
+//**********Wake Lock関連　*******************
+//参考https://github.com/mdn/dom-examples/blob/main/screen-wake-lock-api/script.js
 // test support
 let isSupported = false;
 
@@ -2147,17 +2118,14 @@ if ('wakeLock'in navigator) {
 let requestWakeLock = null;
 let wakeLock = null;
 
+// create a reference for the wake lock
 if (isSupported) {
-	// create a reference for the wake lock
-
 	console.log('const requestWakeLock()');
 	// create an async function to request a wake lock
 	requestWakeLock = async () => {
 		try {
 			wakeLock = await navigator.wakeLock.request('screen');
-
 			dispMsg('<< Wake Lock is active.>>', 3000);
-
 			// listen for our release event
 			wakeLock.onrelease = function(ev) {
 				console.log(ev);
@@ -2177,9 +2145,8 @@ if (isSupported) {
 			dispMsg('Wake Lock request failed.', 3000);
 		}
 	}
-	// requestWakeLock()
 }
-
+//他のアプリなどから戻って再表示されたときの処理
 const handleVisibilityChange = () => {
 	if (wakeLock !== null && document.visibilityState === 'visible') {
 		requestWakeLock();
@@ -2191,6 +2158,7 @@ const handleVisibilityChange = () => {
 //デフォルトモード、パラメータの設定
 //両モードのデフォルトパラメータの設定
 setDefaultPara();  //モード切替用push,pull配列に入れる
+//デフォルトはノーマルモード
 isNormalMode = true;
 pullPara(0);  //ノーマルモードのデフォルト値をグローバル変数にセット
 isNormalBeat = true;
