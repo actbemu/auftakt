@@ -12,14 +12,31 @@ ADモードに実装する
 2025/08/06 20:26　基本動作、一発で所望の動作確認できた。
 --
 バグ？
-デバッグ用パラメータ一覧にクリックサウンドスクリプトが空文字のまま
-初回起動待機時、マウスクリックが反応しないことが多い
-常にmousemoveイベント処理が実行される。
+常にmousemoveイベント処理が実行される。←仕方がない。余計な処理を実行しないように配慮する。
+★クリックスクリプトモードのとき、拍点検出後にその拍点から予約しているために、Click timing をeraly側にすると
+拍点の音が鳴らなくなる。
+→予約のタイミングを、拍点よりも手前で行う必要がある。予約のタイムスタンプはclickDelayに応じて変化させる必要がある。
+拍点検出の他に、予約タイミング検出を付ける必要がある。
+この対応を行う際に、将来のスクリプトの開始拍も設定できるようにする。
+ボール打ち上げの開始時刻と拍スクリプトの先頭の予約時刻を指定すれば良い。
+スクリプトでの予約は、拍点検出というよりも、先頭予約時刻（clickDelayも加味した時刻）のわずかに手前を検出するという考え方にする。
+
+検討事項
+・setTempo テンポ変更の反映。次のサウンドの予約開始タイムスタンプの変更も含める。
+→実際の発音は、テンポ変更前の予約音の再生が終わってからになる。現行の拍点での予約から前倒しにするだけで良いだろう。
+
+・metroStart()→metroStart(開始拍)
+開始拍の指定は良いが、ユーザインタフェースが問題。設定シートでわざわざ設定するのか。
+→スクリプトの埋込コマンドで開始拍を指定できるようにする。ex.《b4 1_/_21》 
+当面、アウフタクトがあっても、繰り返すときにはアウフタクトも小節内の一つの音価に含まれてしまい区別できなくなるので、あまり関係ないのかもしれない。
+
+
+
 */
 
 //■■■■■■■ 定数・変数宣言、定義 ■■■■■■
 //----- グローバル変数の宣言・定義 -----------------
-const DEBUG = true;  //デバグ用 主にconsole表示 
+const DEBUG = false;  //デバグ用 主にconsole表示 
 var no_of_draw = 0;  //描画カウンタ
 
 //公開URL　　QRコード出力で使用
@@ -217,19 +234,19 @@ let xxU, xxD;	//跳ね上げ点と着地点のx座標
 let Beat_idx = 0;	//拍位置のインデクス
 const divHrate = 0.75	//分割振りの高さ比率(0.6～0.75)
 
-//Beat Sound タイミング調整
-let ary_sdelay = new Array(160,120,80,0,-50,-100,-200);	//設定パネル、ラジオボタン設定値割り付け
-let sdelay_idx = 3;
-let sdelay = 0;	//サウンドタイミング調整用[msec]
+//クリック音 タイミング調整
+let ary_clickDelay = new Array(160,120,80,0,-50,-100,-200);	//設定パネル、ラジオボタン設定値割り付け
+let clickDelay_idx = 3;
+let clickDelay = 0;	//サウンドタイミング調整用[msec]
 
-//■Click Sound Script関連2025/08/06 15:46
+//■Click Sound Script クリックサウンドスクリプト関連2025/08/06 15:46
 let isCSStr = false;  // Click Sound Scriptモードのフラグ
 let csScript = '1111';  //設定スクリプト
 let aryCT = [];  //クリックタイミングの配列
 let aryCT_idx = 0;  //配列のインデクス
 let click_time = 0;  //配列の値(次の音までの間隔、単位音価に対する倍数)
 let unit_note_value;  // 単位音価の実時間[msec] ←bpm2msecの値と同じ？
-let lastCTTimestamp;  //直前の一括予約の最後の予約時刻
+let lastCTTimestamp = 0;  //直前の一括予約の最後の予約時刻
 
 //■■■■■■■ 関数 ■■■■■■
 
@@ -877,8 +894,8 @@ function dispShareSheet() {
 		txt += '&mt=' + motionType;
 	if (clickType != 1)
 		txt += '&ct=' + clickType;
-	if (sdelay_idx != 3) {
-		txt += "&bst=" + sdelay_idx;
+	if (clickDelay_idx != 3) {
+		txt += "&bst=" + clickDelay_idx;
 	}
 	if(clickType ==9){
 		txt += "&cs=" + elCTScript.value;
@@ -909,7 +926,7 @@ function drawMark() {
 	flying_time = downBeatTimeStamp - upBeatTimeStamp;
 	//これだと正常動作？
 	//正規化時刻と座標	
-	const t = (currentTimeStamp() - upBeatTimeStamp + sdelay) / flying_time;
+	const t = (currentTimeStamp() - upBeatTimeStamp + clickDelay) / flying_time;
 	//★要確認
 	const y = -4 * t * (t - 1);
 
@@ -936,11 +953,21 @@ function drawMark() {
 	//■次の描画の予約（お決まりの手続き）
 	rafBall = window.requestAnimationFrame(drawMark);
 
+	//CSSクリックサウンドスクリプトの予約処理
+	//サウンド予約開始タイムスタンプ
+	let rsvTS = downBeatTimeStamp + clickDelay;
+	//一括予約呼び出しタイミングマージン[msec]
+	const rsvTS_margin = 40;
+	//console.log(`    ${rsvTS}`);
+	if(clickType == 9 && (exBeat_idx == upB.length - 1) && (rsvTS - currentTimeStamp()) < rsvTS_margin){
+		console.log(`  ★一括予約タイミングチェック  clickDelay:${clickDelay}  rsvTS:${rsvTS}  rsvTS_margin:${rsvTS_margin}`);
+				rsvByCTarray(rsvTS);
+	}
 	//拍点処理
 	//現在時刻が着地点の拍点タイプスタンプの手前8msecを切ったら拍点とみなす
-	//if (currentTimeStamp() - downBeatTimeStamp + sdelay >= -8) {
+	//if (currentTimeStamp() - downBeatTimeStamp + clickDelay >= -8) {
 	//現在時刻が着地点の拍点タイプスタンプ以上になったら拍点とみなす
-	if (currentTimeStamp() - downBeatTimeStamp + sdelay >= 0) {
+	if (currentTimeStamp() - downBeatTimeStamp >= 0) {
 		//拍点検出
 		//拍子拍点か判別
 		if (maxHeight.length == 1) {
@@ -988,7 +1015,7 @@ function drawMark() {
 			//★★本来の拍点処理ここから
 			//この拍点が配列の最後の拍点かをチェック
 			let isLastBeat = false;
-			if(exBeat_idx == (upB.length - 1)) isLastBeat = true;
+			if(exBeat_idx == (upB.length - 1)) isLastBeat = true;  //isLastBeatは未使用か？
 			//インデクス更新　インデクス更新はここに移動2025
 			exBeat_idx++;
 			if (exBeat_idx >= upB.length)
@@ -1030,10 +1057,10 @@ function drawMark() {
 			}
 			//クリックサウンドスクリプトによる一括予約
 			//第1拍(exBeat_idx == 0)の拍点処理で一括予約
-			//一括予約
-			if(clickType == 9 && isBeatPoint && exBeat_idx == 0){
-				rsvByCTarray(upBeatTimeStamp);
-			}
+			//一括予約2025/08/14拍点よりも手前で予約するように変更。この関数のはじめの方
+			//if(clickType == 9 && isBeatPoint && exBeat_idx == 0){
+			//	rsvByCTarray(upBeatTimeStamp);
+			//}
 		}
 
 	}
@@ -1152,15 +1179,15 @@ function metroStart() {
 	//★こうすれば変拍子のときも対応可能？
 	//拍子拍点クリック音予約
 	if (clickType > 0 && clickType <= 5) rsvClickSound(0, nextClickTimeStamp);
-	//クリックサウンドスクリプト対応(clickTypeが9のとき)
+	//CSSクリックサウンドスクリプト対応(clickTypeが9のとき)
 	if(clickType == 9){
 		//スクリプトをテキストボックスから読み取って★配列作成★
 		//配列作成するのはこのmetrostartのタイミングだけ。
-		let cs_String = elCTScript.value;
-		console.log(`クリックスクリプト cs_String:${cs_String}`)
+		//let cs_String = elCTScript.value;
+		if(DEBUG) console.log(`クリックスクリプト :《${elCTScript.value}》`)
 		makeClickTimingArray(beatStr, elCTScript.value);
 		//aryCTに基づいて一括サウンド予約
-		rsvByCTarray(nextClickTimeStamp);
+		rsvByCTarray(nextClickTimeStamp + clickDelay);
 	}
 	
 	//次の着地点のタイムスタンプ
@@ -1197,21 +1224,23 @@ function metroStop() {
 //   soundtype:サウンドの種類 1のとき分割音
 //   timestamp:鳴らす時刻タイムスタンプ[msec]
 function rsvClickSound(soundtype, timestamp) {
-	let gain0 = 1;
-	//初期ゲイン
-	let len = 0.03;
+	let gain0 = soundtype == 0? 1: 0.5;
+	let len = soundtype == 0?0.03: 0.03 / 2;
 	//音の減衰長さ
 	//分割音（soundtypeが1のとき）のパラメータ調整
+	/*
 	if (soundtype == 1) {
 		gain0 = 0.5;
 		len *= 0.5
 	}
-	const nextClickTime = timeStampToAudioContextTime(timestamp);
-	console.log(`@rsvClickSound   for ${nextClickTime}sec (timestamp=${timestamp}) `);
-	gain.gain.setValueAtTime(gain0, nextClickTime);
-	//sdelayはボールの座標計算で使うように変更
-	gain.gain.linearRampToValueAtTime(0, nextClickTime + len);
-	//sdelayはボールの座標計算で使うように変更
+	*/
+	
+	const next_click_time = timeStampToAudioContextTime(timestamp);
+	console.log(`@rsvClickSound   for ${next_click_time}sec (timestamp=${timestamp}) `);
+	gain.gain.setValueAtTime(gain0, next_click_time);
+	//clickDelayはボールの座標計算で使うように変更
+	gain.gain.linearRampToValueAtTime(0, next_click_time + len);
+	//clickDelayはボールの座標計算で使うように変更
 }
 
 //指定したDOM要素を長押しかどうかを判別して指定した関数に振り分ける=====================
@@ -1717,9 +1746,9 @@ function getURLPara(url) {
 		if (fl < 0 || fl > 6)
 			fl = 3;
 		//範囲外のときは、時間差０に設定
-		//sdelay = ary_sdelay[fl] / 1000;
-		sdelay = ary_sdelay[fl];
-		sdelay_idx = fl;
+		//clickDelay = ary_clickDelay[fl] / 1000;
+		clickDelay = ary_clickDelay[fl];
+		clickDelay_idx = fl;
 		//設定パネルのラジオボタンchckedに反映
 		setRadioValue("radiotiming", fl);
 	}
@@ -2384,8 +2413,8 @@ elRadioTiming.forEach(function(radioButton) {
 		// 選択されているラジオボタンの値を取得
 		// this.checked は、イベントが発生したラジオボタンがチェックされているかを示す
 		if (this.checked) {
-			sdelay_idx = this.value;
-			sdelay = ary_sdelay[sdelay_idx];
+			clickDelay_idx = this.value;
+			clickDelay = ary_clickDelay[clickDelay_idx];
 		}
 	});
 });
