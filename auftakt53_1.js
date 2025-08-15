@@ -6,15 +6,17 @@
 ADモードに実装する
 
 記録↓
+2025/08/14 1９:30 タイミング調整周りの詰め
 2025/08/14 14:30 変数名の整理
 2025/08/13 13:30 細かいバグ潰し
 2025/08/13 11:40 初期化ルーチン整理
 2025/08/08 20:32　埋め込みコマンドで任意のn連符、またしても一発で実装できた。
 2025/08/06 20:26　基本動作、一発で所望の動作確認できた。
 --
-バグ？
-delayを大きくすると、着地点の手前でボールが消えてしまう。
-ボレロの２小節目の最後の音が余計に鳴る？
+バグ
+マウスドラッグのとき、メイン画面の外でmouseupすると、mousedownが解除されず
+ホバリングでもテンポが変わってしまう。→タイマーでmousedownをfalseにする
+			
 
 ★DEBUG=trueのままだと、ノーマルモードでもスクリプトが再生されてしまうので注意。
 常にmousemoveイベント処理が実行される。←仕方がない。余計な処理を実行しないように配慮する。
@@ -686,6 +688,8 @@ function mcMouseDown(event) {
 		}
 	}
 	, 600);
+	//メインキャンバスの外でmouse_upとなった場合の対策
+	timer2 = setTimeout( () => {f_mousedown = false;}, 2000);
 }
 
 //スワイプ動作時の処理-----------------------------------------------------
@@ -933,7 +937,7 @@ function drawMark() {
 	const t = (currentTimeStamp() - upBeatTimeStamp) / flying_time;
 	//★要確認
 	const y = -4 * t * (t - 1);
-
+	
 	//console.log(x + " " + y);
 	let maxH = (cvMain.height - 2.5 * ball_height);  //テンポ表示部分を割り引く
 	maxH = maxH * maxHeight0;  //分割拍の高さmaxHeight0
@@ -947,8 +951,10 @@ function drawMark() {
 
 	//maxHをグローバル変数に保存
 	maxH0 = maxH;
-	//ボールを表示
-	drawBall(xxU + t * (xxD - xxU), (cvMain.height - 0.5 * ball_height) - y * maxH);
+	//ボールを表示  地平線からのめり込むような場合は表示しない
+	if(y>=-0.05){
+		drawBall(xxU + t * (xxD - xxU), (cvMain.height - 0.5 * ball_height) - y * maxH);
+	}
 	noOfDraw++;  //デバグ用描画数カウンタ
 
 	//３連符(0.88888)、１６分音符(0.75)のライン描画
