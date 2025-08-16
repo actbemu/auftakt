@@ -2288,7 +2288,7 @@ if(chkIfPC()){
 	cvMain.addEventListener('touchmove', mcMove);
 	cvMain.addEventListener('touchend', mcMouseUp);
 	//タッピング
-	//elTap.addEventListener('touchstart', Tapping);
+	elTap.addEventListener('touchstart', Tapping);
 
 }
 //----テンポUP/Downボタンをタップ/長押ししたときの処理
