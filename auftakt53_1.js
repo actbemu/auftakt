@@ -14,6 +14,9 @@ ADモードに実装する
 2025/08/06 20:26　基本動作、一発で所望の動作確認できた。
 --
 バグ
+Tappingでの移動平均をちゃんと求めていなかった。
+
+
 マウスドラッグのとき、メイン画面の外でmouseupすると、mousedownが解除されず
 ホバリングでもテンポが変わってしまう。→タイマーでmousedownをfalseにする
 			
@@ -226,12 +229,12 @@ let isBeatPoint = true;	//分割振りで拍子拍点か否かを判別するた
 
 
 //タッピングテンポ設定関連
-let tp0 = performance.now();	//前回タップの時刻
-let tap_av_n = 3;	//タッピング移動平均の個数（3～4）
-let arrTap = new Array(tap_av_n);
-let seq_count = 0;	//タッピングで有効と判定された連続回数
-let sum0 = 0;	//移動平均の回数に満たないときに平均を求めるための合計値
-let sum = 0;	//移動平均算出用合計値
+let prevTap = performance.now();	//前回タップの時刻
+let nTapAv = 4;	//タッピング移動平均の個数（3～4）
+let arrTap = new Array(nTapAv);
+let countSeqTap = 0;	//タッピングで有効と判定された連続回数
+let sumTap0 = 0;	//移動平均の回数に満たないときに平均を求めるための合計値
+let sumTap = 0;	//移動平均算出用合計値
 
 //レイアウト関連（動指標動作範囲など）
 let xx0;	//1拍目のx座標
@@ -546,47 +549,54 @@ function dispADSetting() {
 }
 
 
-//TAPボタンタップの処理----------------------------------------------------
+//TAPボタンタップの処理（新）----------------------------------------------------
 function Tapping() {
-	let i;
 	let tp1 = performance.now();
-	let tp10 = tp1 - tp0;  //2点間の時間msec
-	let av;
-	let mm0;
-
-	if (tp10 <= 2000) {
-		//２秒以内に次のタップがあったとき、タッピングしているとみなす
-		arrTap.push(tp10);
-		arrTap.shift();
-		seq_count++;  	//連続タップしている回数（初期値は0）
-		if (seq_count < tap_av_n) {
-			sum0 += tp10;
-			av = sum0 / seq_count;
-		} else if (seq_count >= tap_av_n) {
-			//この時点で配列が満たされているはず
-			//平均値を計算
-			sum = 0;
-			for (i = 0; i < tap_av_n; i++) {
-				sum += arrTap[i];
-			}
-			av = sum / tap_av_n;
-		}
-		mm0 = 60000 / av;
-		mm0 = Math.round(mm0);  //整数値に
-		if(tempoType == 0){
-			MM = mm0;
-			BPM = toBPM(MM);
-		}else{
-			BPM = mm0;
-			MM = toMM(BPM);
-		}
-		setTempo();
-	} else {
-		seq_count = 0;
-		//１回でも間隔が開いたらリセット
-		sum0 = 0;
+	let tp10 = tp1 - prevTap;
+	let sum = 0;
+	let av = 0;
+	//前回より２秒以上離れていたら、配列をクリア
+	if(tp10 >= 2000){
+		arrTap.length = 0;
+		arrTap_idx = 0;
+		//arrTap.push(tp10);
+		prevTap = tp1;
+		//console.log('TAPing 初期化');
+		return;
 	}
-	tp0 = tp1;
+	//前回より２秒に満たないうちのタップは(タンピングとみなし)、tp10を配列末尾に追加pushする。
+	arrTap.push(tp10);
+	prevTap = tp1;
+	//配列のサイズがnTapAvに満たないうちは、配列の全体の平均を求め、BPMを算出する。 
+	if(arrTap.length < nTapAv){
+		sum = arrTap .reduce(function (acc, cur) {
+		  return acc + cur;
+		});
+		av = sum / arrTap.length;
+		//console.log(`△length:${arrTap.length}　　av:${av} `);
+
+	}else{
+	//配列のサイズがnTapAv以上の場合は、n番からn+nTapAv-1番までの平均を求める。
+		sum = 0;
+		for (let i  = arrTap_idx; i  < arrTap_idx + nTapAv; i++){
+			sum += arrTap[arrTap_idx];
+		}
+		av = sum / nTapAv ; 
+		arrTap_idx++;
+		//console.log(`△△length:${nTapAv}　　av:${av} 　idx:${arrTap_idx}`);
+
+	}
+	//BPMに変換してsetTempo
+	mm0 = Math.round(60000 / av);  //整数値に
+	//console.log(`▼TAP! tp10:${tp10} length:${arrTap.length}  mm0:${mm0}`);
+	if(tempoType == 0){
+		MM = mm0;
+		BPM = toBPM(MM);
+	}else{
+		BPM = mm0;
+		MM = toMM(BPM);
+	}
+	setTempo();
 }
 
 //キャンバススワイプでテンポ増減===================================
@@ -1801,7 +1811,7 @@ function getURLPara(url) {
 	//このパラメータが指定されていたら必ずスクリプトモードにする
 	//すなわち、clickType = 9;isNormalMode = false;
 	if(DEBUG){console.log(`《${str_cs}》`)}
-	if(str_cs.length > 0){
+	if(str_cs){
 		clickType = 9;
 		isNormalMode = false;
 		csScript = str_cs;
@@ -2257,7 +2267,6 @@ cvMain.addEventListener('mouseup', mcMouseUp);
 //タッピングボタン
 //elTap.addEventListener('click', Tapping);
 //elTap.addEventListener('touchstart', Tapping);
-elTap.addEventListener('mousedown', Tapping);
 
 //isPC = chkIfPC();  //PCかスマホかの判定
 //isPC = true;  //判定がうまくいかないので強制的にPCにするときは、コメントを外す。
@@ -2268,7 +2277,9 @@ if(chkIfPC()){
 	cvMain.addEventListener('mousemove', mcMouseMove);
 	cvMain.addEventListener('mouseup', mcMouseUp);
 	//タッピング
-	elTap.addEventListener('pointerdown', Tapping);
+	//elTap.addEventListener('pointerdown', Tapping);
+	elTap.addEventListener('mousedown', Tapping);
+
 
 }else{
 	//スマホ、タブレット用イベントリスナー
