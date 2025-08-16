@@ -6,6 +6,7 @@
 ADモードに実装する
 
 記録↓
+2025/08/16 21:07 タッピングアルゴリズム変更（スマホでイベントキャッチしていない？）
 2025/08/14 1９:30 タイミング調整周りの詰め
 2025/08/14 14:30 変数名の整理
 2025/08/13 13:30 細かいバグ潰し
@@ -226,15 +227,11 @@ let ndivBeat = 1;	//分割振り（1～３）設定パネルでの設定値
 //let divBeat_idx =0;	//一拍内の分割振りインデクス
 let isBeatPoint = true;	//分割振りで拍子拍点か否かを判別するため
 
-
-
 //タッピングテンポ設定関連
 let prevTap = performance.now();	//前回タップの時刻
 let nTapAv = 4;	//タッピング移動平均の個数（3～4）
 let arrTap = new Array(nTapAv);
-let countSeqTap = 0;	//タッピングで有効と判定された連続回数
-let sumTap0 = 0;	//移動平均の回数に満たないときに平均を求めるための合計値
-let sumTap = 0;	//移動平均算出用合計値
+let arrTap_idx = 0;
 
 //レイアウト関連（動指標動作範囲など）
 let xx0;	//1拍目のx座標
@@ -244,7 +241,7 @@ let Beat_idx = 0;	//拍位置のインデクス
 const divHrate = 0.75	//分割振りの高さ比率(0.6～0.75)
 
 //クリック音 タイミング調整
-let ary_clickDelay = new Array(160,120,80,0,-50,-100,-200);	//設定パネル、ラジオボタン設定値割り付け
+let ary_clickDelay = new Array(160,120,80,0,-50,-100,-200);	//設定パネル、ラジオボタン設定値割り付け[msec]
 let clickDelay_idx = 3;
 let clickDelay = 0;	//サウンドタイミング調整用[msec]
 
@@ -550,6 +547,7 @@ function dispADSetting() {
 
 
 //TAPボタンタップの処理（新）----------------------------------------------------
+//タップのたびに呼ばれる
 function Tapping() {
 	let tp1 = performance.now();
 	let tp10 = tp1 - prevTap;
