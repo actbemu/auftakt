@@ -6,6 +6,7 @@
 ADモードに実装する
 
 記録↓
+2025/08/17 URLパラメータの取得の処理の統一化。検討
 2025/08/16 21:07 タッピングアルゴリズム変更（スマホでイベントキャッチしていない？）
 2025/08/14 1９:30 タイミング調整周りの詰め
 2025/08/14 14:30 変数名の整理
@@ -1691,7 +1692,7 @@ function getURLPara(url) {
 	let str_mm = url_params.get('mm');
 	//拍子構成文字列(1～3)
 	let str_ex_beat = url_params.get('exb');
-	//以下は０も含むので注意
+	//以下は０も含むもの
 	//サウンドON/OFF(0/1)
 	let str_bs = url_params.get('bs');
 	//サウンドタイミング調整(0～6)7段階
@@ -1706,31 +1707,31 @@ function getURLPara(url) {
 	let str_cs = url_params.get('cs');
 	
 	//取得した文字列からパラメータに落とし込む
-	//置き換えのパターン、数字以外は半角0に置き換える
+	//置き換えのパターン、数字以外は削除（''に置き換える）
 	const pattern = "[^0-9]/g";
 	
 	//拍子
-	//btが指定されていないときはデフォルト値
-	if (str_beat === null) {
-		Beat = Beat0;
-	} else {
-		Beat = parseInt(str_beat.replace(pattern, '0'));
+	if (str_beat){
+		Beat = parseInt(str_beat.replace(pattern, ''));
+		if(Beat > 0 && Beat <= 6){
+			Beat = Beat0;
+		}
+		beatStr = B2BeatStr(Beat, 1);
 	}
-	beatStr = B2BeatStr(Beat, 1);
-	
 	//テンポ
-	//mmが指定されていないときはデフォルト値
-	if (str_mm != null) {
-		MM = parseInt(str_mm.replace(pattern, '0'));
-		BPM = toBPM(MM);
+	if (str_mm) {
+		MM = parseInt(str_mm.replace(pattern, ''));
+		if(MM){ BPM = toBPM(MM);}
+		else{
+			MM = MM0;
+			BPM = toBPM(MM);
+		}
 	}
 
-	//クリックサウンドON/OFF
+	//クリックサウンドON/OFF(非推奨)
 	let fl;
-	if (str_bs === null) {
-		f_sound = true
-	} else {
-		if (parseInt(str_bs) == 1) {
+	if (str_bs){
+		if (parseInt(str_bs.replace(pattern, '')) == 1) {
 			f_sound = true;
 			fl = 1;
 			clickType = ndivSound;
@@ -1744,79 +1745,75 @@ function getURLPara(url) {
 		setRadioValue("radiosound", fl);
 	}
 	//サウンドタイミング
-	if (str_bst === null) {
-		fl = 3;
-	} else {
+	if (str_bst) {
 		//ndivSoundが指定されていないときはデフォルト値
 		fl = parseInt(str_bst);
-		if (fl < 0 || fl > 6)
-			fl = 3;
 		//範囲外のときは、時間差０に設定
+		if (fl < 0 || fl > 6)fl = 3;
 		//clickDelay = ary_clickDelay[fl] / 1000;
 		clickDelay = ary_clickDelay[fl];
 		clickDelay_idx = fl;
-		//設定パネルのラジオボタンchckedに反映
-		setRadioValue("radiotiming", fl);
+	}else{
+		fl = 3;
 	}
+	//設定パネルのラジオボタンchckedに反映
+	setRadioValue("radiotiming", fl);
+
 	//待ち時間
-	if (str_waiting === null) {
-		start_wait = 0
-	} else {
-		//start_waitが指定されていないときはデフォルト値
+	if (str_waiting){
 		start_wait = parseInt(str_waiting.replace(pattern, '0'));
 		if (start_wait > 2)
 			start_wait = 2;
-		//設定パネルのラジオボタンchckedに反映
-		setRadioValue("waitingtime", start_wait);
+	}else{
+		start_wait = 0;
 	}
+	//設定パネルのラジオボタンchckedに反映
+	setRadioValue("waitingtime", start_wait);
+
 	//動きのタイプ
-	if (str_motion_type === null) {
-		motionType = 0
-	} else {
+	if (str_motion_type) {
 		//motion_typeが指定されていないときはデフォルト値
-		motionType = parseInt(str_motion_type.replace(pattern, '0'));
-		if (motionType > 1)
-			start_wait = 1;
-		//設定パネルのラジオボタンchckedに反映
-		setRadioValue("motion_type", motionType);
+		motionType = parseInt(str_motion_type.replace(pattern, ''));
+		if (motionType > 1) motionType = 1;
 	}
+	//設定パネルのラジオボタンchckedに反映
+	setRadioValue("motion_type", motionType);
+	
 	//クリックサウンドの鳴らし方
-	if (str_click_type === null) {
-		clickType = 1
-	} else {
-		//click_typeが指定されていないときはデフォルト値
+	if (str_click_type){
 		clickType = parseInt(str_click_type.replace(pattern, '0'));
-		if (clickType > 5)
-			clickType = 5;
+		clickType = clickType <= 5? clickType: 5;
 		//設定パネルのラジオボタンchckedに反映
 		setRadioValue("click_type", clickType);
 	}
+
+	
 	//拍子構成文字列str_ex_beat
-	if (DEBUG)
-		console.log(`URL指定の拍子構成文字列【${str_ex_beat}】`);
 	if (str_ex_beat) {
-		let check_result = str_ex_beat.match(/^[1-9]+$/);
+		//let check_result = str_ex_beat.match(/^[1-9]+$/);
+		//1-9以外の文字が混じっていたら処理しない
 		if (str_ex_beat.match(/^[1-9]+$/)) {
-			//1-9以外の文字が混じっていたらエラー
-			elBeatStr.value = str_ex_beat;
+			if (DEBUG) console.log(`URL指定の拍子構成文字列【${str_ex_beat}】`);
 			beatStr = str_ex_beat;
+			//設定パネルのテキストボックスに反映
+			elBeatStr.value = str_ex_beat;
+			//このパラメータが指定されていたら必ずADモードで起動
+			isNormalMode = false;
 		}
-		//このパラメータが指定されていたら必ずADモードで起動
-		isNormalMode = false;
 	}
 	
 	//クリックサウンドスクリプト
 	//このパラメータが指定されていたら必ずスクリプトモードにする
 	//すなわち、clickType = 9;isNormalMode = false;
-	if(DEBUG){console.log(`《${str_cs}》`)}
 	if(str_cs){
+		if(DEBUG){console.log(`《${str_cs}》`)}
+		str_cs = str_cs.replace(/[^0-9 \(\)\{\}\[\]\/\.\_]/g,'');
 		clickType = 9;
 		isNormalMode = false;
 		csScript = str_cs;
 		elCTScript.value = str_cs;
 	}
-	
-	
+		
 	f_sound = clickType > 0 ? true : false;
 
 	//対応するモードのPULL用配列に格納
@@ -2701,7 +2698,11 @@ if(DEBUG){
 	
 	//
 	showCurrentParm('初期化すべて終了後のパラメータ');
-
+	console.log(`■■■■正規表現置き換えのテスト クリックサウンドスクリプト用■■■■`);
+	let test_str = '111 / (22121)0101 　/ [111]1101 / {5. 11111} ,?sdf あいも';
+	console.log(`変換前■■■■${test_str}■■■■`);
+	console.log(`変換後◆◆◆◆${test_str.replace(/[^0-9 \(\)\{\}\[\]\/\.\_]/g,'')}◆◆◆◆`);
+	
 
 }  //end of if(DEBUG)
 showCurrentParm('初期化すべて終了後のパラメータ');
