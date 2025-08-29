@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<!-- ver.2　Rev.5 QRコード画面、ボタン画像ではなくCSSで対応-->
+<!-- ver.3　Rev.1-->
     <meta charset="utf-8">
 	<meta name="keywords" content="Metrononme, Auftakt">
     <link rel="stylesheet" href="./css/style_at5.css">
@@ -19,7 +19,7 @@
 	<link rel="shortcut icon" href="./favicon.ico">
      <link rel="icon" href="./favicon.ico">
 -->
-<title>Metronome: Auftakt 5 ver.2 Rev.6</title>
+<title>Metronome: Auftakt 5 ver.3 Rev.1</title>
 </head>
 <body>
 
@@ -31,7 +31,7 @@
 <!--	<div class="wrapper"> -->
 	<!-- メッセージボックス -->
 			<div id="msgbox">
-				Metronome： Auftakt5 Ver.2R6 @K. Kimura
+				Metronome: Auftakt5 Ver.3.1 @K. Kimura 2025
 			</div>
 <!--	</div> -->
 
@@ -132,7 +132,7 @@
 
     </div>  <!--  設定画面ここまで  -->
 
-    <!-- QRコード表示パネル -->
+    <!-- QRコード表示(Share)パネル -->
 	<div id="QRsheet">
 		<div class="titlebar">
 			<div  class="sheet_title">
@@ -176,14 +176,14 @@
 
 		</div>
 		
-		<br>
+		</br>
 		<div>
 		◆Measure Structure<br>
 		<div class="form1">
-		<input id="ex_beat_str" type="text" maxlength="30"  size="10" value="1111">
+		<input id="ex_beat_str" type="text" maxlength="40"  size="10" value="332">
 		</div>
-		</div>
-	</br>
+		
+		
 		<div>
 		◆Motion</br>
 			<div class="form1">
@@ -191,21 +191,24 @@
 			<input type="radio" name="motion_type" value="1" />Note
 			</div>
 		</div>
-	</br>
+	
 		<div>
 		◆Click Sound<br>
 			<div class="form1">
-			<input type="radio" name="click_type" value="0"  />None</br>
-			<input type="radio" name="click_type" value="1" checked/>Beat
-			<div class="foram2" id="normal_beat_division">
-				&nbsp;&nbsp;&nbsp;<input type="radio" name="click_type" value="2" />1/2&nbsp;
-				<input type="radio" name="click_type" value="3" />1/3&nbsp;
-				<input type="radio" name="click_type" value="4" />1/4
+				<input type="radio" name="click_type" value="0"  />None</br>
+				<input type="radio" name="click_type" value="1" checked/>Beat
+				<div class="form2" id="normal_beat_division">
+					&nbsp;&nbsp;&nbsp;<input type="radio" name="click_type" value="2" />1/2&nbsp;
+					<input type="radio" name="click_type" value="3" />1/3&nbsp;
+					<input type="radio" name="click_type" value="4" />1/4
 				</div>
-			<input type="radio" name="click_type" value="5" />Note
-			</div>
+				<input type="radio" name="click_type" value="5" />Note<br>
+				<input type="radio" name="click_type" value="9" />Script<br>
+				<input id="cs_str" type="text" maxlength="100"  size="8" value="">
 		</div>
-	</br>
+		</div>
+		</div>
+	
 		<div align="right">
 			<span class="btn" id="btn_share1">Share</span>
 		</div>
@@ -281,4 +284,3 @@
 	
 </body>
 </html>
-
