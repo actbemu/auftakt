@@ -977,9 +977,9 @@ function drawMark() {
 	let rsvTS = downBeatTimeStamp + clickDelay;
 	//一括予約呼び出しタイミングマージン[msec]
 	const rsvTS_margin = 200;
-	console.log(`    ${rsvTS}  clickDelay:${clickDelay}`);
+	//console.log(`    ${rsvTS}  clickDelay:${clickDelay}`);
 	if(clickType == 9 && (exBeat_idx == b_upB.length - 1) && (rsvTS - currentTimeStamp()) < rsvTS_margin){
-		console.log(`  ★一括予約タイミングチェック  clickDelay:${clickDelay}  rsvTS:${rsvTS}  rsvTS_margin:${rsvTS_margin}`);
+		//console.log(`  ★一括予約タイミングチェック  clickDelay:${clickDelay}  rsvTS:${rsvTS}  rsvTS_margin:${rsvTS_margin}`);
 				rsvByCTarray(rsvTS);
 	}
 	//拍点処理
@@ -1245,7 +1245,7 @@ function rsvClickSound(soundtype, timestamp) {
 	*/
 	
 	const next_click_time = timeStampToAudioContextTime(timestamp);
-	console.log(`@rsvClickSound   for ${next_click_time}sec (timestamp=${timestamp}) `);
+	//console.log(`@rsvClickSound   for ${next_click_time}sec (timestamp=${timestamp}) `);
 	gain.gain.setValueAtTime(gain0, next_click_time);
 	gain.gain.linearRampToValueAtTime(0, next_click_time + len);
 }
