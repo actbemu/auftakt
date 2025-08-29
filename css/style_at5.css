@@ -219,6 +219,7 @@ select{
     top:60px;
     left:5%;
     width:90%;
+	/*height:90%;*/
 	/*background:rgb(193 228 233 / 50%);   白藍*/
     background:rgb(176 223 210/75%);  /*   */
 	
@@ -241,6 +242,10 @@ select{
 
 #ex_beat_str{
 	font-size:5mm;
+		width: calc(100% - 2em);}
+#cs_str{
+	font-size:4mm;
+	width: calc(100% - 2em);
 }
 
 /*モード変更時のプロンプト*/
